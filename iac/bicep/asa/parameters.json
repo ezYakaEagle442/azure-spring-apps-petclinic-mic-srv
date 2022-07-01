@@ -1,0 +1,111 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "appName": {
+        "value": "petcliasa"
+      },
+      "location": {
+        "value": "centralindia"
+      },       
+      "AzureSpringAppsRp": {
+        "value": "d2531223-68f9-459e-b225-5592f90d145e"
+      },        
+      "kvName": {
+        "value": "kv-petcliasa-UNIQUEID42"
+      },
+      "kvRGName": {
+        "value": "rg-iac-kv"
+      },            
+      "publicNetworkAccess": {
+        "value": "enabled"
+      }, 
+      "kvSkuName": {
+        "value": "standard"
+      },         
+      "secretsObject": {
+        "value": {
+          "secrets": [
+            {
+              "secretName": "MYSQL-SERVER-NAME",
+              "secretValue": "petcliasa"
+            },
+            {
+              "secretName": "MYSQL-SERVER-FULL-NAME",
+              "secretValue": "petcliasa.mysql.database.azure.com"
+            },            
+            {
+              "secretName": "MYSQL-DATABASE-NAME",
+              "secretValue": "petclinic"
+            },
+            {
+              "secretName": "MYSQL-SERVER-ADMIN-NAME",
+              "secretValue": "mys_adm"
+            },
+            {
+              "secretName": "MYSQL-SERVER-ADMIN-LOGIN-NAME",
+              "secretValue": "mys_adm"
+            },            
+            {
+              "secretName": "MYSQL-SERVER-ADMIN-PASSWORD",
+              "secretValue": "IsTrator42!"
+            }                        
+          ]
+        }
+      },         
+      "administratorLogin": {
+        "value": "mys_adm"
+      },         
+      "administratorLoginPassword": {
+        "value": "IsTrator42!"
+      },
+      "clientIPAddress": {
+        "value": "xxx SET HERE YOUR WORKSTATION IP ADDRESS FOR DEV/TEST"
+      },
+      "startIpAddress": {
+        "value": "10.42.1.0"
+      },
+      "endIpAddress": {
+        "value": "10.42.1.15"
+      },
+      "vnetName": {
+        "value": "vnet-azure-spring-apps"
+      },
+      "vnetCidr": {
+        "value": "10.42.0.0/21"
+      },
+      "appSubnetCidr": {
+        "value": "10.42.1.0/28"
+      },
+      "serviceRuntimeSubnetCidr": {
+        "value": "10.42.2.0/28"
+      },
+      "serviceCidr": {
+        "value": "10.0.0.0/16,10.1.0.0/16,10.2.0.1/16"
+      },
+      "serviceRuntimeSubnetName": {
+        "value": "snet-svc-run"
+      },
+      "appSubnetName": {
+        "value": "snet-app"
+      },
+      "appNetworkResourceGroup": {
+        "value": "rg-asa-apps-petclinic"
+      } ,
+      "serviceRuntimeNetworkResourceGroup": {
+        "value": "rg-asa-svc-run-petclinic"
+      },
+      "AzureSpringAppsSkuCapacity": {
+        "value": 25
+      },
+      "AzureSpringAppsSkuName": {
+        "value": "S0"
+      },
+      "AzureSpringAppsTier": {
+        "value": "Standard"
+      },                   
+      "gitConfigURI": {
+        "value": "https://github.com/ezYakaEagle442/spring-petclinic-microservices-config"
+      }     
+    }
+  }
