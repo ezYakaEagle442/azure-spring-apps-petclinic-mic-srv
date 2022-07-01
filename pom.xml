@@ -76,6 +76,13 @@
             Azure Key Vault 
             https://microsoft.github.io/spring-cloud-azure/current/reference/html/appendix.html#migration-guide-for-4-0
             -->
+
+            <!-- https://stackoverflow.com/questions/20244696/could-not-resolve-placeholder-in-string-value -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-context</artifactId>
+            </dependency>
+                
             <dependency>
                 <groupId>com.azure.spring</groupId>
                 <artifactId>spring-cloud-azure-dependencies</artifactId>
@@ -246,10 +253,33 @@
                 <!-- Azure Key Vault : https://microsoft.github.io/spring-cloud-azure/docs/4.0.0-beta.2/reference/html/index.html#dependency-setup-3 
                 https://search.maven.org/search?q=a:spring-cloud-azure-starter-keyvault-secrets
                 -->
+
+                <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-dependencies</artifactId>
+                    <version>${spring-cloud.version}</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                </dependency>
+
+                <!-- https://stackoverflow.com/questions/20244696/could-not-resolve-placeholder-in-string-value -->
+                <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-context</artifactId>
+                </dependency>
+                    
+                <dependency>
+                    <groupId>com.azure.spring</groupId>
+                    <artifactId>spring-cloud-azure-dependencies</artifactId>
+                    <version>${spring-cloud-azure.version}</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                </dependency>
+
                 <dependency>
                     <groupId>com.azure.spring</groupId>
                     <artifactId>spring-cloud-azure-starter-keyvault-secrets</artifactId>
-                </dependency>
+                </dependency>	
 
             </dependencies>
         </profile>

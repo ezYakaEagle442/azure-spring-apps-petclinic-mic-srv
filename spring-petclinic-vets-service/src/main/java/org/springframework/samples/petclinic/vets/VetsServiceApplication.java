@@ -25,6 +25,7 @@ import java.net.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import org.springframework.beans.factory.annotation.Value;
 // import org.apache.commons.net.telnet.TelnetClient;
 
 /**
@@ -35,14 +36,30 @@ import java.io.InputStreamReader;
 @EnableConfigurationProperties(VetsProperties.class)
 public class VetsServiceApplication {
 
+	@Value("${spring.datasource.url}")
+    private static String url;
+
+	@Value("${spring.cache.cache-names}")
+    private static String cacheName;
+	
+	@Value("${spring.sql.init.mode}")
+    private static String sqlInitMode;
+
 	public static void main(String[] args) {
 	
 		System.out.println("Checking ENV variables ..."+ "\n");
 		
 		System.out.println("Checking ENV variable AZURE_KEYVAULT_ENDPOINT : |" + System.getenv("AZURE_KEYVAULT_ENDPOINT") + "|\n");
+
+		System.out.println("Checking ENV variable AZURE KV ENDPOINT : |" + System.getenv("ENDPOINT") + "|\n");
 		System.out.println("Checking ENV variable AZURE_TENANT_ID : |" + System.getenv("AZURE_TENANT_ID") + "|\n");
 		System.out.println("Checking ENV variable AZURE_CLIENT_ID : |" + System.getenv("AZURE_CLIENT_ID") + "|\n");
 
+		System.out.println("JDBC URL from config file: " + url);
+		System.out.println("cache name: " + cacheName);
+		System.out.println("SQL Init mode: " + sqlInitMode);
+		System.out.println("JDBC URL from config file: " + url);
+		
 		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" + System.getenv("SPRING_PROFILES_ACTIVE") + "|\n");
 		System.out.println("Checking ENV variable AZURE_KEYVAULT_URI : |" + System.getenv("AZURE_KEYVAULT_URI") + "|\n");
 
