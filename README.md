@@ -12,11 +12,11 @@ urlFragment: "spring-petclinic-microservices"
 
 Azure Spring Apps enables you to easily run a Spring Boot applications on Azure.
 
-This quickstart shows you how to deploy an existing Java Spring Cloud application to Azure. When 
+This quickstart shows you how to deploy an existing Java Spring Apps application to Azure. When 
 you're finished, you can continue to manage the application via the Azure CLI or switch to using the 
 Azure Portal.
 
-* [Deploy Spring Boot apps using Azure Spring Apps and MySQL](#deploy-spring-boot-apps-using-azure-spring-cloud-and-mysql)
+* [Deploy Spring Boot apps using Azure Spring Apps and MySQL](#deploy-spring-boot-apps-using-azure-spring-apps-and-mysql)
   * [What will you experience](#what-will-you-experience)
   * [What you will need](#what-you-will-need)
   * [Install the Azure CLI extension](#install-the-azure-cli-extension)
@@ -29,7 +29,7 @@ Azure Portal.
 ## What will you experience
 You will:
 - Build existing Spring Boot applications
-- Provision an Azure Spring Apps service instance. If you prefer Terraform, you may also provision using Terraform, see [`README-terraform`](./terraform/README-terraform.md) or **[Bicep](./iac/bicep/README.md)**
+- Provision an Azure Spring Apps service instance. If you prefer Terraform, you may also provision using Terraform, see [`README-terraform`](./terraform/README-terraform.md) or **[Bicep](./iac/bicep/README.md)**. Check [API breaking changes](https://docs.microsoft.com/en-us/azure/spring-cloud/breaking-changes)
 - Deploy applications to Azure
 - Bind applications to Azure Database for MySQL
 - Open the application
@@ -92,9 +92,9 @@ Install the Azure Spring Apps extension for the Azure CLI using the following co
 ```bash
     az extension add --name spring
 ```
-Note - `spring-cloud` CLI extension `2.1.0` or later is a pre-requisite to enable the
+Note - `spring` CLI extension `1.1.2` or later is a pre-requisite to enable the
 latest Java in-process agent for Application Insights. If you already 
-have the CLI extension, you may need to upgrade to the latest using --
+have the CLI extension, you may need to upgrade to the latest
 
 ```bash
     az extension update --name spring
@@ -109,8 +109,10 @@ have the CLI extension, you may need to upgrade to the latest using --
     git clone https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv
 ```
 
-### Change directory and build the project
+### Change directory and build the project with Maven
 
+TODO: add ASA Maven Plugin [https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Spring-Apps:-Deploy](https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Spring-Apps:-Deploy)
+ 
 ```bash
     cd azure-spring-apps-petclinic-mic-srv
     mvn clean package -DskipTests -Denv=cloud
@@ -526,7 +528,7 @@ Type and run the following Kusto query to see all in the inbound calls into Azur
     | sort by TimeGenerated
 ```
 
-Type and run the following Kusto query to see all the logs from the managed Spring Cloud
+Type and run the following Kusto query to see all the logs from the managed Spring Apps
 Config Server managed by Azure Spring Apps:
 ```sql
     AppPlatformSystemLogs
@@ -535,7 +537,7 @@ Config Server managed by Azure Spring Apps:
     | sort by TimeGenerated
 ```
 
-Type and run the following Kusto query to see all the logs from the managed Spring Cloud
+Type and run the following Kusto query to see all the logs from the managed Spring Apps
 Service Registry managed by Azure Spring Apps:
 ```sql
     AppPlatformSystemLogs
@@ -770,7 +772,7 @@ In this quickstart, you've deployed an existing Spring Boot-based app using Azur
 - [Deploy Spring microservices from scratch](https://github.com/microsoft/azure-spring-cloud-training)
 - [Deploy existing Spring microservices](https://github.com/Azure-Samples/azure-spring-cloud)
 - [Azure for Java Cloud Developers](https://docs.microsoft.com/en-us/azure/java/)
-- [Spring Cloud Azure](https://cloud.spring.io/spring-cloud-azure/)
+- [Spring Cloud for Azure](https://cloud.spring.io/spring-cloud-azure/)
 - [Spring Cloud](https://spring.io/projects/spring-cloud)
 
 ## Credits

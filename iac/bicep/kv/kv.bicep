@@ -16,7 +16,7 @@ param kvName string = 'kv-${appName}'
 
 param setKVAccessPolicies bool = false
 
-@description('The KeyVault AccessPolicies for the Azure Spring Cloud Apps Identities  wrapped into an object.')
+@description('The KeyVault AccessPolicies for the Azure Spring Apps Identities  wrapped into an object.')
 param accessPoliciesObject object
 
 @description('The KV location')

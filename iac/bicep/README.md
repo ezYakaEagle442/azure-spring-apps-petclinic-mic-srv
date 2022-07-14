@@ -35,7 +35,7 @@ az group create --name rg-iac-asa-petclinic-mic-srv --location centralindia
 az deployment group create --name iac-101-kv -f ./kv/kv.bicep -g rg-iac-kv \
     --parameters @./kv/parameters-kv.json
 
-az deployment group create --name iac-101-asc -f ./asa/main.bicep -g rg-iac-asa-petclinic-mic-srv \
+az deployment group create --name iac-101-asa -f ./asa/main.bicep -g rg-iac-asa-petclinic-mic-srv \
     --parameters @./asa/parameters.json --debug # --what-if to test like a dry-run
 ```
 

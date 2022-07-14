@@ -13,16 +13,16 @@ param administratorLogin string = 'mys_adm'
 @description('The MySQL DB Admin Password.')
 param administratorLoginPassword string
 
-@description('Azure Spring Cloud Outbound Public IP')
-param azureSpringCloudOutboundPubIP string
+@description('Azure Spring Apps Outbound Public IP')
+param azureSpringAppsOutboundPubIP string
 
 @description('Allow client workstation for local Dev/Test only')
 param clientIPAddress string
 
-@description('Allow Azure Spring Cloud from Apps subnet to access MySQL DB')
+@description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
 param startIpAddress string
 
-@description('Allow Azure Spring Cloud from Apps subnet to access MySQL DB')
+@description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
 param endIpAddress string
 
 var serverName = '${appName}'
@@ -85,10 +85,10 @@ resource mysqlserver 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
 
 output mySQLResourceID string = mysqlserver.id
 
-// Add firewall config to allow Azure Spring Cloud :
+// Add firewall config to allow Azure Spring Apps :
 // virtualNetwor FirewallRules to Allow public access from Azure services 
-resource fwRuleAzureSpringCloudApps 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-05-01' = {
-  name: 'Allow-Azure-Spring-Cloud-Apps'
+resource fwRuleAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-05-01' = {
+  name: 'Allow-Azure-Spring-Apps'
   parent: mysqlserver
   properties: {
     startIpAddress: startIpAddress
@@ -106,13 +106,13 @@ resource fwRuleClientIPAddress 'Microsoft.DBforMySQL/flexibleServers/firewallRul
   }
 }
 
- // Allow Azure Spring Cloud
- resource fwRuleAllowAzureSpringCloud 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-05-01' = {
-  name: 'Allow Azure Spring Cloud'
+ // Allow Azure Spring Apps
+ resource fwRuleAllowAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-05-01' = {
+  name: 'Allow Azure Spring Apps'
   parent: mysqlserver
   properties: {
-    startIpAddress: azureSpringCloudOutboundPubIP
-    endIpAddress: azureSpringCloudOutboundPubIP
+    startIpAddress: azureSpringAppsOutboundPubIP
+    endIpAddress: azureSpringAppsOutboundPubIP
   }
 }
 

@@ -3,17 +3,17 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "appName": {
-        "value": "petcliasc"
+        "value": "petcliasa"
       }, 
       "kvName": {
-        "value": "kv-petcliasc-UNIQUEID42"
+        "value": "kv-petcliasa-UNIQUEID42"
       },
       "secretsObject": {
         "value": {
           "secrets": [
             {
               "secretName": "MYSQL-SERVER-FULL-NAME",
-              "secretValue": "petcliasc"
+              "secretValue": "petcliasa"
             },
             {
               "secretName": "MYSQL-DATABASE-NAME",

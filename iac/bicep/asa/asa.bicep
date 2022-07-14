@@ -92,7 +92,7 @@ output logAnalyticsWorkspaceResourceId string = logAnalyticsWorkspace.id
 
 // pre-req: https://docs.microsoft.com/en-us/azure/spring-cloud/quickstart-deploy-infrastructure-vnet-bicep
 // https://docs.microsoft.com/en-us/azure/spring-cloud/quickstart-deploy-infrastructure-vnet-azure-cli#prerequisites
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-01-01-preview' = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-05-01-preview' = {
   name: azureSpringAppsInstanceName
   location: location
   sku: {
@@ -183,7 +183,7 @@ resource appInsightsDiagnosticSettings 'Microsoft.Insights/diagnosticSettings@20
   }
 }
 
-resource azureSpringAppsmonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-03-01-preview' = {
+resource azureSpringAppsmonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-05-01-preview' = {
   name: monitoringSettingsName
   parent: azureSpringApps
   properties: {
@@ -194,7 +194,7 @@ resource azureSpringAppsmonitoringSettings 'Microsoft.AppPlatform/Spring/monitor
 }
 
 
-resource adminserverapp 'Microsoft.AppPlatform/Spring/apps@2022-03-01-preview' = {
+resource adminserverapp 'Microsoft.AppPlatform/Spring/apps@2022-05-01-preview' = {
   name: 'admin-server'
   location: location
   parent: azureSpringApps
@@ -217,7 +217,7 @@ resource adminserverapp 'Microsoft.AppPlatform/Spring/apps@2022-03-01-preview' =
 output adminServerIdentity string = adminserverapp.identity.principalId
 
 
-resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-03-01-preview' = {
+resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-05-01-preview' = {
   name: 'customers-service'
   location: location
   parent: azureSpringApps
@@ -239,7 +239,7 @@ resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-03-01-previ
 }
 output customersServiceIdentity string = customersserviceapp.identity.principalId
 
-resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-03-01-preview' = {
+resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-05-01-preview' = {
   name: 'api-gateway'
   location: location
   parent: azureSpringApps
@@ -261,7 +261,7 @@ resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-03-01-preview' = 
 }
 output apiGatewayIdentity string = apigatewayapp.identity.principalId
 
-resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-03-01-preview' = {
+resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-05-01-preview' = {
   name: 'vets-service'
   location: location
   parent: azureSpringApps
@@ -283,7 +283,7 @@ resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-03-01-preview' =
 }
 output vetsServiceIdentity string = vetsserviceapp.identity.principalId
 
-resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-03-01-preview' = {
+resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-05-01-preview' = {
   name: 'visits-service'
   location: location
   parent: azureSpringApps
@@ -305,7 +305,7 @@ resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-03-01-preview
 }
 output visitsServiceIdentity string = visitsservicerapp.identity.principalId
 
-resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2022-01-01-preview' = {
+resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2022-05-01-preview' = {
   name: configServerName
   parent: azureSpringApps
   properties: {

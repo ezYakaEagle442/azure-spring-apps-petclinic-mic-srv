@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "appName": {
-        "value": "petcliasc"
+        "value": "petcliasa"
       },
       "kvName": {
-        "value": "kv-petcliasc-UNIQUEID42"
+        "value": "kv-petcliasa-UNIQUEID42"
       },      
       "setKVAccessPolicies": {
         "value": false
