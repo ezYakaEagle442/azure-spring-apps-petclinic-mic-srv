@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "appName": {
+        "value": "petcliasa"
+      },
+      "location": {
+        "value": "westeurope"
+      },       
+      "administratorLogin": {
+        "value": "mys_adm"
+      },
+      "administratorLoginPassword": {
+        "value": "changeIT"
+      },
+      "clientIPAddress": {
+        "value": "xxx"
+      },  
+      "startIpAddress": {
+        "value": "10.42.1.0"
+      }, 
+      "endIpAddress": {
+        "value": "10.42.1.15"
+      }     
+    }
+  }
