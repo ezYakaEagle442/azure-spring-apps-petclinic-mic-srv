@@ -10,19 +10,19 @@
     </parent>
 
     <groupId>org.springframework.samples</groupId>
-    <artifactId>spring-petclinic-microservices</artifactId>
-    <version>2.6.3</version>
+    <artifactId>asa-spring-petclinic-microservices</artifactId>
+    <version>2.6.6</version>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
 
     <modules>
-        <module>spring-petclinic-admin-server</module>
-        <module>spring-petclinic-customers-service</module>
-        <module>spring-petclinic-vets-service</module>
-        <module>spring-petclinic-visits-service</module>
-        <module>spring-petclinic-config-server</module>
-        <module>spring-petclinic-discovery-server</module>
-        <module>spring-petclinic-api-gateway</module>
+        <module>asa-spring-petclinic-admin-server</module>
+        <module>asa-spring-petclinic-customers-service</module>
+        <module>asa-spring-petclinic-vets-service</module>
+        <module>asa-spring-petclinic-visits-service</module>
+        <module>asa-spring-petclinic-config-server</module>
+        <module>asa-spring-petclinic-discovery-server</module>
+        <module>asa-spring-petclinic-api-gateway</module>
     </modules>
 
     <properties>
@@ -286,7 +286,7 @@
 
         <!-- https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry -->
         <profile>
-            <id>github-asc</id>
+            <id>github-asa</id>
             <repositories>
                 <!--
                 <repository>
@@ -295,8 +295,8 @@
                 </repository>
                 -->
                 <repository>
-                    <id>github-asc</id>
-                    <url>https://maven.pkg.github.com/ezYakaEagle442/azure-spring-cloud-petclinic-mic-srv</url>
+                    <id>github-asa</id>
+                    <url>https://maven.pkg.github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv</url>
                     <releases>
                         <enabled>true</enabled>
                     </releases>
@@ -312,7 +312,7 @@
     <!--
     <servers>
         <server>
-            <id>github-asc</id>
+            <id>github-asa</id>
             <username>ezYakaEagle442</username>
             <password>${env.GITHUB_TOKEN}</password>
         </server>
@@ -321,9 +321,9 @@
     
     <distributionManagement>
         <repository>
-            <id>github-asc</id>
+            <id>github-asa</id>
             <name>GitHub OWNER Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/ezYakaEagle442/azure-spring-cloud-petclinic-mic-srv</url>
+            <url>https://maven.pkg.github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv</url>
             <layout>default</layout>
         </repository>
     </distributionManagement>

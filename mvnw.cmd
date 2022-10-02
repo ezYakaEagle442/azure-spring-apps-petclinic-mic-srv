@@ -119,8 +119,9 @@ for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do s
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 set WRAPPER_JAR="%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.jar"
 set WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
+set WRAPPER_VERSION=0.5.6
 
-set DOWNLOAD_URL="https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.5.4/maven-wrapper-0.5.4.jar"
+set DOWNLOAD_URL="https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/%WRAPPER_VERSION%/maven-wrapper-%WRAPPER_VERSION%.jar"
 
 FOR /F "tokens=1,2 delims==" %%A IN ("%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.properties") DO (
     IF "%%A"=="wrapperUrl" SET DOWNLOAD_URL=%%B
@@ -134,7 +135,7 @@ if exist %WRAPPER_JAR% (
     )
 ) else (
     if not "%MVNW_REPOURL%" == "" (
-        SET DOWNLOAD_URL="%MVNW_REPOURL%/io/takari/maven-wrapper/0.5.4/maven-wrapper-0.5.4.jar"
+        SET DOWNLOAD_URL="%MVNW_REPOURL%/io/takari/maven-wrapper/%WRAPPER_VERSION%/maven-wrapper-%WRAPPER_VERSION%.jar"
     )
     if "%MVNW_VERBOSE%" == "true" (
         echo Couldn't find %WRAPPER_JAR%, downloading it ...
