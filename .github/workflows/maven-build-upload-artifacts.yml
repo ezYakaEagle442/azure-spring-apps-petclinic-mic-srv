@@ -1,16 +1,20 @@
-name: Build to Azure Spring Cloud with Key Vault and Upload the jar Arfifacts
+name: Build to Azure Spring Apps with Key Vault and Upload the jar Arfifacts
 on: [push]
 
 ###################################################################################################################
 #
-# https://github.com/marketplace/actions/azure-spring-cloud
+# https://learn.microsoft.com/en-us/azure/spring-apps/how-to-github-actions?pivots=programming-language-java
+# https://learn.microsoft.com/en-us/azure/spring-apps/github-actions-key-vault
+# https://learn.microsoft.com/en-us/azure/spring-apps/tutorial-managed-identities-key-vault?tabs=system-assigned-managed-identity
+#
+# https://github.com/marketplace/actions/azure-spring-apps
 # https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect
 # https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure
 #
 ###################################################################################################################
 
 env:
-  SPRING_CLOUD_SERVICE: asc-petcliasc # customize this
+  AZURE_SPRING_APPS_SERVICE: asa-petcliasa42 # customize this
   
   # ==== APPS ====:
   API_GATEWAY: api-gateway
@@ -19,14 +23,14 @@ env:
   VETS_SERVICE: vets-service
   VISITS_SERVICE: visits-service
 
-  # useless as config & discovery server are managed by Azure Spring Cloud 
+  # useless as config & discovery server are managed by Azure Spring Apps 
   CONFIG_SERVER: config-server
   DISCOVERY_SERVER: discovery-server
 
 
   PRJ_PREFIX: spring-petclinic
 
-  # ==== Azure Spring Cloud Apps Deployment params ====:
+  # ==== Azure Spring Apps Apps Deployment params ====:
   DEPLOYMENT_VERSION: 2.6.3
 
 jobs:
@@ -194,7 +198,7 @@ jobs:
       run: |
         mkdir -p ~/.m2
         echo "<settings><servers><server><id>github-asc</id><username>$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $1}')</username><password>\${env.GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
-        REPO="github-asc::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}"
+        REPO="github-asa::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}"
 
         mvn deploy -DaltReleaseDeploymentRepository="${REPO}" -DaltSnapshotDeploymentRepository="${REPO}" --batch-mode -DskipTests -Dmaven.install.skip=true
       env:

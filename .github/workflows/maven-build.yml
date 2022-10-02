@@ -37,4 +37,16 @@ jobs:
         distribution: 'microsoft' # https://github.com/actions/setup-java
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: | 
+        mvn -B clean package --file pom.xml -DskipTests -Denv=cloud
+        
+        echo "github.workspace = ${{ github.workspace }}"
+        pwd
+
+        ls -al
+        ls -al spring-petclinic-admin-server/target/*.jar
+        ls -al spring-petclinic-api-gateway/target/*.jar
+        ls -al spring-petclinic-config-server/target/*.jar
+        ls -al spring-petclinic-customers-service/target/*.jar
+        ls -al spring-petclinic-vets-service/target/*.jar
+        ls -al spring-petclinic-visits-service/target/*.jar

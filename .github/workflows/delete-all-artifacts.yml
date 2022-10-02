@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZ_CLI_VERSION: 2.34.1
+  AZ_CLI_VERSION: 2.40.0
   
   # ==== APPS ====:
   API_GATEWAY: api-gateway
@@ -13,7 +13,7 @@ env:
   VETS_SERVICE: vets-service
   VISITS_SERVICE: visits-service
 
-  # useless as config & discovery server are managed by Azure Spring Cloud
+  # useless as config & discovery server are managed by Azure Spring Apps
   CONFIG_SERVER: config-server
   DISCOVERY_SERVER: discovery-server
 

@@ -1,19 +1,19 @@
-name: Download the jar Arfifacts & Deploy to Azure Spring Cloud with Key Vault
+name: Download the jar Arfifacts & Deploy to Azure Spring Apps with Key Vault
 
 on:
   workflow_dispatch:
 
 ###################################################################################################################
 #
-# https://github.com/marketplace/actions/azure-spring-cloud
+# https://github.com/marketplace/actions/azure-spring-apps
 # https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect
 # https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure
 #
 ###################################################################################################################
 
 env:
-  AZ_CLI_VERSION: 2.37.0
-  SPRING_CLOUD_SERVICE: asa-petcliasa # customize this
+  AZ_CLI_VERSION: 2.40.0
+  AZURE_SPRING_APPS_SERVICE: asa-petcliasa # customize this
   KEYVAULT: kv-petcliasa42 # customize this
   
   # ==== APPS ====:
@@ -23,18 +23,18 @@ env:
   VETS_SERVICE: vets-service
   VISITS_SERVICE: visits-service
 
-  # useless as config & discovery server are managed by Azure Spring Cloud
+  # useless as config & discovery server are managed by Azure Spring Apps
   CONFIG_SERVER: config-server
   DISCOVERY_SERVER: discovery-server
 
   PRJ_PREFIX: spring-petclinic
 
-  # ==== Azure Spring Cloud Apps Deployment params ====:
+  # ==== Azure Spring Apps Apps Deployment params ====:
 
   # https://docs.spring.io/spring-boot/docs/2.6.6/reference/html/howto.html#howto.properties-and-configuration.set-active-spring-profiles
   # https://docs.spring.io/spring-boot/docs/2.6.6/reference/html/features.html#features.profiles
   # customize this
-  DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://kv-petcliasa42.vault.azure.net -Xms512m -Xmx1024m  -Dspring.profiles.active=mysql,docker,cloud # --spring.profiles.active=mysql,key-vault,cloud
+  DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://kv-petcliasa42.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,docker,cloud # --spring.profiles.active=mysql,key-vault,cloud
   AZURE_KEYVAULT_ENDPOINT: https://kv-petcliasa42.vault.azure.net
 
   DEPLOYMENT_VERSION: 2.6.6
@@ -47,7 +47,7 @@ env:
   # If set to true and the deployment specified by deployment-name does not exist at execution time, it will be created.
   DEPLOYMENT_CREATE_NEW: true
 
-  # https://github.com/marketplace/actions/azure-spring-cloud#arguments
+  # https://github.com/marketplace/actions/azure-spring-apps#arguments
   # Choose either the Blue or Green settings below
   # /!\ Deployment name can contain only lowercase letters, numbers and hyphens.
   DEPLOYMENT_NAME: blue
@@ -116,7 +116,7 @@ jobs:
     # Variables in the env map cannot be defined in terms of other variables in the map
     - name: Set dependent environment variables
       run: |
-        # ==== JARS ====: PWD already in /home/runner/work/azure-spring-cloud-petclinic-mic-srv >> $GITHUB_ENV
+        # ==== JARS ====: PWD already in /home/runner/work/azure-spring-apps-petclinic-mic-srv >> $GITHUB_ENV
         echo "API_GATEWAY_JAR=${{ env.PRJ_PREFIX }}-${{ env.API_GATEWAY }}/target/$API_GATEWAY_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "ADMIN_SERVER_JAR=${{ env.PRJ_PREFIX }}-${{ env.ADMIN_SERVER }}/target/$ADMIN_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "CONFIG_SERVER_JAR=${{ env.PRJ_PREFIX }}-${{ env.CONFIG_SERVER }}/target/$CONFIG_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
@@ -220,13 +220,13 @@ jobs:
     # https://gist.github.com/maxim/6e15aa45ba010ab030c4
     # local test with: curl -u username:<Your PAT Token> -H "Accept: application/vnd.github.v3+json" https://api.github.com
     # curl -u username:<Your PAT Token> -H "Accept: application/vnd.github.v3+json" https://api.github.com/user/packages/maven/org.springframework.samples.petclinic.admin.spring-petclinic-admin-server/versions
-    # curl -u username:<Your PAT Token> -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/ezYakaEagle442/azure-spring-cloud-petclinic-mic-srv/releases
+    # curl -u username:<Your PAT Token> -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/releases
 
     TODO: replace the curl workaround with https://gist.github.com/tgrall/25f82f69bfdbc630bfc7a2e4c3acd39d 
 
     gh api graphql -f query='
     {
-        repository(owner: "tgrall-octodemo", name: "azure-spring-cloud-petclinic-mic-srv") {
+        repository(owner: "ezYakaEagle442", name: "azure-spring-apps-petclinic-mic-srv") {
           packages(first: 10, packageType: MAVEN, names: "org.springframework.samples.petclinic.client.spring-petclinic-customers-service") {
             edges {
               node {
@@ -497,7 +497,7 @@ jobs:
       uses: Azure/get-keyvault-secrets@v1
       with:
         keyvault: ${{ env.KEYVAULT }}
-        secrets: "MYSQL-SERVER-FULL-NAME,MYSQL-DATABASE-NAME,MYSQL-SERVER-ADMIN-LOGIN-NAME,MYSQL-SERVER-ADMIN-PASSWORD"
+        secrets: "MYSQL-SERVER-NAME,MYSQL-SERVER-FULL-NAME,SPRING-DATASOURCE-URL,SPRING-DATASOURCE-USERNAME,SPRING-DATASOURCE-PASSWORD,SPRING-CLOUD-AZURE-KEY-VAULT-ENDPOINT,SPRING-CLOUD-AZURE-TENANT-ID"
       id: mysqlsecrets
       
     - name: Login with Service SP
@@ -506,62 +506,56 @@ jobs:
         creds: ${{ steps.keyvaultaction.outputs.AZURE-CREDENTIALS-FOR-SPRING }}
 
     - name: Deploy vets-service
-      uses: Azure/spring-cloud-deploy@v1
+      uses: Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.VETS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
         package: ${{ env.VETS_SERVICE_PACKAGE_PATH }}
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
-        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
-        environment-variables: -AZURE_TENANT_ID ${{ secrets.CFG_SRV_SPN_TNT }} -AZURE_CLIENT_ID ${{ secrets.CFG_SRV_SPN_ID }} -AZURE_CLIENT_SECRET ${{ secrets.CFG_SRV_SPN_PWD }} -AZURE_KEYVAULT_ENDPOINT ${{ env.AZURE_KEYVAULT_ENDPOINT }} -MYSQL_SERVER_FULL_NAME "${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-FULL-NAME }}" -MYSQL_DATABASE_NAME "${{ steps.mysqlsecrets.outputs.MYSQL-DATABASE-NAME }}" -MYSQL_SERVER_ADMIN_LOGIN_NAME "${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-LOGIN-NAME }}" -MYSQL_SERVER_ADMIN_PASSWORD "${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-PASSWORD }}" 
         deployment-name:  ${{ env.VETS_SERVICE_DEPLOYMENT }}
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
         version: ${{ env.DEPLOYMENT_VERSION }} 
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
 
     - name: Deploy visits-service
-      uses: Azure/spring-cloud-deploy@v1
+      uses: Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.VISITS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
         package: ${{ env.VISITS_SERVICE_PACKAGE_PATH }}
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
-        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
-        environment-variables: "-MYSQL_SERVER_FULL_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-FULL-NAME }} -MYSQL_DATABASE_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-DATABASE-NAME }} -MYSQL_SERVER_ADMIN_LOGIN_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-LOGIN-NAME }} -MYSQL_SERVER_ADMIN_PASSWORD ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-PASSWORD }}"
         deployment-name:  ${{ env.VISITS_SERVICE_DEPLOYMENT }}
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
         version: ${{ env.DEPLOYMENT_VERSION }} 
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
 
     - name: Deploy customers-service
-      uses: Azure/spring-cloud-deploy@v1
+      uses: Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.CUSTOMERS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
         package: ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
-        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
-        environment-variables: "-MYSQL_SERVER_FULL_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-FULL-NAME }} -MYSQL_DATABASE_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-DATABASE-NAME }} -MYSQL_SERVER_ADMIN_LOGIN_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-LOGIN-NAME }} -MYSQL_SERVER_ADMIN_PASSWORD ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-PASSWORD }}"
         deployment-name:  ${{ env.CUSTOMERS_SERVICE_DEPLOYMENT }}
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
         version: ${{ env.DEPLOYMENT_VERSION }} 
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
 
     - name: Deploy api-gateway
-      uses: Azure/spring-cloud-deploy@v1
+      uses: Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.API_GATEWAY }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
         package: ${{ env.API_GATEWAY_PACKAGE_PATH }}
@@ -572,11 +566,11 @@ jobs:
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }} 
 
     - name: Deploy admin-server
-      uses:  Azure/spring-cloud-deploy@v1
+      uses:  Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.ADMIN_SERVER }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
         package: ${{ env.ADMIN_SERVER_PACKAGE_PATH }}

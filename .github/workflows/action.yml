@@ -1,18 +1,19 @@
-name: Build & Deploy to Azure Spring Cloud with Key Vault
+name: Build & Deploy to Azure Spring Apps with Key Vault
 on: [push]
 
 ###################################################################################################################
 #
-# https://github.com/marketplace/actions/azure-spring-cloud
+# https://learn.microsoft.com/en-us/azure/spring-apps/how-to-github-actions?pivots=programming-language-java
+# https://github.com/marketplace/actions/azure-spring-apps
 # https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect
 # https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure
 #
 ###################################################################################################################
 
 env:
-  AZ_CLI_VERSION: 2.34.1
-  SPRING_CLOUD_SERVICE: asc-petcliasc # customize this
-  KEYVAULT: kv-petcliasc42 # customize this
+  AZ_CLI_VERSION: 2.40.0
+  SPRING_CLOUD_SERVICE: asa-petcliasa # customize this
+  KEYVAULT: kv-petcliasa42 # customize this
   
   # ==== APPS ====:
   API_GATEWAY: api-gateway
@@ -25,11 +26,11 @@ env:
 
   PRJ_PREFIX: spring-petclinic
 
-  # ==== Azure Spring Cloud Apps Deployment params ====:
+  # ==== Azure Spring Apps Apps Deployment params ====:
 
   # customize this
-  # DEPLOYMENT_RG: rg-iac-asc-petclinic-mic-srv
-  DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://kv-petcliasc42.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
+  # DEPLOYMENT_RG: rg-iac-asa-petclinic-mic-srv
+  DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://kv-petcliasa42.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
   
   DEPLOYMENT_VERSION: 2.6.3
   DEPLOYMENT_RUNTIME_VERSION: Java_11
@@ -292,8 +293,9 @@ jobs:
       with:
         creds: ${{ steps.keyvaultaction.outputs.AZURE-CREDENTIALS-FOR-SPRING }}
 
+    # https://github.com/marketplace/actions/azure-spring-apps
     - name: Deploy DISCOVERY-SERVER
-      uses:  Azure/spring-cloud-deploy@v1
+      uses:  Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
@@ -308,7 +310,7 @@ jobs:
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
    
     - name: Deploy CONFIG-SERVER
-      uses:  Azure/spring-cloud-deploy@v1
+      uses:  Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
@@ -323,7 +325,7 @@ jobs:
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
 
     - name: Deploy admin-server
-      uses:  Azure/spring-cloud-deploy@v1
+      uses:  Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
@@ -338,7 +340,7 @@ jobs:
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
 
     - name: Deploy api-gateway
-      uses: Azure/spring-cloud-deploy@v1
+      uses: Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
@@ -353,7 +355,7 @@ jobs:
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }} 
  
     - name: Deploy vets-service
-      uses: Azure/spring-cloud-deploy@v1
+      uses: Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
@@ -373,7 +375,7 @@ jobs:
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
 
     - name: Deploy visits-service
-      uses: Azure/spring-cloud-deploy@v1
+      uses: Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
@@ -393,7 +395,7 @@ jobs:
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
 
     - name: Deploy customers-service
-      uses: Azure/spring-cloud-deploy@v1
+      uses: Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
