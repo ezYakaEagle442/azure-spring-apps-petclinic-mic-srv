@@ -1,0 +1,64 @@
+# This workflow will delete all the Azure services, including ASA, MYSQL
+# eventually if deployToVNet=true : also VNet, private DNS-Zone, client VM deployed to the VNet
+
+name: Delete Azure Resource Groups
+
+env:
+  APP_NAME: petcliasa
+  LOCATION: westeurope
+  RG_KV: rg-iac-kv # RG where to deploy KV
+  RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA MySQL, etc.
+  
+  KV_NAME: kv-petcliasa # The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters
+
+
+  # https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#consume-secrets-in-your-workflow
+  # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-secrets
+
+  # ==== Secrets ====
+  credentials: ${{ secrets.AZURE_CREDENTIALS }}
+
+  # ==== Versions ====
+  AZ_CLI_VERSION: 2.40.0
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete-rg:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
+    # /!\ IMPORTANT: The step that creates or updates the environment variable does not have access to the new value, but all subsequent steps in a job will have access.
+    - name: Set Base environment variables
+      run: |
+        echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV        
+      shell: bash
+
+    - name: Azure Login
+      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ env.credentials }}
+
+    - name: Delete Azure Resource Groups
+      uses: azure/CLI@v1.0.6 # https://github.com/marketplace/actions/azure-cli-action
+      with:
+        azcliversion: ${{ env.AZ_CLI_VERSION }}
+        inlineScript: |
+          az config set extension.use_dynamic_install=yes_without_prompt
+          # az group delete --name ${{ env.RG_KV }} --yes
+          az group delete --name ${{ env.RG_APP }} --yes
+
+    # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
+    # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners
+    # if the runner is self-hosted which is not github provided it is recommended to manually logout at the end of the workflow as shown below.
+    - name: Azure Logout security hardening
+      uses: azure/CLI@v1
+      with:
+        azcliversion: ${{ env.AZ_CLI_VERSION }}
+        inlineScript: |
+          az logout
+          az cache purge
+          az account clear

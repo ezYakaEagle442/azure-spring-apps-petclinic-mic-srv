@@ -1,0 +1,65 @@
+# This workflow will delete all the ASA Apps
+name: Delete Apps
+
+env:
+  LOCATION: westeurope
+  RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to delete the asa Apps
+  ASA_SERVICE_NAME: asa-svc-pub # ASA Instance service name. Ex 'asa-svc-pub' or 'asa-svc-corp' when deployed to your VNet
+
+  ADMIN_SERVER: admin-server
+  CONFIG_SERVER: config-server
+  DISCOVERY_SERVER: discovery-server
+
+  API_GATEWAY: api-gateway
+  CUSTOMERS_SERVICE: customers-service
+  VETS_SERVICE: vets-service
+  VISITS_SERVICE: visits-service
+
+  # https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#consume-secrets-in-your-workflow
+  # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-secrets
+
+  # ==== Secrets ====
+  credentials: ${{ secrets.AZURE_CREDENTIALS }}
+
+  # ==== Versions ====
+  AZ_CLI_VERSION: 2.40.0
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete-rg:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Azure Login
+      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ env.credentials }}
+
+    - name: Delete Apps
+      uses: azure/CLI@v1.0.6 # https://github.com/marketplace/actions/azure-cli-action
+      with:
+        azcliversion: ${{ env.AZ_CLI_VERSION }}
+        inlineScript: |
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az spring app delete --name ${{ env.ADMIN_SERVER }} --service ${{ env.ASA_SERVICE_NAME }}  -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.VISITS_SERVICE }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.VETS_SERVICE }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.CUSTOMERS_SERVICE }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.API_GATEWAY }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.CONFIG_SERVER }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.DISCOVERY_SERVER }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
+
+    # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
+    # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners
+    # if the runner is self-hosted which is not github provided it is recommended to manually logout at the end of the workflow as shown below.
+    - name: Azure Logout security hardening
+      uses: azure/CLI@v1
+      with:
+        azcliversion: ${{ env.AZ_CLI_VERSION }}
+        inlineScript: |
+          az logout
+          az cache purge
+          az account clear
