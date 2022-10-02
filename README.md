@@ -49,7 +49,7 @@ or sign up for a
 In addition, you will need the following:
 
 | [Azure CLI version 2.17.1 or higher](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) 
-| [Java 8](https://www.azul.com/downloads/azure-only/zulu/?version=java-8-lts&architecture=x86-64-bit&package=jdk) 
+| [Java 11](https://learn.microsoft.com/java/openjdk/download)
 | [Maven](https://maven.apache.org/download.cgi) 
 | [MySQL CLI](https://dev.mysql.com/downloads/shell/)
 | [Git](https://git-scm.com/)
@@ -124,7 +124,7 @@ This will take a few minutes.
 
 See **[Bicep](./iac/bicep/README.md)**
 
-<span style="color:red">**Be aware that the MySQL DB is NOT deployed in a VNet but network FireWall Rules are Set. So ensure to allow ASC Outbound IP addresses or check the option "Allow public access from any Azure service within Azure to this server" in the Azure Portal / your MySQL DB / Networking / Firewall rules**</span>
+<span style="color:red">**Be aware that the MySQL DB is NOT deployed in a VNet but network FireWall Rules are Set. So ensure to allow ASA Outbound IP addresses or check the option "Allow public access from any Azure service within Azure to this server" in the Azure Portal / your MySQL DB / Networking / Firewall rules**</span>
 
 ## Deploy a Windows VM Client in the VNet
 
@@ -178,7 +178,7 @@ az vm create --name $win_client_vm_name \
     # --zone 1
 
 network_interface_id=$(az vm show --name $win_client_vm_name -g $rg_name --query 'networkProfile.networkInterfaces[0].id' -o tsv)
-echo "ASC Pet Clinic windows Client VM Network Interface ID :" $network_interface_id
+echo "ASA Pet Clinic windows Client VM Network Interface ID :" $network_interface_id
 
 network_interface_private_ip=$(az resource show --ids $network_interface_id \
     --query 'properties.ipConfigurations[0].properties.privateIPAddress' -o tsv)
@@ -199,7 +199,7 @@ Note: you can not setup WSL2 on all Azure VM , D_v3 should support nested virtua
 
 
 
-Now, the Bicep IaC should have configured the Azure Private DNS Zone, as explained in the [docs](https://docs.microsoft.com/en-us/azure/spring-cloud/access-app-virtual-network?tabs=azure-portal)
+Now, the Bicep IaC should have configured the Azure Private DNS Zone, as explained in the [docs](https://learn.microsoft.com/en-us/azure/spring-apps/access-app-virtual-network?tabs=azure-portal)
 
 ```sh
 rg_name="rg-iac-asa-petclinic-mic-srv"
@@ -386,7 +386,7 @@ Open the Petclinic application and try out a few tasks - view pet owners and the
 vets, and schedule pet visits:
 
 ```bash
-open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/
+open https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/
 ```
 
 You can also `curl` the REST API exposed by the Petclinic application. The admin REST
@@ -394,15 +394,15 @@ API allows you to create/update/remove items in Pet Owners, Pets, Vets and Visit
 You can run the following curl commands:
 
 ```bash
-curl -X GET https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/owners
-curl -X GET https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/owners/4
-curl -X GET https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/owners/ 
-curl -X GET https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/petTypes
-curl -X GET https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/owners/3/pets/4
-curl -X GET https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/owners/6/pets/8/
-curl -X GET https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/vet/vets
-curl -X GET https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/visit/owners/6/pets/8/visits
-curl -X GET https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/visit/owners/6/pets/8/visits
+curl -X GET https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/owners
+curl -X GET https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/owners/4
+curl -X GET https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/owners/ 
+curl -X GET https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/petTypes
+curl -X GET https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/owners/3/pets/4
+curl -X GET https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/owners/6/pets/8/
+curl -X GET https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/vet/vets
+curl -X GET https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/visit/owners/6/pets/8/visits
+curl -X GET https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/visit/owners/6/pets/8/visits
 ```
 
 #### Get the log stream for API Gateway and Customers Service
@@ -426,13 +426,13 @@ Actuator endpoints let you monitor and interact with your application. By defaul
 You can try them out by opening the following app actuator endpoints in a browser:
 
 ```bash
-open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuator/
-open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuator/env
-open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuator/configprops
+open https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuator/
+open https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuator/env
+open https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/actuator/configprops
 
-open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/actuator
-open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/actuator/env
-open https://${SPRING_CLOUD_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/actuator/configprops
+open https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/actuator
+open https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/actuator/env
+open https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/api/customer/actuator/configprops
 ```
 
 #### Start monitoring Spring Boot apps and dependencies - in Application Insights
@@ -564,7 +564,7 @@ Read :
 
 Read those doc/samples below :
 - [https://github.com/Azure-Samples/azure-spring-boot-samples/tree/spring-cloud-azure_4.0.0/keyvault/spring-cloud-azure-starter-keyvault-secrets](https://github.com/Azure-Samples/azure-spring-boot-samples/tree/spring-cloud-azure_4.0.0/keyvault/spring-cloud-azure-starter-keyvault-secrets)
-- [https://microsoft.github.io/spring-cloud-azure/docs/4.0.0-beta.2/reference/html/index.html#secret-management](https://microsoft.github.io/spring-cloud-azure/docs/4.0.0-beta.2/reference/html/index.html#secret-management)
+- [https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#secret-management](https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#secret-management)
 
 The Config-server uses the config declared on the repo at [https://github.com/ezYakaEagle442/spring-petclinic-microservices-config/blob/main/application.yml](https://github.com/ezYakaEagle442/spring-petclinic-microservices-config/blob/main/application.yml) and need a Service Principal to be able to read secrets from KeyVault.
   'Key Vault Administrator'
@@ -654,7 +654,7 @@ Read [GitHub Action for deploying to Azure Spring Apps](https://github.com/marke
 Finally, edit the workflow file `.github/workflows/action.yml` in your forked repo to fill in the Azure Spring Apps instance name, and Key Vault name that you just created:
 ```yml
 env:
-  SPRING_CLOUD_SERVICE: azure-spring-cloud-name # name of your Azure Spring Apps instance
+  AZURE_SPRING_APPS_SERVICE: azure-spring-apps-name # name of your Azure Spring Apps instance
   KEYVAULT: your-keyvault-name # customize this
   DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://<your-keyvault-name>.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
 
@@ -767,12 +767,12 @@ url: jdbc:mysql://petclinic-mysql-server.mysql.database.azure.com:3306/petclinic
 
 In this quickstart, you've deployed an existing Spring Boot-based app using Azure CLI, Terraform and GitHub Actions. To learn more about Azure Spring Apps, go to:
 
-- [Azure Spring Apps](https://azure.microsoft.com/en-us/services/spring-cloud/)
-- [Azure Spring Apps docs](https://docs.microsoft.com/en-us/azure/java/)
+- [Azure Spring Apps](https://azure.microsoft.com/en-us/products/spring-apps)
+- [Azure Spring Apps docs](https://learn.microsoft.com/en-us/azure/spring-apps/)
 - [Deploy Spring microservices from scratch](https://github.com/microsoft/azure-spring-cloud-training)
 - [Deploy existing Spring microservices](https://github.com/Azure-Samples/azure-spring-cloud)
-- [Azure for Java Cloud Developers](https://docs.microsoft.com/en-us/azure/java/)
-- [Spring Cloud for Azure](https://cloud.spring.io/spring-cloud-azure/)
+- [Azure for Java Cloud Developers](https://learn.microsoft.com/en-us/azure/developer/java)
+- [Spring Cloud for Azure](https://spring.io/projects/spring-cloud-azure)
 - [Spring Cloud](https://spring.io/projects/spring-cloud)
 
 ## Credits

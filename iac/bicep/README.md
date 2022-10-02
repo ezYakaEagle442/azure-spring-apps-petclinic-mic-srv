@@ -1,5 +1,21 @@
 # Azure Spring Apps
 
+## Enterprise Tier
+
+Read the [pre-req doc](https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-standard#prerequisites)
+
+If you're deploying Azure Spring Apps Enterprise tier for the first time in the target subscription, use the following commands to register the provider and accept the legal terms and privacy statements for the Enterprise tier :
+```sh
+az provider register --namespace Microsoft.SaaS
+az term accept \
+     --publisher vmware-inc \
+     --product azure-spring-cloud-vmware-tanzu-2 \
+     --plan tanzu-asc-ent-mtr
+```
+
+
+## Standard Tier
+
 TODO : Use [Pipelines with GitHub Actions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-github-actions?tabs=CLI)
 ```sh
 
@@ -22,7 +38,7 @@ done
 azureSpringAppsRpAppId="$(az ad sp list --filter "displayname eq 'Azure Spring Cloud Resource Provider'" --query "[?appDisplayName=='Azure Spring Cloud Resource Provider'].appId" -o tsv | head -1)"
 ```
 
-In the [Bicep parameter file](./asa/parameters.json) :
+In the [Bicep parameter file](./parameters.json) :
 - set the above value $azureSpringAppsRpAppIdin to the field "azureSpringAppsRp"
 - set your laptop/dev station IP adress to the field "clientIPAddress"
 
@@ -30,13 +46,14 @@ In the [Bicep parameter file](./asa/parameters.json) :
 ```sh
 # Check, choose a Region with AZ : https://docs.microsoft.com/en-us/azure/availability-zones/az-overview#azure-regions-with-availability-zones
 az group create --name rg-iac-kv --location centralindia
-az group create --name rg-iac-asa-petclinic-mic-srv --location centralindia
+az group create --name rg-iac-asa-petclinic-mic-srv --location westeurope
 
-az deployment group create --name iac-101-kv -f ./kv/kv.bicep -g rg-iac-kv \
-    --parameters @./kv/parameters-kv.json
+az deployment group create --name iac-101-kv -f ./modules/kv/kv.bicep -g rg-iac-kv \
+    --parameters @./modules/kv/parameters-kv.json
 
 az deployment group create --name iac-101-asa -f ./asa/main.bicep -g rg-iac-asa-petclinic-mic-srv \
     --parameters @./asa/parameters.json --debug # --what-if to test like a dry-run
 ```
 
 Note: you can Run a Bicep script to debug and output the results to Azure Storage, see the [doc](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/deployment-script-bicep#sample-bicep-files)
+
