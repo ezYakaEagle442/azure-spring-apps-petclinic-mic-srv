@@ -63,7 +63,7 @@ resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
     enabledForTemplateDeployment: true
     enablePurgeProtection: true
     enableSoftDelete: true
-    enableRbacAuthorization: false // /!\ Preview feature: When true, the key vault will use RBAC for authorization of data actions, and the access policies specified in vault properties will be ignored
+    enableRbacAuthorization: true // /!\ Preview feature: When true, the key vault will use RBAC for authorization of data actions, and the access policies specified in vault properties will be ignored
     // When enabledForDeployment is true, networkAcls.bypass must include \"AzureServices\"
     networkAcls: {
       bypass: 'AzureServices'
@@ -75,27 +75,14 @@ resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
         }
       ]
       */
-      virtualNetworkRules: vNetRules
+      // virtualNetworkRules: vNetRules
     }
     softDeleteRetentionInDays: 7 // 30 must be greater or equal than '7' but less or equal than '90'.
-    accessPolicies: []
+    //accessPolicies: []
   }
 }
 
 output keyVault object = kv
-
-
-// create accessPolicies https://docs.microsoft.com/en-us/azure/templates/microsoft.keyvault/vaults/accesspolicies?tabs=bicep
-// /!\ Preview feature: When enableRbacAuthorization is true in KV, the key vault will use RBAC for authorization of data actions, and the access policies specified in vault properties will be ignored
-// https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/loops#loop-with-condition
-resource kvAccessPolicies 'Microsoft.KeyVault/vaults/accessPolicies@2021-06-01-preview' = if (setKVAccessPolicies) { 
-  name: 'add' // any('add-${app.appName}')
-  parent: kv // https://github.com/Azure/bicep/issues/5660 https://gitmetadata.com/repo/Azure/bicep/issues/4756
-  properties: {
-    accessPolicies: [for accessPolicy in accessPoliciesObject.accessPolicies: {
-        tenantId: tenantId
-        objectId: accessPolicy.objectId
-        permissions: accessPolicy.permissions
-      }]
-  }
-}
+output keyVaultId string = kv.id
+output keyVaultPublicNetworkAccess string = kv.properties.publicNetworkAccess
+output keyVaultURI string = kv.properties.vaultUri
