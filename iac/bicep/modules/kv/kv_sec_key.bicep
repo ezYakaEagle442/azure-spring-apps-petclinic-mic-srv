@@ -33,8 +33,12 @@ param secretValue string
 @description('Expiry date in seconds since 1970-01-01T00:00:00Z. Ex: 1672444800 ==> 31/12/2022')
 param secretExpiryDate int = 1672444800
 
-resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
-  name: kvName
+@description('The name of the KV RG')
+param kvRGName string
+
+resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  name: kvRGName
+  scope: subscription()
 }
 
 

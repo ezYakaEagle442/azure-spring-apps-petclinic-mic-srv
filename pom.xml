@@ -16,13 +16,13 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>asa-spring-petclinic-admin-server</module>
-        <module>asa-spring-petclinic-customers-service</module>
-        <module>asa-spring-petclinic-vets-service</module>
-        <module>asa-spring-petclinic-visits-service</module>
-        <module>asa-spring-petclinic-config-server</module>
-        <module>asa-spring-petclinic-discovery-server</module>
-        <module>asa-spring-petclinic-api-gateway</module>
+        <module>spring-petclinic-admin-server</module>
+        <module>spring-petclinic-customers-service</module>
+        <module>spring-petclinic-vets-service</module>
+        <module>spring-petclinic-visits-service</module>
+        <module>spring-petclinic-config-server</module>
+        <module>spring-petclinic-discovery-server</module>
+        <module>spring-petclinic-api-gateway</module>
     </modules>
 
     <properties>
@@ -77,11 +77,17 @@
             https://microsoft.github.io/spring-cloud-azure/current/reference/html/appendix.html#migration-guide-for-4-0
             -->
 
-            <!-- https://stackoverflow.com/questions/20244696/could-not-resolve-placeholder-in-string-value -->
+            <!-- 
+            spring-cloud-context version is managed by spring-cloud-commons-dependencies
+            spring-cloud-commons-dependencies is imported in spring-cloud-dependencies.
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-context</artifactId>
+                <version>3.1.3</version>
+                <scope>import</scope> 
+                <type>pom</type>               
             </dependency>
+            -->
                 
             <dependency>
                 <groupId>com.azure.spring</groupId>
