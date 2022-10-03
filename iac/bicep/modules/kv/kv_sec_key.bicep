@@ -41,6 +41,9 @@ resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   scope: subscription()
 }
 
+resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
+  name: kvName
+}
 
 // https://docs.microsoft.com/en-us/azure/developer/github/github-key-vault
 // https://docs.microsoft.com/en-us/azure/templates/microsoft.keyvault/vaults/secrets?tabs=bicep
