@@ -162,6 +162,8 @@ module azurespringapps './modules/asa/asa.bicep' = {
   params: {
     appName: appName
     location: location
+    kvName: kvName
+    kvRGName: kvRGName
     azureSpringAppsInstanceName: azureSpringAppsInstanceName
     azureSpringAppsSkuCapacity: azureSpringAppsSkuCapacity
     azureSpringAppsSkuName: azureSpringAppsSkuName
@@ -199,6 +201,8 @@ module asaCorpVNet './modules/asa/asa.bicep' = if (deployToVNet) {
   params: {
     appName: appName
     location: location
+    kvName: kvName
+    kvRGName: kvRGName    
     azureSpringAppsInstanceName: azureSpringAppsInstanceName
     azureSpringAppsSkuCapacity: azureSpringAppsSkuCapacity
     azureSpringAppsSkuName: azureSpringAppsSkuName
