@@ -32,3 +32,18 @@ resource kvAccessPolicies 'Microsoft.KeyVault/vaults/accessPolicies@2021-06-01-p
   }
 }
 
+// see ../../petclinic-apps.bicep
+output kvAccessPolicyObjectIdCustomersService string = kv.properties.accessPolicies[0].objectId
+output kvAccessPolicyAppIdCustomersService string = kv.properties.accessPolicies[0].applicationId
+output kvAccessPolicyPermissionGetsecretCustomersService array = kv.properties.accessPolicies[0].permissions.secrets
+output kvAccessPolicyTenantIdCustomersService string = kv.properties.accessPolicies[0].tenantId
+
+output kvAccessPolicyObjectIdVetsService string = kv.properties.accessPolicies[1].objectId
+output kvAccessPolicyAppIdVetsService string = kv.properties.accessPolicies[1].applicationId
+output kvAccessPolicyPermissionGetsecretVetsService array = kv.properties.accessPolicies[1].permissions.secrets
+output kvAccessPolicyTenantIdVetsService string = kv.properties.accessPolicies[1].tenantId
+
+output kvAccessPolicyObjectIdVisitsService string = kv.properties.accessPolicies[2].objectId
+output kvAccessPolicyAppIdVisitsService string = kv.properties.accessPolicies[2].applicationId
+output kvAccessPolicyPermissionGetsecretVisitsService array = kv.properties.accessPolicies[2].permissions.secrets
+output kvAccessPolicyTenantIdVisitsService string = kv.properties.accessPolicies[2].tenantId
