@@ -1,4 +1,4 @@
-name: Build to Azure Spring Apps with Key Vault and Upload the jar Arfifacts
+name: Build to Azure Spring Apps and Upload the jar Arfifacts
 on: [push]
 
 ###################################################################################################################
@@ -27,11 +27,10 @@ env:
   CONFIG_SERVER: config-server
   DISCOVERY_SERVER: discovery-server
 
-
   PRJ_PREFIX: spring-petclinic
 
   # ==== Azure Spring Apps Apps Deployment params ====:
-  DEPLOYMENT_VERSION: 2.6.3
+  DEPLOYMENT_VERSION: 2.6.6
 
 jobs:
   build:  

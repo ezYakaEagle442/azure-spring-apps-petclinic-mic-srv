@@ -110,8 +110,22 @@ param endIpAddress string = '10.42.1.15'
 // @description('MySQL ResourceID')
 // param mySQLResourceID string
 
+@maxLength(24)
+@description('The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters.')
+param kvName string = 'kv-${appName}'
 
+@description('The name of the KV RG')
+param kvRGName string
 
+resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  name: kvRGName
+  scope: subscription()
+}
+
+resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
+  name: kvName
+  scope: kvRG
+}
 // pre-req: https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-azure-cli#prerequisites
 resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-05-01-preview' = {
@@ -138,17 +152,33 @@ output azureSpringAppsResourceId string = azureSpringApps.id
 output azureSpringAppsFQDN string = azureSpringApps.properties.fqdn
 output azureSpringAppsOutboundPubIP string = azureSpringApps.properties.networkProfile.outboundIPs.publicIPs[0]
 
-module mysql './../mysql/mysql.bicep' = {
-  name: 'mysqldb'
+module mysqlPub './../mysql/mysql.bicep' = {
+  name: 'mysqldbpub'
   params: {
     appName: appName
     location: location
     clientIPAddress: clientIPAddress
     startIpAddress: startIpAddress
     endIpAddress: endIpAddress
-    serverName: serverName
-    administratorLogin: administratorLogin
-    administratorLoginPassword: administratorLoginPassword
+    serverName: kv.getSecret('MYSQL-SERVER-NAME')
+    administratorLogin: kv.getSecret('SPRING-DATASOURCE-USERNAME')
+    administratorLoginPassword: kv.getSecret('SPRING-DATASOURCE-PASSWORD')
+    setFwRuleClient: setFwRuleClient
+    azureSpringAppsOutboundPubIP: azureSpringApps.properties.networkProfile.outboundIPs.publicIPs[0]
+  }
+}
+
+module mysqlWithCorpEnv './../mysql/mysql.bicep' = if (deployToVNet) {
+  name: 'mysqldbcorpenv'
+  params: {
+    appName: appName
+    location: location
+    clientIPAddress: clientIPAddress
+    startIpAddress: startIpAddress
+    endIpAddress: endIpAddress
+    serverName: kv.getSecret('MYSQL-SERVER-NAME')
+    administratorLogin: kv.getSecret('SPRING-DATASOURCE-USERNAME')
+    administratorLoginPassword: kv.getSecret('SPRING-DATASOURCE-PASSWORD')
     setFwRuleClient: setFwRuleClient
     azureSpringAppsOutboundPubIP: azureSpringApps.properties.networkProfile.outboundIPs.publicIPs[0]
   }

@@ -146,12 +146,55 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' existing = if (depl
   name: vnetName
 }
 
+resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  name: kvRGName
+  scope: subscription()
+}
+
 resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
   name: kvName
+  scope: kvRG
 }
 
 module azurespringapps './modules/asa/asa.bicep' = {
-  name: 'azurespringapps'
+  name: 'asa-pub'
+  // scope: resourceGroup(rg.name)
+  params: {
+    appName: appName
+    location: location
+    azureSpringAppsInstanceName: azureSpringAppsInstanceName
+    azureSpringAppsSkuCapacity: azureSpringAppsSkuCapacity
+    azureSpringAppsSkuName: azureSpringAppsSkuName
+    azureSpringAppsTier: azureSpringAppsTier
+    appNetworkResourceGroup: appNetworkResourceGroup
+    appSubnetId: vnet.properties.subnets[1].id
+    monitoringSettingsName: monitoringSettingsName
+    serviceRuntimeNetworkResourceGroup: serviceRuntimeNetworkResourceGroup
+    serviceRuntimeSubnetId: vnet.properties.subnets[0].id
+    serviceCidr: serviceCidr
+    configServerName: configServerName
+    gitConfigURI: gitConfigURI
+    serviceRegistryName: serviceRegistryName
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    appInsightsName: appInsightsName
+    appInsightsDiagnosticSettingsName: appInsightsDiagnosticSettingsName
+    zoneRedundant: zoneRedundant
+    serverName: kv.getSecret('MYSQL-SERVER-NAME')
+    administratorLogin: kv.getSecret('SPRING-DATASOURCE-USERNAME')
+    administratorLoginPassword: kv.getSecret('SPRING-DATASOURCE-PASSWORD')   
+    clientIPAddress: clientIPAddress
+    startIpAddress: startIpAddress
+    endIpAddress: endIpAddress
+    deployToVNet: deployToVNet
+    setFwRuleClient: setFwRuleClient
+  }
+  dependsOn: [
+    roleAssignments
+  ]
+}
+
+module asaCorpVNet './modules/asa/asa.bicep' = if (deployToVNet) {
+  name: 'asa-corp-vnet'
   // scope: resourceGroup(rg.name)
   params: {
     appName: appName

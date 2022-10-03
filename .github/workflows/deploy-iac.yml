@@ -11,7 +11,7 @@ env:
   
   DEPLOY_TO_VNET: false
 
-  KV_NAME: kv-petcliasa21 # The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters
+  KV_NAME: kv-petclipoc # The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters
   SET_KV_ACCESS_POLICIES: false # let it to false
 
   # https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#consume-secrets-in-your-workflow
@@ -80,7 +80,7 @@ jobs:
       run: |
           pwd
           ls -al
-          # /home/runner/work/aca-java-petclinic-mic-srv/aca-java-petclinic-mic-srv/.
+          # /home/runner/work/asa-java-petclinic-mic-srv/asa-java-petclinic-mic-srv/.
           
           az deployment group create --name asa-petclinic-kv -f iac/bicep/modules/kv/kv.bicep -g ${{ env.RG_KV }} \
             -p appName=${{ env.APP_NAME }} \
@@ -98,7 +98,7 @@ jobs:
     # Now that GH Runner is Allowed to access KV, create the secrets
     - name: Create MYSQL-SERVER-NAME secret in Azure Key Vault
       run: |
-          az deployment group create --name aca-petclinic-kv-sec1 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+          az deployment group create --name asa-petclinic-kv-sec1 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
             -p appName=${{ env.APP_NAME }} \
             -p kvName=${{ env.KV_NAME }} \
             -p secretName="MYSQL-SERVER-NAME" \
@@ -108,7 +108,7 @@ jobs:
 
     - name: Create MYSQL-SERVER-FULL-NAME secret in Azure Key Vault
       run: |
-          az deployment group create --name aca-petclinic-kv-sec2 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+          az deployment group create --name asa-petclinic-kv-sec2 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
             -p appName=${{ env.APP_NAME }} \
             -p kvName=${{ env.KV_NAME }} \
             -p secretName="MYSQL-SERVER-FULL-NAME" \
@@ -118,7 +118,7 @@ jobs:
 
     - name: Create SPRING-DATASOURCE-USERNAME secret in Azure Key Vault
       run: |
-          az deployment group create --name aca-petclinic-kv-sec4 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+          az deployment group create --name asa-petclinic-kv-sec4 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
             -p appName=${{ env.APP_NAME }} \
             -p kvName=${{ env.KV_NAME }} \
             -p secretName="SPRING-DATASOURCE-USERNAME" \
@@ -128,7 +128,7 @@ jobs:
 
     - name: Create SPRING-DATASOURCE-PASSWORD secret in Azure Key Vault
       run: |
-          az deployment group create --name aca-petclinic-kv-sec5 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+          az deployment group create --name asa-petclinic-kv-sec5 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
             -p appName=${{ env.APP_NAME }} \
             -p kvName=${{ env.KV_NAME }} \
             -p secretName="SPRING-DATASOURCE-PASSWORD" \
@@ -138,7 +138,7 @@ jobs:
 
     - name: Create SPRING-CLOUD-AZURE-KEY-VAULT-ENDPOINT secret in Azure Key Vault
       run: |
-          az deployment group create --name aca-petclinic-kv-sec6 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+          az deployment group create --name asa-petclinic-kv-sec6 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
             -p appName=${{ env.APP_NAME }} \
             -p kvName=${{ env.KV_NAME }} \
             -p secretName="SPRING-CLOUD-AZURE-KEY-VAULT-ENDPOINT" \
@@ -148,7 +148,7 @@ jobs:
 
     - name: Create SPRING-CLOUD-AZURE-TENANT-ID secret in Azure Key Vault
       run: |
-          az deployment group create --name aca-petclinic-kv-sec7 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+          az deployment group create --name asa-petclinic-kv-sec7 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
             -p appName=${{ env.APP_NAME }} \
             -p kvName=${{ env.KV_NAME }} \
             -p secretName="SPRING-CLOUD-AZURE-TENANT-ID" \
@@ -159,7 +159,7 @@ jobs:
     - name: Create VM-ADMIN-USER-NAME secret in Azure Key Vault
       if: ${{ env.DEPLOY_TO_VNET }} 
       run: |
-          az deployment group create --name aca-petclinic-kv-sec8 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+          az deployment group create --name asa-petclinic-kv-sec8 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
             -p appName=${{ env.APP_NAME }} \
             -p kvName=${{ env.KV_NAME }} \
             -p secretName="VM-ADMIN-USER-NAME" \
@@ -170,7 +170,7 @@ jobs:
     - name: Create VM-ADMIN-PASSWORD secret in Azure Key Vault
       if: ${{ env.DEPLOY_TO_VNET }}
       run: |
-          az deployment group create --name aca-petclinic-kv-sec9 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+          az deployment group create --name asa-petclinic-kv-sec9 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
             -p appName=${{ env.APP_NAME }} \
             -p kvName=${{ env.KV_NAME }} \
             -p secretName="VM-ADMIN-PASSWORD" \
@@ -178,15 +178,15 @@ jobs:
             -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
       shell: bash
 
-    #- name: Create SPRING-DATASOURCE-URL secret in Azure Key Vault
-    #  run: |
-    #      az deployment group create --name aca-petclinic-kv-sec3 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} --debug \
-    #        -p appName=${{ env.APP_NAME }} \
-    #        -p kvName=${{ env.KV_NAME }} \
-    #        -p secretName="SPRING-DATASOURCE-URL" \
-    #        -p secretValue=${{ secrets.SPRING_DATASOURCE_URL }} \
-    #        -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
-    #  shell: bash
+    - name: Create SPRING-DATASOURCE-URL secret in Azure Key Vault
+      run: |
+          az deployment group create --name asa-petclinic-kv-sec3 -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} --debug \
+            -p appName=${{ env.APP_NAME }} \
+            -p kvName=${{ env.KV_NAME }} \
+            -p secretName="SPRING-DATASOURCE-URL" \
+            -p secretValue=${{ secrets.SPRING_DATASOURCE_URL }} \
+            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
+      shell: bash
 
     - name: Disable local IP access to the Key Vault
       if: ${{ always() }}
@@ -215,9 +215,11 @@ jobs:
     - name: Deploy the pre-req
       run: |
           # --debug # --what-if to test like a dry-run
-          az deployment group create --name aca-petclinic-pre-req -f iac/bicep/pre-req.bicep -g ${{ env.RG_APP }} \
+          az deployment group create --name asa-petclinic-pre-req -f iac/bicep/pre-req.bicep -g ${{ env.RG_APP }} \
             -p appName=${{ env.APP_NAME }} \
             -p location=${{ env.LOCATION }} \
+            -p kvName=${{ env.KV_NAME }} \
+            -p kvRGName=${{ env.RG_KV }} \
             -p setFwRuleClient=false \
             -p deployToVNet=${{ env.DEPLOY_TO_VNET }} \
             -p autoShutdownNotificationEmail="toto@groland.grd" \
@@ -262,7 +264,17 @@ jobs:
     steps:
     - name: Deploy Azure Spring Apps
       run: |
-          az deployment group create --name aca-petclinic-apps -f iac/bicep/petclinic-apps.bicep -g ${{ env.RG_APP }} \
+
+          # If you're deploying Azure Spring Apps Enterprise tier for the first time in the target subscription, 
+          # use the following commands to register the provider and accept the legal terms and privacy statements for the Enterprise tier
+          echo "see Azure Spring Apps Enterprise tier pre-req at https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-standard#prerequisites"
+          az provider register --namespace Microsoft.SaaS
+          az term accept \
+              --publisher vmware-inc \
+              --product azure-spring-cloud-vmware-tanzu-2 \
+              --plan tanzu-asc-ent-mtr
+              
+          az deployment group create --name asa-petclinic-apps -f iac/bicep/petclinic-apps.bicep -g ${{ env.RG_APP }} \
             -p appName=${{ env.APP_NAME }} \
             -p location=${{ env.LOCATION }} \
             -p kvName=${{ env.KV_NAME }} \

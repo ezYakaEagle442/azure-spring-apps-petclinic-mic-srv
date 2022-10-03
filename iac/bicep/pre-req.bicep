@@ -147,14 +147,23 @@ module dnsprivatezone './modules/asa/dns.bicep' = if (deployToVNet) {
     azureSpringAppsInstanceName: azureSpringAppsInstanceName
     serviceRuntimeNetworkResourceGroup: serviceRuntimeNetworkResourceGroup
   }
+  dependsOn: [
+    vnetModule 
+  ]     
 }
 
 resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' existing = if (deployToVNet) {
   name: vnetName
 }
 
+resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  name: kvRGName
+  scope: subscription()
+}
+
 resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
   name: kvName
+  scope: kvRG
 }
 
 module clientVM './modules/asa/client-vm.bicep' = if (deployToVNet) {
@@ -173,4 +182,8 @@ module clientVM './modules/asa/client-vm.bicep' = if (deployToVNet) {
      nsgName: nsgName
      nsgRuleName: nsgRuleName
   }   
+  dependsOn: [
+    vnetModule
+    dnsprivatezone    
+  ]   
 }
