@@ -22,9 +22,6 @@ param appName string = 'petclinic${uniqueString(resourceGroup().id)}'
 param location string = 'westeurope'
 // param rgName string = 'rg-${appName}'
 
-@description('The Azure Spring Apps Resource Provider ID')
-param azureSpringAppsRp string
-
 @maxLength(24)
 @description('The name of the KV, must be UNIQUE.  A vault name must be between 3-24 alphanumeric characters.')
 param kvName string // = 'kv-${appName}'
