@@ -1,5 +1,7 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
 name: Build & Deploy to Azure Spring Apps with Key Vault
-on: [push]
 
 ###################################################################################################################
 #
@@ -13,7 +15,7 @@ on: [push]
 env:
   AZ_CLI_VERSION: 2.40.0
   SPRING_CLOUD_SERVICE: asa-petcliasa # customize this
-  KEYVAULT: kv-petcliasa42 # customize this
+  KEYVAULT: kv-petcliasa21 # customize this
   
   # ==== APPS ====:
   API_GATEWAY: api-gateway
@@ -26,11 +28,11 @@ env:
 
   PRJ_PREFIX: spring-petclinic
 
-  # ==== Azure Spring Apps Apps Deployment params ====:
+  # ==== Azure Spring Apps / Apps Deployment params ====:
 
   # customize this
   # DEPLOYMENT_RG: rg-iac-asa-petclinic-mic-srv
-  DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://kv-petcliasa42.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
+  DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://kv-petcliasa21.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
   
   DEPLOYMENT_VERSION: 2.6.3
   DEPLOYMENT_RUNTIME_VERSION: Java_11
@@ -53,8 +55,20 @@ env:
   # DEPLOYMENT_STAGING: false
   # DEPLOYMENT_ACTION: set-production
 
+
+  # ==== Secrets ====
+  credentials: ${{ secrets.AZURE_CREDENTIALS }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT: ${{ secrets.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}
+  SPRING_CLOUD_AZURE_TENANT_ID: ${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }}
+
+
+on: [push]
+
 jobs:
-  build:
+  set-var:
     runs-on: ubuntu-latest
     # environment: production // https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
     # https://github.com/marketplace/actions/azure-login
@@ -147,38 +161,6 @@ jobs:
         echo "VISITS_SERVICE_DEPLOYMENT=$VISITS_SERVICE_DEPLOYMENT"
       shell: bash
 
-    - name: Login with Key Vault SP
-      uses: azure/login@v1 
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    # When Public access is disabled on KV, you need to add a network rule in the KV Firewall
-    - name: Authorize local IP to access the Azure Key Vault
-      uses: azure/CLI@v1
-      with:
-        azcliversion: ${{ env.AZ_CLI_VERSION }}
-        inlineScript: |
-          az keyvault network-rule add --ip-address $LOCAL_IP --name ${{ env.KEYVAULT }} --only-show-errors
-          sleep 30
-
-    - name: Get service SP from Key Vault
-      uses: Azure/get-keyvault-secrets@v1
-      with:
-        keyvault: ${{ env.KEYVAULT }}
-        secrets: "AZURE-CREDENTIALS-FOR-SPRING"
-      id: keyvaultaction
-    
-    - name: Get MySQL Secrets from Key Vault
-      uses: Azure/get-keyvault-secrets@v1
-      with:
-        keyvault: ${{ env.KEYVAULT }}
-        secrets: "MYSQL-SERVER-FULL-NAME,MYSQL-DATABASE-NAME,MYSQL-SERVER-ADMIN-LOGIN-NAME,MYSQL-SERVER-ADMIN-PASSWORD"
-      id: mysqlsecrets
-      
-    - name: Login with Service SP
-      uses: azure/login@v1
-      with:
-        creds: ${{ steps.keyvaultaction.outputs.AZURE-CREDENTIALS-FOR-SPRING }}
     # Something to note, actions/checkout@v2 no longer sets the github workspace to the path input, which means you may need to manually set the working directory for your runs step
     # https://github.com/actions/checkout/blob/main/adrs/0153-checkout-v2.md#path
         
@@ -192,14 +174,21 @@ jobs:
         distribution: 'microsoft'
         cache: maven
 
-    - name: maven build, clean
-      run: |
-        mvn clean package -DskipTests -Denv=cloud
-        echo "github.workspace = ${{ github.workspace }}"
-        pwd
-        ls -al
-      # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts
+  # https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
+  # invalid value workflow reference: references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
+  call-maven-build-workflow:
+    name: Trigger Maven
+    needs: pre-flight
+    uses: ./.github/workflows/maven-build.yml # .github/workflows/maven-build.yml@main ==> references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
+    secrets: inherit # pass all secrets
+      # envPAT: ${{ secrets.envPAT }} # pass just this secret
 
+  upload-artifacts:
+    needs: call-maven-build-workflow
+    runs-on: ubuntu-latest
+
+  # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts
+    steps:
     - name: Archive ADMIN-SERVER Jar artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -208,7 +197,7 @@ jobs:
         retention-days: 5
 
     - name: Archive CONFIG-SERVER Jar artifacts
-      uses: actions/upload-artifact@v3
+      uses:  actions/upload-artifact@v3
       with:
         name: ${{ env.CONFIG_SERVER }}
         path: ${{ github.workspace }}/${{ env.CONFIG_SERVER_JAR }}
@@ -256,8 +245,8 @@ jobs:
         inlineScript: |
           az keyvault network-rule remove --ip-address $LOCAL_IP --name ${{ env.KEYVAULT }} --only-show-errors
 
-  deploy:
-    needs: build
+  deploy-apps:
+    needs: [call-maven-build-workflow, upload-artifacts]
     runs-on: ubuntu-latest # [self-hosted, linux, x64]
     steps: 
 
@@ -293,48 +282,53 @@ jobs:
       with:
         creds: ${{ steps.keyvaultaction.outputs.AZURE-CREDENTIALS-FOR-SPRING }}
 
-    # https://github.com/marketplace/actions/azure-spring-apps
-    - name: Deploy DISCOVERY-SERVER
-      uses:  Azure/spring-apps-deploy@v1
+    - name: Deploy vets-service
+      uses: Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
         service-name: ${{ env.SPRING_CLOUD_SERVICE }}
-        app-name: ${{ env.DISCOVERY_SERVER }}
+        app-name: ${{ env.VETS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: $DISCOVERY_SERVER_PACKAGE_PATH
-        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}  
-        deployment-name: $DISCOVERY_SERVER_DEPLOYMENT
-        create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
-        version: ${{ env.DEPLOYMENT_VERSION }} 
-        runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
-   
-    - name: Deploy CONFIG-SERVER
-      uses:  Azure/spring-apps-deploy@v1
-      with:
-        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
-        action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
-        app-name: ${{ env.CONFIG_SERVER }}
-        use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: $CONFIG_SERVER_PACKAGE_PATH
-        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }} 
-        deployment-name: $CONFIG_SERVER_DEPLOYMENT
+        package: $VETS_SERVICE_DEPLOYMENT
+        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
+        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
+        environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
+        deployment-name: $VETS_SERVICE_DEPLOYMENT
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
         version: ${{ env.DEPLOYMENT_VERSION }} 
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
 
-    - name: Deploy admin-server
-      uses:  Azure/spring-apps-deploy@v1
+    - name: Deploy visits-service
+      uses: Azure/spring-apps-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
         service-name: ${{ env.SPRING_CLOUD_SERVICE }}
-        app-name: ${{ env.ADMIN_SERVER }}
+        app-name: ${{ env.VISITS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: $ADMIN_SERVER_PACKAGE_PATH
-        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}   
-        deployment-name: $ADMIN_SERVER_DEPLOYMENT
+        package: $VISITS_SERVICE_PACKAGE_PATH
+        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
+        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
+        environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
+        deployment-name: $VISITS_SERVICE_DEPLOYMENT
+        create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
+        version: ${{ env.DEPLOYMENT_VERSION }} 
+        runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
+
+    - name: Deploy customers-service
+      uses: Azure/spring-apps-deploy@v1
+      with:
+        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+        action: deploy
+        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        app-name: ${{ env.CUSTOMERS_SERVICE }}
+        use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
+        package: $CUSTOMERS_SERVICE_PACKAGE_PATH
+        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
+        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
+        environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
+        deployment-name: $CUSTOMERS_SERVICE_DEPLOYMENT
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
         version: ${{ env.DEPLOYMENT_VERSION }} 
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
@@ -353,82 +347,10 @@ jobs:
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
         version: ${{ env.DEPLOYMENT_VERSION }} 
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }} 
- 
-    - name: Deploy vets-service
-      uses: Azure/spring-apps-deploy@v1
-      with:
-        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
-        action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
-        app-name: ${{ env.VETS_SERVICE }}
-        use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: $VETS_SERVICE_DEPLOYMENT
-        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
-        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
-        environment-variables: "-MYSQL_SERVER_FULL_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-FULL-NAME }} \
-        -MYSQL_DATABASE_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-DATABASE-NAME }} \
-        -MYSQL_SERVER_ADMIN_LOGIN_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-LOGIN-NAME }} \
-        -MYSQL_SERVER_ADMIN_PASSWORD ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-PASSWORD }}"    
-        deployment-name: $VETS_SERVICE_DEPLOYMENT
-        create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
-        version: ${{ env.DEPLOYMENT_VERSION }} 
-        runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
-
-    - name: Deploy visits-service
-      uses: Azure/spring-apps-deploy@v1
-      with:
-        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
-        action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
-        app-name: ${{ env.VISITS_SERVICE }}
-        use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: $VISITS_SERVICE_PACKAGE_PATH
-        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
-        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
-        environment-variables: "-MYSQL_SERVER_FULL_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-FULL-NAME }} \
-        -MYSQL_DATABASE_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-DATABASE-NAME }} \
-        -MYSQL_SERVER_ADMIN_LOGIN_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-LOGIN-NAME }} \
-        -MYSQL_SERVER_ADMIN_PASSWORD ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-PASSWORD }}"
-        deployment-name: $VISITS_SERVICE_DEPLOYMENT
-        create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
-        version: ${{ env.DEPLOYMENT_VERSION }} 
-        runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
-
-    - name: Deploy customers-service
-      uses: Azure/spring-apps-deploy@v1
-      with:
-        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
-        action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
-        app-name: ${{ env.CUSTOMERS_SERVICE }}
-        use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: $CUSTOMERS_SERVICE_PACKAGE_PATH
-        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
-        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
-        environment-variables: "-MYSQL_SERVER_FULL_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-FULL-NAME }} \
-        -MYSQL_DATABASE_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-DATABASE-NAME }} \
-        -MYSQL_SERVER_ADMIN_LOGIN_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-LOGIN-NAME }} \
-        -MYSQL_SERVER_ADMIN_PASSWORD ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-PASSWORD }}"
-        deployment-name: $CUSTOMERS_SERVICE_DEPLOYMENT
-        create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
-        version: ${{ env.DEPLOYMENT_VERSION }} 
-        runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
-
+        
     - name: Disable local IP access to the Key Vault
       uses: azure/CLI@v1
       with:
         azcliversion: ${{ env.AZ_CLI_VERSION }}
         inlineScript: |
-          az keyvault network-rule remove --ip-address $NEW_IP --name ${{ env.KEYVAULT }} --only-show-errors
-
-    # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
-    # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners
-    # if the runner is self-hosted which is not github provided it is recommended to manually logout at the end of the workflow as shown below.
-    - name: Azure Logout security hardening
-      uses: azure/CLI@v1
-      with:
-        azcliversion: ${{ env.AZ_CLI_VERSION }}
-        inlineScript: |
-          az logout
-          az cache purge
-          az account clear
+          az keyvault network-rule remove --ip-address $LOCAL_IP --name ${{ env.KEYVAULT }} --only-show-errors
