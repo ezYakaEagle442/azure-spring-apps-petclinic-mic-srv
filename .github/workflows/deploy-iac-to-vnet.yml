@@ -177,6 +177,14 @@ jobs:
             -p endIpAddress="10.0.0.255" \
             -p nsgRuleSourceAddressPrefix="10.0.0.0/16"
               
+
+            echo "Now Validate private DNS link connection ... "
+            # From the windows client VM inside athe Azure Spring Apps VNet with private zone, then nslookup will resolve to the private ip.
+
+            ssh -i ~/.ssh/$ssh_key $admin_username@$network_interface_pub_ip
+            nslookup ${ASA_INSTANCE_NAME}.${PRIVATE_DNS_ZONE}
+            nslookup $ASA_INSTANCE_NAME
+
       shell: bash
 
     - name: Azure Logout security hardening
