@@ -14,11 +14,6 @@ param appName string = 'iacdemo${uniqueString(resourceGroup().id)}'
 @description('The name of the KV, must be UNIQUE.  A vault name must be between 3-24 alphanumeric characters.')
 param kvName string = 'kv-${appName}'
 
-param setKVAccessPolicies bool = false
-
-@description('The KeyVault AccessPolicies for the Azure Spring Apps Identities  wrapped into an object.')
-param accessPoliciesObject object
-
 @description('The KV location')
 param location string = resourceGroup().location
 
