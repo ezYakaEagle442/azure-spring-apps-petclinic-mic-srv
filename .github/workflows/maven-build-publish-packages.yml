@@ -14,7 +14,7 @@ on: [push]
 ###################################################################################################################
 
 env:
-  AZURE_SPRING_APPS_SERVICE: asa-petcliasa42 # customize this
+  AZURE_SPRING_APPS_SERVICE: asa-petcliasa21 # customize this
   
   # ==== APPS ====:
   API_GATEWAY: api-gateway
@@ -62,7 +62,7 @@ jobs:
     - name: Set dependent environment variables
       run: |
 
-        # ==== JARS ====: PWD already in /home/runner/work/azure-spring-cloud-petclinic-mic-srv >> $GITHUB_ENV
+        # ==== JARS ====: PWD already in /home/runner/work/azure-spring-apps-petclinic-mic-srv >> $GITHUB_ENV
         echo "API_GATEWAY_JAR=${{ env.PRJ_PREFIX }}-${{ env.API_GATEWAY }}/target/$API_GATEWAY_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "ADMIN_SERVER_JAR=${{ env.PRJ_PREFIX }}-${{ env.ADMIN_SERVER }}/target/$ADMIN_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "CONFIG_SERVER_JAR=${{ env.PRJ_PREFIX }}-${{ env.CONFIG_SERVER }}/target/$CONFIG_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV

@@ -4,7 +4,7 @@ name: Delete Apps
 env:
   LOCATION: westeurope
   RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to delete the asa Apps
-  ASA_SERVICE_NAME: asa-svc-pub # ASA Instance service name. Ex 'asa-svc-pub' or 'asa-svc-corp' when deployed to your VNet
+  AZURE_SPRING_APPS_SERVICE: asa-svc-pub # ASA Instance service name. Ex 'asa-svc-pub' or 'asa-svc-corp' when deployed to your VNet
 
   ADMIN_SERVER: admin-server
   CONFIG_SERVER: config-server
@@ -44,21 +44,21 @@ jobs:
         azcliversion: ${{ env.AZ_CLI_VERSION }}
         inlineScript: |
 
-          az spring app list -g ${{ env.RG_APP }} --service ASA_SERVICE_NAME
+          az spring app list -g ${{ env.RG_APP }} --service AZURE_SPRING_APPS_SERVICE
 
-          for app in $(az spring app list --service ASA_SERVICE_NAME -g ${{ env.RG_APP }} | jq -r '.[].name')
+          for app in $(az spring app list --service AZURE_SPRING_APPS_SERVICE -g ${{ env.RG_APP }} | jq -r '.[].name')
           do
             echo "About to delete App " $app
-            # az spring app delete --name $app -g ${{ env.RG_APP }} --service ${{ env.ASA_SERVICE_NAME }} --yes
+            # az spring app delete --name $app -g ${{ env.RG_APP }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} --yes
           done
           az config set extension.use_dynamic_install=yes_without_prompt
-          az spring app delete --name ${{ env.ADMIN_SERVER }} --service ${{ env.ASA_SERVICE_NAME }}  -g ${{ env.RG_APP }} --yes
-          az spring app delete --name ${{ env.VISITS_SERVICE }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
-          az spring app delete --name ${{ env.VETS_SERVICE }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
-          az spring app delete --name ${{ env.CUSTOMERS_SERVICE }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
-          az spring app delete --name ${{ env.API_GATEWAY }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
-          az spring app delete --name ${{ env.CONFIG_SERVER }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
-          az spring app delete --name ${{ env.DISCOVERY_SERVER }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.ADMIN_SERVER }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }}  -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.VISITS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.CUSTOMERS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.API_GATEWAY }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.CONFIG_SERVER }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --yes
+          az spring app delete --name ${{ env.DISCOVERY_SERVER }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --yes
 
     # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
     # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners

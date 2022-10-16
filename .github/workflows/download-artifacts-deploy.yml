@@ -13,8 +13,8 @@ on:
 
 env:
   AZ_CLI_VERSION: 2.40.0
-  AZURE_SPRING_APPS_SERVICE: asa-petcliasa # customize this
-  KEYVAULT: kv-petcliasa42 # customize this
+  AZURE_SPRING_APPS_SERVICE: asa-petcliasa21 # customize this
+  KEYVAULT: kv-petcliasa21 # customize this
   
   # ==== APPS ====:
   API_GATEWAY: api-gateway

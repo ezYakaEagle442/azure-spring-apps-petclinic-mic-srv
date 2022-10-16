@@ -14,7 +14,7 @@ name: Build & Deploy to Azure Spring Apps with Key Vault
 
 env:
   AZ_CLI_VERSION: 2.40.0
-  SPRING_CLOUD_SERVICE: asa-petcliasa # customize this
+  AZURE_SPRING_APPS_SERVICE: asa-petcliasa # customize this
   KEYVAULT: kv-petcliasa21 # customize this
   
   # ==== APPS ====:
@@ -287,7 +287,7 @@ jobs:
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.VETS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
         package: $VETS_SERVICE_DEPLOYMENT
@@ -304,7 +304,7 @@ jobs:
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.VISITS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
         package: $VISITS_SERVICE_PACKAGE_PATH
@@ -321,7 +321,7 @@ jobs:
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.CUSTOMERS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
         package: $CUSTOMERS_SERVICE_PACKAGE_PATH
@@ -338,7 +338,7 @@ jobs:
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.API_GATEWAY }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
         package: $API_GATEWAY_PACKAGE_PATH
