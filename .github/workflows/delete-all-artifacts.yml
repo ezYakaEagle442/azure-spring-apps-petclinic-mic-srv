@@ -5,7 +5,8 @@ on:
 
 env:
   AZ_CLI_VERSION: 2.40.0
-  
+  DEPLOYMENT_VERSION: 2.6.3
+
   # ==== APPS ====:
   API_GATEWAY: api-gateway
   ADMIN_SERVER: admin-server
@@ -20,7 +21,10 @@ env:
   PRJ_PREFIX: spring-petclinic
 
 jobs:
-  deploy:
+  delete-jars:
+    permissions: 
+      contents: read
+      packages: write  
     runs-on: ubuntu-latest
     steps:
     - name: Set Base environment variables
@@ -101,6 +105,7 @@ jobs:
     # You can  download all artifacts in a workflow run by not specifying a name.
     - name: Delete ALL Jar artifacts
       run: |
+        echo "About to delete all jars files ..."
         curl -X DELETE -u username:${{ env.GHA_PAT }} -H "Accept: application/vnd.github.v3+json" ${{ env.ADMIN_SERVER_API_URL }}
         curl -X DELETE -u username:${{ env.GHA_PAT }} -H "Accept: application/vnd.github.v3+json" ${{ env.API_GATEWAY_API_URL }}
         curl -X DELETE -u username:${{ env.GHA_PAT }} -H "Accept: application/vnd.github.v3+json" ${{ env.CONFIG_SERVER_API_URL }}
@@ -109,7 +114,8 @@ jobs:
         curl -X DELETE -u username:${{ env.GHA_PAT }} -H "Accept: application/vnd.github.v3+json" ${{ env.VETS_SERVICE_API_URL }}
         curl -X DELETE -u username:${{ env.GHA_PAT }} -H "Accept: application/vnd.github.v3+json" ${{ env.VISITS_SERVICE_API_URL }}
 
-        curl -X DELETE -u username:${{ env.GHA_PAT }} -H "Accept: application/vnd.github.v3+json" ${{ env.GH_API }}/org.springframework.samples.spring-petclinic-microservices/spring-petclinic-microservices
+        curl -X DELETE -u username:${{ env.GHA_PAT }} -H "Accept: application/vnd.github.v3+json" https://${{ env.GH_API }}/org.springframework.samples.${{ env.PRJ_PREFIX }}-spring-petclinic-microservices/spring-petclinic-microservices
+        echo "All artifacts have been deleted, check at https://github.com/${{github.repository}}/packages/"
       shell: bash
       env:
         GHA_PAT: ${{ secrets.GHA_PAT }}
