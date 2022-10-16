@@ -95,6 +95,57 @@ jobs:
           sleep 30
       shell: bash
 
+    # Now that GH Runner is Allowed to access KV, create the secrets
+    - name: Create MYSQL-SERVER-NAME secret in Azure Key Vault
+      run: |
+          az deployment group create --name asa-petclinic-kv-server-name -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+            -p appName=${{ env.APP_NAME }} \
+            -p kvName=${{ env.KV_NAME }} \
+            -p secretName="MYSQL-SERVER-NAME" \
+            -p secretValue=${{ secrets.MYSQL_SERVER_NAME }} \
+            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}          
+      shell: bash
+
+    - name: Create MYSQL-SERVER-FULL-NAME secret in Azure Key Vault
+      run: |
+          az deployment group create --name asa-petclinic-kv-server-full-name -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+            -p appName=${{ env.APP_NAME }} \
+            -p kvName=${{ env.KV_NAME }} \
+            -p secretName="MYSQL-SERVER-FULL-NAME" \
+            -p secretValue=${{ secrets.MYSQL_SERVER_FULL_NAME }} \
+            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
+      shell: bash
+
+    - name: Create SPRING-DATASOURCE-USERNAME secret in Azure Key Vault
+      run: |
+          az deployment group create --name asa-petclinic-kv-db-usr -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+            -p appName=${{ env.APP_NAME }} \
+            -p kvName=${{ env.KV_NAME }} \
+            -p secretName="SPRING-DATASOURCE-USERNAME" \
+            -p secretValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
+            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
+      shell: bash
+
+    - name: Create SPRING-DATASOURCE-PASSWORD secret in Azure Key Vault
+      run: |
+          az deployment group create --name asa-petclinic-kv-db-pwd -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+            -p appName=${{ env.APP_NAME }} \
+            -p kvName=${{ env.KV_NAME }} \
+            -p secretName="SPRING-DATASOURCE-PASSWORD" \
+            -p secretValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
+            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
+      shell: bash
+
+    - name: Create SPRING-DATASOURCE-URL secret in Azure Key Vault
+      run: |
+          az deployment group create --name asa-petclinic-kv-db-url -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
+            -p appName=${{ env.APP_NAME }} \
+            -p kvName=${{ env.KV_NAME }} \
+            -p secretName="SPRING-DATASOURCE-URL" \
+            -p secretValue=${{ secrets.SPRING_DATASOURCE_URL }} \
+            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
+      shell: bash
+
     - name: Create SPRING-CLOUD-AZURE-KEY-VAULT-ENDPOINT secret in Azure Key Vault
       run: |
           az deployment group create --name asa-petclinic-kv-endpoint -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
