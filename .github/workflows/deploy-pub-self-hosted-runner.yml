@@ -1,0 +1,267 @@
+name: Deploy GHA Self-Hosted Runner # VM with Public IP, not in your VNet
+
+env:
+  APP_NAME: petcliasa
+  LOCATION: westeurope
+  KV_NAME: kv-petcliasa21 # The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters  
+  RG_KV: rg-iac-kv21 # RG where KV is deployed
+  RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the VM
+
+  REPO_URL: https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv
+
+  ADM_USR_NAME: adm_run
+  SSH_KEY_NAME: gha-runner
+  SSH_KEY_EMAIL:  youremail@groland.grd
+  LINUX_VM_NAME: vm-linux-gha-run-asapetcli
+
+  # ==== Identities ====
+  PETCLINIC_IDENTITY: id-asa-petclinic-dev-westeurope-101
+
+  # ==== Versions ====
+  AZ_CLI_VERSION: 2.40.0
+  JAVA_VERSION: 11
+
+  # https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#consume-secrets-in-your-workflow
+  # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-secrets
+  # ==== Secrets ====
+  credentials: ${{ secrets.AZURE_CREDENTIALS }}
+  
+  # SSH_PUB_KEY: ${{ secrets.SSH_PUB_KEY }} # <your SSH public Key>
+  # SSH_PRV_KEY: ${{ secrets.SSH_PRV_KEY }} # <your SSH private Key>
+  SSH_PASSPHRASE:  ${{ secrets.SSH_PASSPHRASE }}
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callinputs
+on:
+  workflow_dispatch:
+    inputs: # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_dispatchinputs
+      email:
+        description: emailRecipient to be informed before the VM shutdown
+        required: true
+        type: string
+jobs:
+
+  deploy-vm:
+    # runs-on: self-hosted
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+
+    outputs:
+      sshCommand: ${{ steps.deploy_VM.outputs.sshCommand }}
+      vmIpAddress: ${{ steps.deploy_VM.outputs.vmIpAddress }}
+
+    steps:
+    # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
+    # /!\ IMPORTANT:  The step that creates or updates the environment variable does not have access to the new value, but all subsequent steps in a job will have access.
+    - name: Set Base environment variables
+      run: |
+        echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Azure Login
+      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ env.credentials }}
+
+    - name: Deploy VM
+      id: deploy-vm      
+      run: |
+          ssh-keygen -t rsa -b 4096 -f ~/.ssh/${{ env.SSH_KEY_NAME }} -C ${{ env.SSH_KEY_EMAIL }} -N '' # -N '' for empty passphrase # -N ${{ env.SSH_PASSPHRASE }}
+          pub_key=`cat ~/.ssh/${{ env.SSH_KEY_NAME }}.pub`
+          prv_key=`cat ~/.ssh/${{ env.SSH_KEY_NAME }}`
+
+          echo "pub_key" $pub_key
+          echo "ghRunnerIP " $LOCAL_IP
+          
+          echo "ls /home/runner/.ssh/"${{ env.SSH_KEY_NAME }}
+          ls /home/runner/.ssh/${{ env.SSH_KEY_NAME }}
+          cat /home/runner/.ssh/${{ env.SSH_KEY_NAME }}.pub
+          echo ""
+          
+          # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idsteps
+          # Each step runs in its own process in the runner environment and has access to the workspace and filesystem. Because steps run in their own process, changes to environment variables are not preserved between steps
+
+          # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#using-a-github-hosted-runner
+          # When the job begins, GitHub automatically provisions a new VM for that job. 
+          # All steps in the job execute on the VM, allowing the steps in that job to share information using the runner's filesystem.
+
+          az deployment group create --name vnet-asa -f iac/bicep/modules/asa/vnet.bicep -g ${{ env.RG_APP }} \
+
+          az deployment group create --name asa-gh-self-hosted-runner -f iac/bicep/modules/gh/gh-self-hosted-runner.bicep -g ${{ env.RG_APP }} \
+            -p appName=${{ env.APP_NAME }} \
+            -p location=${{ env.LOCATION }} \
+            -p linuxVMName=${{ env.LINUX_VM_NAME }} \
+            -p adminUsername=${{ env.ADM_USR_NAME }} \
+            -p authenticationType="sshPublicKey" \
+            -p ghRunnerIP="$LOCAL_IP" \
+            -p nsgRuleSourceAddressPrefix="$LOCAL_IP" \
+            -p adminPasswordOrKey="$pub_key" \
+            -p autoShutdownNotificationEmail=${{ inputs.email }} 
+
+          sshCommand=$(az deployment group show -n asa-gh-self-hosted-runner -g ${{ env.RG_APP }} --query properties.outputs.sshCommand.value | tr -d '"')
+          pipId=$(az deployment group show -n asa-gh-self-hosted-runner -g ${{ env.RG_APP }} --query properties.outputs.pipId.value | tr -d '"')
+          hostname=$(az deployment group show -n asa-gh-self-hosted-runner -g ${{ env.RG_APP }} --query properties.outputs.hostname.value | tr -d '"')
+          pipGUID=$(az deployment group show -n asa-gh-self-hosted-runner -g ${{ env.RG_APP }} --query properties.outputs.pipGUID.value | tr -d '"')
+
+          echo "hostname" $hostname
+          echo "sshCommand" $sshCommand
+          echo "pipId" $pipId
+          echo "pipGUID" $pipGUID
+
+          vmIpAddress=$(az network public-ip show --id $pipId -g  ${{ env.RG_APP }} | jq .ipAddress)
+          echo "vmIpAddress " $vmIpAddress
+
+          # echo "::set-output name=sshCommand::$sshCommand"
+          # echo "::set-output name=vmIpAddress::$vmIpAddress"
+
+          # https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/
+          # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
+          # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
+          echo "hostname=$hostname" >> $GITHUB_OUTPUT
+          echo "sshCommand=$sshCommand" >> $GITHUB_OUTPUT
+          echo "pipId=$pipId" >> $GITHUB_OUTPUT
+          echo "pipGUID=$pipGUID" >> $GITHUB_OUTPUT
+          echo "vmIpAddress=$vmIpAddress" >> $GITHUB_OUTPUT
+
+          echo "VM Deployed"
+
+    - name: Setup Runner
+      id: setup_runner      
+      run: |
+          echo "Assigning Identity " ${{ env.PETCLINIC_IDENTITY }} " to VM " ${{ env.LINUX_VM_NAME }}
+          az vm identity assign --name ${{ env.LINUX_VM_NAME }} --identities ${{ env.PETCLINIC_IDENTITY }} -g ${{ env.RG_APP }}
+
+          vmIpAddress=${{ steps.deploy-vm.outputs.vmIpAddress }}
+          echo "vmIpAddress= " "$vmIpAddress"
+
+          sshCommand="${{ steps.deploy-vm.outputs.sshCommand }}" 
+          echo "sshCommand= " $sshCommand
+
+          pub_key=`cat ~/.ssh/${{ env.SSH_KEY_NAME }}.pub`
+          prv_key=`cat ~/.ssh/${{ env.SSH_KEY_NAME }}`
+
+          echo "pub_key" $pub_key
+          # echo "prv_key" $prv_key
+
+          # verify .ssh/authorized_keys
+          pwd
+          echo "ls /home"
+          ls /home
+
+          echo "ls /home/runner/.ssh/"${{ env.SSH_KEY_NAME }}
+          ls /home/runner/.ssh/${{ env.SSH_KEY_NAME }}
+          echo ""
+
+          # eval `ssh-agent -s`
+          # ssh-add
+          # sshpass -p foo ssh username@host.example.com
+          $sshCommand -i /home/runner/.ssh/${{ env.SSH_KEY_NAME }}
+
+          echo " /home/"${{ env.ADM_USR_NAME }}
+          ls /home/${{ env.ADM_USR_NAME }}
+          echo ""
+
+          # verify .ssh/authorized_keys
+          ls /home/${{ env.ADM_USR_NAME }}
+
+          # Once you have successfully connected to the VM, install the DevTools
+
+          # Note: the GH Hosted Runner / Ubuntu latest image has already Azure CLI installed
+          # https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#cli-tools
+
+          sudo apt-get install -y apt-transport-https
+          # https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest
+          curl -sL https://packages.microsoft.com/keys/microsoft.asc |
+              gpg --dearmor |
+              sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+          sudo apt-get update
+          sudo apt-get install ca-certificates curl apt-transport-https lsb-release gnupg
+
+          AZ_REPO=$(lsb_release -cs)
+          echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | 
+              sudo tee /etc/apt/sources.list.d/azure-cli.list
+
+          sudo apt-get update
+          sudo apt-get install azure-cli
+          az upgrade
+          az version
+
+          az bicep install
+          az bicep upgrade
+          az bicep version
+          az bicep --help
+
+          # Java
+          # https://docs.microsoft.com/en-us/java/openjdk/containers
+          # https://docs.microsoft.com/en-us/java/openjdk/install#install-on-ubuntu 
+          # Valid values are only '18.04' and '20.04'
+          # For other versions of Ubuntu, please use the tar.gz package
+          ubuntu_release=`lsb_release -rs`
+          echo "ubuntu_release: " $ubuntu_release
+          wget https://packages.microsoft.com/config/ubuntu/${ubuntu_release}/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+          sudo dpkg -i packages-microsoft-prod.deb
+
+          sudo apt-get install apt-transport-https
+          sudo apt-get update
+          sudo apt-get install msopenjdk-11 --yes
+          java -version
+
+          # jq
+          sudo apt-get install jq --yes
+
+          # Maven
+          sudo apt install maven --yes
+          mvn -version
+
+          # Git
+          git clone ${{ env.REPO_URL }}
+
+          # Self-hosted Runner requires Docker
+
+          # see also https://docs.github.com/en/actions/hosting-your-own-runners/monitoring-and-troubleshooting-self-hosted-runners#troubleshooting-containers-in-self-hosted-runners
+          # https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+
+          sudo apt-get update
+          sudo apt-get install \
+              ca-certificates \
+              curl \
+              gnupg \
+              lsb-release
+
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+              echo \
+                "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+                $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+              sudo apt-get update
+              sudo apt-get install docker-ce docker-ce-cli containerd.io --yes
+              sudo docker --version
+
+              service --status-all
+              sudo service docker start
+              sudo service docker status
+
+              sudo systemctl is-active docker.service
+
+              # If your job fails with the following error:https://docs.github.com/en/actions/hosting-your-own-runners/monitoring-and-troubleshooting-self-hosted-runners#checking-the-docker-permissions
+              # dial unix /var/run/docker.sock: connect: permission denied
+              # https://gist.github.com/didof/be97b600ba3f9d1725b8c6d1c643c745
+
+              # Create a folder
+              mkdir actions-runner && cd actions-runner# Download the latest runner package
+              curl -o actions-runner-linux-x64-2.298.2.tar.gz -L https://github.com/actions/runner/releases/download/v2.298.2/actions-runner-linux-x64-2.298.2.tar.gz# Optional: Validate the hash
+              echo "0bfd792196ce0ec6f1c65d2a9ad00215b2926ef2c416b8d97615265194477117  actions-runner-linux-x64-2.298.2.tar.gz" | shasum -a 256 -c# Extract the installer
+              tar xzf ./actions-runner-linux-x64-2.298.2.tar.gz
+
+              # Create the runner and start the configuration experience
+              ./config.sh --url https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv --token AKMJLR5ZUAPWJWE7TPCNZC3DJP27Y# Last step, run it!
+              ./run.sh
+
+              echo" Use this YAML in your workflow file for each job :"
+              "runs-on: self-hosted"
