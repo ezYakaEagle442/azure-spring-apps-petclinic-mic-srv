@@ -3,7 +3,47 @@
 
 name: Java CI with Maven
 
+env:
+  PROJECT_NAME: petclinic                # set this to your project's name
+  KV_NAME: kv-petcliasa21               # The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters
+  
+  RG_KV: rg-iac-kv21 # RG where to deploy KV
+  RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ACA, ACA Env., MySQL, etc.
+
+  # ==== APPS ====
+  PRJ_PREFIX: asa-spring-petclinic
+
+  API_GATEWAY: api-gateway
+  ADMIN_SERVER: admin-server
+  CUSTOMERS_SERVICE: customers-service
+  VETS_SERVICE: vets-service
+  VISITS_SERVICE: visits-service
+
+  CONFIG_SERVER: config-server
+  DISCOVERY_SERVER: discovery-server
+
+  # ==== Versions ====
+  DEPLOYMENT_VERSION: 2.6.6
+  AZ_CLI_VERSION: 2.40.0
+  JAVA_VERSION: 11
+
+  # https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#consume-secrets-in-your-workflow
+  # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-secrets
+  # ==== Secrets ====
+  credentials: ${{ secrets.AZURE_CREDENTIALS }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  SPN_ID: ${{ secrets.SPN_ID }}
+  SPN_PWD: ${{ secrets.SPN_PWD }}
+  
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callinputs
+
 on:
+  workflow_call:
+    outputs:
+      tag_id:
+        description: "The Maven Build job output"
+        value: ${{ jobs.maven-build.outputs.tag_id }}
+
   push:
     branches:
       - azure
@@ -24,9 +64,10 @@ on:
       - 'releases/**'
 
 jobs:
-  build:
-
+  maven-build:
     runs-on: ubuntu-latest
+    outputs:
+      tag_id: ${{ steps.acr_build.outputs.tag_id }}
 
     steps:
     - uses: actions/checkout@v2
@@ -37,6 +78,7 @@ jobs:
         distribution: 'microsoft' # https://github.com/actions/setup-java
         cache: maven
     - name: Build with Maven
+      id: mvn_build
       run: | 
         mvn -B clean package --file pom.xml -DskipTests -Denv=cloud
         
@@ -50,3 +92,25 @@ jobs:
         ls -al spring-petclinic-customers-service/target/*.jar
         ls -al spring-petclinic-vets-service/target/*.jar
         ls -al spring-petclinic-visits-service/target/*.jar
+
+        tag_id=$GITHUB_SHA
+        echo "GITHUB_RUN_ID="$GITHUB_RUN_ID
+        echo "GITHUB_SHA="$GITHUB_SHA
+        echo "run_id="${{ github.run_id }}
+        echo "github.sha="${{ github.sha }}
+        
+        echo "tag_id="$tag_id
+        SHORT_SHA=`echo $GITHUB_SHA | cut -c1-8`
+        echo "SHORT_SHA="$SHORT_SHA
+
+        tag_id=$SHORT_SHA
+        echo "tag_id="$tag_id
+
+        # The `set-output` command is deprecated and will be disabled soon. 
+        # see: https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/
+        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
+        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
+        
+        # echo "::set-output name=tag_id::$tag_id"
+        echo "tag_id=$tag_id" >> $GITHUB_ENV
+        echo "tag_id=$tag_id" >> $GITHUB_OUTPUT
