@@ -65,7 +65,7 @@ jobs:
   maven-build:
     runs-on: ubuntu-latest
     outputs:
-      tag_id: ${{ steps.acr_build.outputs.tag_id }}
+      tag_id: ${{ steps.mvn_build.outputs.tag_id }}
 
     steps:
     - uses: actions/checkout@v2
