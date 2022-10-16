@@ -220,7 +220,6 @@ jobs:
             -p location=${{ env.LOCATION }} \
             -p kvName=${{ env.KV_NAME }} \
             -p kvRGName=${{ env.RG_KV }} \
-            -p setFwRuleClient=false \
             -p deployToVNet=${{ env.DEPLOY_TO_VNET }}
               
       shell: bash
@@ -269,7 +268,11 @@ jobs:
             -p kvRGName=${{ env.RG_KV }} \
             -p publicNetworkAccess=enabled \
             -p kvSkuName=standard \
-            -p deployToVNet=${{ env.DEPLOY_TO_VNET }}
+            -p deployToVNet=${{ env.DEPLOY_TO_VNET }} \
+            -p clientIPAddress="10.0.0.0" \
+            -p startIpAddress="10.0.0.0" \
+            -p endIpAddress="10.0.0.255" \
+            -p nsgRuleSourceAddressPrefix="10.0.0.0/16"            
       shell: bash
 
     # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
