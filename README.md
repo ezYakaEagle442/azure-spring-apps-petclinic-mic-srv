@@ -10,10 +10,16 @@ urlFragment: "spring-petclinic-microservices"
 
 # Deploy Spring Boot apps using Azure Spring Apps and MySQL 
 
+[![IaC Deployment Status](https://github.com/ezYakaEagle442//azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac.yml/badge.svg)](https://github.com/ezYakaEagle442//azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+[![Build Status](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/maven-build.yml/badge.svg)](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/maven-build.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Azure Spring Apps enables you to easily run a Spring Boot applications on Azure.
 
-This quickstart shows you how to deploy an existing Java Spring Apps application to Azure. When 
-you're finished, you can continue to manage the application via the Azure CLI or switch to using the 
+This quickstart shows you how to deploy an existing Java Spring Apps application to Azure. 
+When you're finished, you can continue to manage the application via the Azure CLI or switch to using the 
 Azure Portal.
 
 * [Deploy Spring Boot apps using Azure Spring Apps and MySQL](#deploy-spring-boot-apps-using-azure-spring-apps-and-mysql)
@@ -21,15 +27,19 @@ Azure Portal.
   * [What you will need](#what-you-will-need)
   * [Install the Azure CLI extension](#install-the-azure-cli-extension)
   * [Clone and build the repo](#clone-and-build-the-repo)
-  * [Unit 1 - Deploy and monitor Spring Boot apps](#unit-1---deploy-and-monitor-spring-boot-apps)
-  * [Unit 2 - AUTOMATE deployments using GitHub Actions](#unit-2---automate-deployments-using-github-actions)
-  * [Unit 3 - Manage application secrets using Azure KeyVault](#unit-3---manage-application-secrets-using-azure-keyvault)
-  * [Next Steps](#next-steps)
+  * [Unit 1 - AUTOMATE Infra deployments using GitHub Actions](#deploy-azure-spring-apps-instance-and-the-petclinic-microservices-apis-with-iac)
+  * [Unit 2 - AUTOMATE Apps deployments using GitHub Actions](#deploy-azure-spring-apps-instance-and-the-petclinic-microservices-apis-with-iac)
+  * [Unit 3 - Deploy and monitor Spring Boot apps](#monitor-spring-boot-applications)
+  * [Unit 4 - Delete Passwords](#delete-passwords)
+ https://aka.ms/Delete-Passwords
+ https://techcommunity.microsoft.com/t5/apps-on-azure-blog/delete-passwords-passwordless-connections-for-java-apps-to-azure/ba-p/3638714
+ https://learn.microsoft.com/en-us/azure/developer/java/spring-framework/migrate-mysql-to-passwordless-connection?toc=%2Fazure%2Fdeveloper%2Fintro%2Ftoc.json&bc=%2Fazure%2Fdeveloper%2Fintro%2Fbreadcrumb%2Ftoc.json&tabs=sign-in-azure-cli%2Cjava%2Capp-service%2Ccontainer-apps-identity
+ 
 
 ## What will you experience
 You will:
 - Build existing Spring Boot applications
-- Provision an Azure Spring Apps service instance. If you prefer Terraform, you may also provision using Terraform, see [`README-terraform`](./terraform/README-terraform.md) or **[Bicep](./iac/bicep/README.md)**. Check [API breaking changes](https://docs.microsoft.com/en-us/azure/spring-cloud/breaking-changes)
+- Provision an Azure Spring Apps service instance using **[Bicep](./iac/bicep/README.md)**. Check [API breaking changes](https://docs.microsoft.com/en-us/azure/spring-cloud/breaking-changes)
 - Deploy applications to Azure
 - Bind applications to Azure Database for MySQL
 - Open the application
@@ -39,16 +49,13 @@ You will:
 
 ## What you will need
 
-In order to deploy a Java app to cloud, you need 
-an Azure subscription. If you do not already have an Azure 
-subscription, you can activate your 
-[MSDN subscriber benefits](https://azure.microsoft.com/pricing/member-offers/msdn-benefits-details/) 
-or sign up for a 
-[free Azure account]((https://azure.microsoft.com/free/)).
+In order to deploy a Java app to cloud, you need  an Azure subscription. If you do not already have an Azure 
+subscription, you can activate your  [MSDN subscriber benefits](https://azure.microsoft.com/pricing/member-offers/msdn-benefits-details/) 
+or sign up for a  [free Azure account]((https://azure.microsoft.com/free/)).
 
 In addition, you will need the following:
 
-| [Azure CLI version 2.17.1 or higher](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) 
+| [Azure CLI version 2.40.0 or higher](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) 
 | [Java 11](https://learn.microsoft.com/java/openjdk/download)
 | [Maven](https://maven.apache.org/download.cgi) 
 | [MySQL CLI](https://dev.mysql.com/downloads/shell/)
@@ -61,19 +68,15 @@ Note -  The [`jq` utility](https://stedolan.github.io/jq/download/). On Windows,
            alias jq=<JQ Download location>/jq-win64.exe
            ```
 
-Note - The Bash shell. While Azure CLI should behave identically on all environments, shell 
-semantics vary. Therefore, only bash can be used with the commands in this repo. 
+Note - The Bash shell. While Azure CLI should behave identically on all environments, shell  semantics vary. Therefore, only bash can be used with the commands in this repo. 
 To complete these repo steps on Windows, use Git Bash that accompanies the Windows distribution of 
 Git. Use only Git Bash to complete this training on Windows. Do not use WSL.
 
 ### OR Use Azure Cloud Shell
 
-Or, you can use the Azure Cloud Shell. Azure hosts Azure Cloud Shell, an interactive shell 
-environment that you can use through your browser. You can use the Bash with Cloud Shell 
-to work with Azure services. You can use the Cloud Shell pre-installed commands to run the 
-code in this README without having to install anything on your local environment. To start Azure 
-Cloud Shell: go to [https://shell.azure.com](https://shell.azure.com), or select the 
-Launch Cloud Shell button to open Cloud Shell in your browser.
+Or, you can use the Azure Cloud Shell. Azure hosts Azure Cloud Shell, an interactive shell  environment that you can use through your browser. You can use the Bash with Cloud Shell  to work with Azure services. You can use the Cloud Shell pre-installed commands to run the  code in this README without having to install anything on your local environment. 
+
+To start Azure Cloud Shell: go to [https://shell.azure.com](https://shell.azure.com), or select the Launch Cloud Shell button to open Cloud Shell in your browser.
 
 To run the code in this article in Azure Cloud Shell:
 
@@ -85,7 +88,7 @@ To run the code in this article in Azure Cloud Shell:
 
 1. Select Enter to run the code.
 
-## Install the Azure CLI extension
+### Install the Azure CLI extension
 
 Install the Azure Spring Apps extension for the Azure CLI using the following command
 
@@ -126,214 +129,16 @@ See **[Bicep](./iac/bicep/README.md)**
 
 <span style="color:red">**Be aware that the MySQL DB is NOT deployed in a VNet but network FireWall Rules are Set. So ensure to allow ASA Outbound IP addresses or check the option "Allow public access from any Azure service within Azure to this server" in the Azure Portal / your MySQL DB / Networking / Firewall rules**</span>
 
-## Deploy a Windows VM Client in the VNet
-
-### VM
-```sh
-
-nsg="vnet-azure-spring-apps-snet-app-nsg-${location}" # "nsg-app-client"
-YOUR_RG="rg-iac-asa-petclinic-mic-srv" # "rg-asa-apps-petclinic"
-
-az network nsg rule create --access Allow --destination-port-range 3389 --name "Allow RDP from local dev station" --nsg-name $nsg -g ${YOUR_RG} --priority 121 --source-address-prefixes "<Your IP Adress>"
-
-# az vm list-sizes --location $location --output table
-# az vm image list-publishers --location $location --output table | grep -i "Microsoft"
-# az vm image list-offers --publisher MicrosoftWindowsServer --location $location --output table
-# az vm image list --publisher MicrosoftWindowsServer --offer WindowsServer --location $location --output table
-
-# az vm image list-publishers --location $location --output table | grep -i Canonical
-# az vm image list-offers --publisher Canonical --location $location --output table
-# az vm image list --publisher Canonical --offer UbuntuServer --location $location --output table
-# az vm image list --publisher Canonical --offer 0001-com-ubuntu-server-focal --location northeurope --output table --all
-
-# az vm image list-publishers --location northeurope --output table | grep -i "Mariner"
-# az vm image list-offers --publisher MicrosoftCBLMariner --location $location --output table
-# az vm image list --publisher MicrosoftCBLMariner --offer cbl-mariner --location $location --output table --all
-
-# --image The name of the operating system image as a URN alias, URN, custom image name or ID, custom image version ID, or VHD blob URI. In addition, it also supports shared gallery image. This parameter is required unless using `--attach-os-disk.`  Valid URN format: "Publisher:Offer:Sku:Version". For more information, see https: //docs.microsoft.com/azure/virtual-machines/linux/cli-ps-findimage.  Values from: az vm image list, az vm image show, az sig image-version show-shared.
-# --image Canonical:0001-com-ubuntu-server-focal:20_04-lts-gen2:20.04.202203220
-
-az vm image list-offers --publisher MicrosoftWindowsDesktop --location $location --output table
-az vm image list --publisher MicrosoftWindowsDesktop --offer Windows-11 --location $location --output table
-
-win_client_vm_name="vm-win-pet-cli" #Windows computer name cannot be more than 15 characters long,
-win_vm_admin_username="adm_asa"
-win_vm_admin_pwd="IsTrator4224!" # The password length must be between 12 and 123. 
-rg_name="rg-iac-asa-petclinic-mic-srv"
-vnet_name="vnet-azure-spring-apps"
-appSubnet="snet-app"
-nsg="vnet-azure-spring-apps-snet-app-nsg-${location}"
-
-az vm create --name $win_client_vm_name \
-    --image MicrosoftWindowsDesktop:windows-11:win11-21h2-pron:22000.556.220303 \
-    --admin-username $win_vm_admin_username \
-    --admin-password $win_vm_admin_pwd \
-    --resource-group $rg_name \
-    --vnet-name $vnet_name \
-    --subnet $appSubnet \
-    --nsg $nsg \
-    --size Standard_B2s \
-    --location $location \
-    --output table
-    # --zone 1
-
-network_interface_id=$(az vm show --name $win_client_vm_name -g $rg_name --query 'networkProfile.networkInterfaces[0].id' -o tsv)
-echo "ASA Pet Clinic windows Client VM Network Interface ID :" $network_interface_id
-
-network_interface_private_ip=$(az resource show --ids $network_interface_id \
-    --query 'properties.ipConfigurations[0].properties.privateIPAddress' -o tsv)
-echo "Network Interface private IP :" $network_interface_private_ip
-
-network_interface_pub_ip_id=$(az resource show --ids $network_interface_id \
-    --query 'properties.ipConfigurations[0].properties.publicIPAddress.id' -o tsv)
-
-network_interface_pub_ip=$(az network public-ip show -g $rg_name --id $network_interface_pub_ip_id --query "ipAddress" -o tsv)
-echo "Network Interface public  IP :" $network_interface_pub_ip
-```
-You can now use RDP to connect to your Windows client VM.
-
-Note: you can not setup WSL2 on all Azure VM , D_v3 should support nested virtualization , see :
-- [https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-guide/nested-virtualization](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-guide/nested-virtualization)
-- [https://docs.microsoft.com/en-us/answers/questions/442463/error-when-enabling-wsl2-in-azure-vm.html](https://docs.microsoft.com/en-us/answers/questions/442463/error-when-enabling-wsl2-in-azure-vm.html)
-
-
-
-
 Now, the Bicep IaC should have configured the Azure Private DNS Zone, as explained in the [docs](https://learn.microsoft.com/en-us/azure/spring-apps/access-app-virtual-network?tabs=azure-portal)
 
-```sh
-rg_name="rg-iac-asa-petclinic-mic-srv"
-rg_ASA_apps_name="rg-asa-apps-petclinic"
-rg_ASA_svc_run_name="rg-asa-svc-run-petclinic"
-
-ASA_INSTANCE_NAME="asa-aspetcliasa"
-PRIVATE_DNS_ZONE="private.azuremicroservices.io"
-ASA_PRIVATE_DNS_LINK_NAME="dns-lnk-asa"
-vnet_name="vnet-azure-spring-apps"
-az network private-dns zone create --name ${PRIVATE_DNS_ZONE} -g  $rg_name
-az network private-dns link vnet list -g $rg_name --zone-name ${PRIVATE_DNS_ZONE}
-
-vnet_id=$(az network vnet show --resource-group $rg_name --name $vnet_name --query id -o tsv)
-echo "VNet Id :" $vnet_id
-
-az network private-dns link vnet create \
-  --resource-group $rg_name \
-  --zone-name ${PRIVATE_DNS_ZONE} \
-  --name $ASA_PRIVATE_DNS_LINK_NAME \
-  --virtual-network $vnet_id \
-  --registration-enabled false
-
-private_dns_link_id=$(az network private-dns link vnet show --name $ASA_PRIVATE_DNS_LINK_NAME --zone-name ${PRIVATE_DNS_ZONE} -g $rg_name --query "id" --output tsv)
-echo "Azure Spring Apps Private-Link DNS ID :" $private_dns_link_id
-
-APPS_AKS_LB_FRONT_IP_ID=$(az network lb show --name "kubernetes-internal" -g $rg_ASA_apps_name --query 'frontendIpConfigurations[0].id' --output tsv)
-APPS_AKS_LB_FRONT_IP_NAME=$(az network lb show --name "kubernetes-internal" -g $rg_ASA_apps_name --query "frontendIpConfigurations[0].name" --output tsv)
-
-ASA_SVC_RUN_AKS_LB_FRONT_IP_ID=$(az network lb show --name "kubernetes-internal" -g $rg_ASA_svc_run_name --query 'frontendIpConfigurations[0].id' --output tsv)
-ASA_SVC_RUN_AKS_LB_FRONT_IP_NAME=$(az network lb show --name "kubernetes-internal" -g $rg_ASA_svc_run_name --query "frontendIpConfigurations[0].name" --output tsv)
-
-ASA_APPS_LB_PRV_IP=$(az network lb frontend-ip show --lb-name "kubernetes-internal" --name $APPS_AKS_LB_FRONT_IP_NAME -g $rg_ASA_apps_name --query privateIpAddress -o tsv)
-
-ASA_SVC_RUN_LB_PRV_IP=$(az network lb frontend-ip show --lb-name "kubernetes-internal" --name $ASA_SVC_RUN_AKS_LB_FRONT_IP_NAME -g $rg_ASA_svc_run_name --query privateIpAddress -o tsv)
-
-az network private-dns record-set a create --name $ASA_INSTANCE_NAME --zone-name ${PRIVATE_DNS_ZONE}  -g $rg_name
-
-az network private-dns record-set a add-record -g $rg_name \
-  --record-set-name $ASA_INSTANCE_NAME \
-  --zone-name ${PRIVATE_DNS_ZONE} \
-  --ipv4-address $ASA_APPS_LB_PRV_IP
-
-az network private-dns record-set a add-record -g $rg_name \
-  --record-set-name "$ASA_INSTANCE_NAME.test" \
-  --zone-name ${PRIVATE_DNS_ZONE} \
-  --ipv4-address $ASA_APPS_LB_PRV_IP
-
-#az network private-dns record-set a add-record -g $rg_name \
-#  --record-set-name $xxx \
-#  --zone-name ${PRIVATE_DNS_ZONE} \
-#  --ipv4-address $ASA_SVC_RUN_LB_PRV_IP
-```
-
-Now Validate private DNS link connection
-From the windows client VM inside athe Azure Spring Apps VNet with private zone, then nslookup will resolve to the private ip.
+### Configure MySQL DatabaseDB Time Zone
 
 ```sh
-nslookup ${ASA_INSTANCE_NAME}.${PRIVATE_DNS_ZONE}
-nslookup $ASA_INSTANCE_NAME
-```
+SELECT name FROM mysql.time_zone_name;
 
-
-### Create MySQL Database
-
-Create a MySQL database in Azure Database for MySQL.
-
-```sh
-    // create mysql server
-    az mysql server create --resource-group ${RESOURCE_GROUP} \
-     --name ${MYSQL_SERVER_NAME}  --location ${REGION} \
-     --admin-user ${MYSQL_SERVER_ADMIN_NAME} \
-     --admin-password ${MYSQL_SERVER_ADMIN_PASSWORD} \
-     --sku-name GP_Gen5_2 \
-     --ssl-enforcement Disabled \
-     --version 5.7
-    
-    // allow access from Azure resources
-    az mysql server firewall-rule create --name allAzureIPs \
-     --server ${MYSQL_SERVER_NAME} \
-     --resource-group ${RESOURCE_GROUP} \
-     --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
-    
-    // allow access from your dev machine for testing
-    az mysql server firewall-rule create --name devMachine \
-     --server ${MYSQL_SERVER_NAME} \
-     --resource-group ${RESOURCE_GROUP} \
-     --start-ip-address <ip-address-of-your-dev-machine> \
-     --end-ip-address <ip-address-of-your-dev-machine>
-    
-    // increase connection timeout
-    az mysql server configuration set --name wait_timeout \
-     --resource-group ${RESOURCE_GROUP} \
-     --server ${MYSQL_SERVER_NAME} --value 2147483
-    
-    // SUBSTITUTE values
-    mysql -u ${MYSQL_SERVER_ADMIN_LOGIN_NAME} \
-     -h ${MYSQL_SERVER_FULL_NAME} -P 3306 -p
-    
-    Enter password:
-    Welcome to the MySQL monitor.  Commands end with ; or \g.
-    Your MySQL connection id is 64379
-    Server version: 5.6.39.0 MySQL Community Server (GPL)
-    
-    Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.
-    
-    Oracle is a registered trademark of Oracle Corporation and/or its
-    affiliates. Other names may be trademarks of their respective
-    owners.
-    
-    Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
-    
-    mysql> CREATE DATABASE petclinic;
-    Query OK, 1 row affected (0.10 sec)
-    
-    mysql> CREATE USER 'root' IDENTIFIED BY 'petclinic';
-    Query OK, 0 rows affected (0.11 sec)
-    
-    mysql> GRANT ALL PRIVILEGES ON petclinic.* TO 'root';
-    Query OK, 0 rows affected (1.29 sec)
-    
-    mysql> CALL mysql.az_load_timezone();
-    Query OK, 3179 rows affected, 1 warning (6.34 sec)
-    
-    mysql> SELECT name FROM mysql.time_zone_name;
-    ...
-    
-    mysql> quit
-    Bye
-    
-    
     az mysql server configuration set --name time_zone \
      --resource-group ${RESOURCE_GROUP} \
-     --server ${MYSQL_SERVER_NAME} --value "US/Pacific"
+     --server ${MYSQL_SERVER_NAME} --value "Europe/Paris"
 ```
 
 
