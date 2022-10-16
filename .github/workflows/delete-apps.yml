@@ -43,6 +43,14 @@ jobs:
       with:
         azcliversion: ${{ env.AZ_CLI_VERSION }}
         inlineScript: |
+
+          az spring app list -g ${{ env.RG_APP }} --service ASA_SERVICE_NAME
+
+          for app in $(az spring app list --service ASA_SERVICE_NAME -g ${{ env.RG_APP }} | jq -r '.[].name')
+          do
+            echo "About to delete App " $app
+            # az spring app delete --name $app -g ${{ env.RG_APP }} --service ${{ env.ASA_SERVICE_NAME }} --yes
+          done
           az config set extension.use_dynamic_install=yes_without_prompt
           az spring app delete --name ${{ env.ADMIN_SERVER }} --service ${{ env.ASA_SERVICE_NAME }}  -g ${{ env.RG_APP }} --yes
           az spring app delete --name ${{ env.VISITS_SERVICE }} --service ${{ env.ASA_SERVICE_NAME }} -g ${{ env.RG_APP }} --yes
