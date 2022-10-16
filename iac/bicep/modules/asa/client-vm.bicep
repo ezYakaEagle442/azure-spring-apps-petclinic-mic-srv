@@ -176,7 +176,7 @@ resource windowsVM 'Microsoft.Compute/virtualMachines@2022-03-01' = {
       imageReference: {
         publisher: 'MicrosoftWindowsDesktop'
         offer: 'windows-11'
-        sku: 'win11-21h2-pro'
+        sku: 'win11-22h2-pro'
         version: 'latest'
       }
     }
