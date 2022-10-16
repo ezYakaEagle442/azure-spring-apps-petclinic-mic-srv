@@ -262,6 +262,7 @@ jobs:
           echo "Checking tag_id output ... " ${{ needs.call-maven-build-workflow.outputs.tag_id }}
           tag_id=${{ needs.call-maven-build-workflow.outputs.tag_id }}
           echo "Tag ID:"$tag_id
+          echo "Image Build tag ID from {{ env.tag_id }} "${{ env.tag_id }}
 
           # If you're deploying Azure Spring Apps Enterprise tier for the first time in the target subscription, 
           # use the following commands to register the provider and accept the legal terms and privacy statements for the Enterprise tier
