@@ -179,7 +179,7 @@ jobs:
   # invalid value workflow reference: references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
   call-maven-build-workflow:
     name: Trigger Maven
-    needs: pre-flight
+    needs: set-var
     uses: ./.github/workflows/maven-build.yml # .github/workflows/maven-build.yml@main ==> references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
     secrets: inherit # pass all secrets
       # envPAT: ${{ secrets.envPAT }} # pass just this secret
@@ -256,18 +256,18 @@ jobs:
       with:
         azcliversion: ${{ env.AZ_CLI_VERSION }}
         inlineScript: |
-          NEW_IP=$(curl whatismyip.akamai.com)
-          echo "NEW_IP" $NEW_IP
-          echo "NEW_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
-          az keyvault network-rule add --ip-address $NEW_IP --name ${{ env.KEYVAULT }} --only-show-errors
+          LOCAL_IP=$(curl whatismyip.akamai.com)
+          echo "LOCAL_IP" $LOCAL_IP
+          echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
+          az keyvault network-rule add --ip-address $LOCAL_IP --name ${{ env.KEYVAULT }} --only-show-errors
           sleep 30
 
     # You can  download all artifacts in a workflow run by not specifying a name.
     - name: Download ALL Jar artifacts
       uses: actions/download-artifact@v3
 
-    - name: Login with Key Vault SP
-      uses: azure/login@v1 
+    - name: Azure Login
+      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
@@ -278,11 +278,7 @@ jobs:
         secrets: "AZURE-CREDENTIALS-FOR-SPRING"
       id: keyvaultaction  
     
-    - name: Login with Service SP
-      uses: azure/login@v1
-      with:
-        creds: ${{ steps.keyvaultaction.outputs.AZURE-CREDENTIALS-FOR-SPRING }}
-
+    # https://github.com/marketplace/actions/azure-spring-apps
     - name: Deploy vets-service
       uses: Azure/spring-apps-deploy@v1
       with:
