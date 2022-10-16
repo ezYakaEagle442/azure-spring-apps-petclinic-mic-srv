@@ -201,4 +201,4 @@ jobs:
 
         mvn deploy -DaltReleaseDeploymentRepository="${REPO}" -DaltSnapshotDeploymentRepository="${REPO}" --batch-mode -DskipTests -Dmaven.install.skip=true
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.PKG_PAT }}
