@@ -64,7 +64,8 @@ resource mysqlserver 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' =
 output mySQLResourceID string = mysqlserver.id
 
 // Add firewall config to allow Azure Spring Apps :
-// virtualNetwor FirewallRules to Allow public access from Azure services 
+// virtualNetwork FirewallRules to Allow public access from Azure services
+/*
 resource fwRuleAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = {
   name: 'Allow-Azure-Spring-Apps'
   parent: mysqlserver
@@ -73,6 +74,7 @@ resource fwRuleAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRul
     endIpAddress: endIpAddress
   }
 }
+*/
 
 // Allow client workstation with IP 'clientIPAddress' for local Dev/Test only
 resource fwRuleClientIPAddress 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = if (setFwRuleClient)  {
