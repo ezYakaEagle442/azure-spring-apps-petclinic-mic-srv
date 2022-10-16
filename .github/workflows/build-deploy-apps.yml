@@ -65,7 +65,8 @@ env:
   SPRING_CLOUD_AZURE_TENANT_ID: ${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }}
 
 
-on: [push]
+on: # [push]
+  workflow_dispatch:
 
 jobs:
   set-var:
