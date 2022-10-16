@@ -45,7 +45,7 @@ In the [Bicep parameter file](./parameters.json) :
 
 ```sh
 # Check, choose a Region with AZ : https://docs.microsoft.com/en-us/azure/availability-zones/az-overview#azure-regions-with-availability-zones
-az group create --name rg-iac-kv --location westeurope
+az group create --name rg-iac-kv21 --location westeurope
 az group create --name rg-iac-asa-petclinic-mic-srv --location westeurope
 
 az deployment group create --name iac-101-kv -f ./modules/kv/kv.bicep -g rg-iac-kv \
