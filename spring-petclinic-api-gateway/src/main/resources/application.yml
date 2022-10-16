@@ -1,6 +1,10 @@
 spring:
   cloud:
     gateway:
+      discovery:
+        # make sure a DiscoveryClient implementation (such as Netflix Eureka) is on the classpath and enabled
+        locator: # https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-discoveryclient-route-definition-locator
+          enabled: true #  to configure Spring Cloud Gateway to use the Spring Cloud Service Registry to discover the available microservices.    
       routes:
         - id: vets-service
           uri: http://vets-service
@@ -20,3 +24,9 @@ spring:
             - Path=/api/customer/**
           filters:
             - StripPrefix=2
+      globalcors: # o allow CORS requests to our gateway. This can be helpful when you add a front-end that is not hosted on Azure Spring Apps.
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET            
