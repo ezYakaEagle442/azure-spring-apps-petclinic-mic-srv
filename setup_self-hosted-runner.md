@@ -23,6 +23,12 @@ ssh-keygen -t rsa -b 4096 -N $ssh_passphrase -f ~/.ssh/$ssh_key -C "youremail@gr
 # --image The name of the operating system image as a URN alias, URN, custom image name or ID, custom image version ID, or VHD blob URI. In addition, it also supports shared gallery image. This parameter is required unless using `--attach-os-disk.`  Valid URN format: "Publisher:Offer:Sku:Version". For more information, see https: //docs.microsoft.com/azure/virtual-machines/linux/cli-ps-findimage.  Values from: az vm image list, az vm image show, az sig image-version show-shared.
 # --image Canonical:0001-com-ubuntu-server-focal:20_04-lts-gen2:20.04.202203220
 
+
+az vm image list-publishers --location $location --output table | grep -i Canonical
+az vm image list-offers --publisher Canonical --location $location --output table
+az vm image list --publisher Canonical --offer UbuntuServer --location $location --output table --all
+az vm image list --publisher Canonical --offer 0001-com-ubuntu-server-focal --location northeurope --output table --all
+
 az vm create --name $self_hosted_runner_vm_name \
     --image UbuntuLTS \
     --admin-username adm_run \
