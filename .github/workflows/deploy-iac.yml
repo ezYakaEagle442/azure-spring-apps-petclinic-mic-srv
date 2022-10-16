@@ -274,10 +274,10 @@ jobs:
           echo "****************************************************************************************"
           echo "*                                                                                      *"
           echo "*                                                                                      *"
-          echo "The client 'XXX' with object id 'XXX' MUST have authorization to perform action        *"
+          echo "*The client 'XXX' with object id 'XXX' MUST have authorization to perform action       *"
           echo "'Microsoft.SaaS/register/action' whne running az term accept ...                       *"
           echo "*                                                                                      *"
-          echo "****************************************************************************************
+          echo "****************************************************************************************"
           # az provider register --namespace Microsoft.SaaS
           # az term accept \
           #    --publisher vmware-inc \
