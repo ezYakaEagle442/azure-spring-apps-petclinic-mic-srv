@@ -50,7 +50,12 @@ env:
 
 on:
   workflow_dispatch:
-
+    inputs: # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_dispatchinputs
+      tag_id:
+        description: the Image Tag ID
+        required: true
+        type: string
+        
 jobs:
   deploy-kv:
     runs-on: ubuntu-latest
@@ -243,7 +248,13 @@ jobs:
   deploy-apps:
     needs: call-maven-build-workflow
     runs-on: ubuntu-latest
+            
     steps:
+    - name: Login with GHA Runner SP
+      uses: azure/login@v1.4.6 # fails https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }} # ${{ env.credentials }}
+
     - name: Deploy Azure Spring Apps
       run: |
 
