@@ -52,50 +52,13 @@ param tenantId string = subscription().tenantId
 @description('Should the service be deployed to a Corporate VNet ?')
 param deployToVNet bool = false
 
-
-@description('emailRecipient informed before the VM shutdown')
-param autoShutdownNotificationEmail string
-
-@description('Windows client VM deployed to the VNet. Computer name cannot be more than 15 characters long')
-param windowsVMName string = 'vm-win-asa-petcli'
-
-@description('The CIDR or source IP range. Asterisk "*" can also be used to match all source IPs. Default tags such as "VirtualNetwork", "AzureLoadBalancer" and "Internet" can also be used. If this is an ingress rule, specifies where network traffic originates from.')
-param nsgRuleSourceAddressPrefix string
-param nsgName string = 'nsg-asa-${appName}-app-client'
-param nsgRuleName string = 'Allow RDP from local dev station'
-
-param nicName string = 'nic-asa-${appName}-client-vm'
-
-param vnetName string = 'vnet-azure-spring-apps'
-param vnetCidr string = '10.42.0.0/21 '
-
-@description('The name or ID of an existing subnet in "vnet" into which to deploy the Spring Apps app. Required when deploying into a Virtual Network. Smaller subnet sizes are supported, please refer: https://aka.ms/azure-spring-cloud-smaller-subnet-vnet-docs.')
-param appSubnetCidr string = '10.42.1.0/28'
-
-@description('The name or ID of an existing subnet in "vnet" into which to deploy the Spring Apps service runtime. Required when deploying into a Virtual Network.')
-param serviceRuntimeSubnetCidr string = '10.42.2.0/28'
-
-@description('Comma-separated list of IP address ranges in CIDR format. The IP ranges are reserved to host underlying Azure Spring Apps infrastructure, which should be 3 at least /16 unused IP ranges, must not overlap with any Subnet IP ranges. Addresses 10.2.0.0/16 matching the format *.*.*.0 or *.*.*.255 are reserved and cannot be used')
-param serviceCidr string = '10.0.0.1/16,10.1.0.1/16,10.2.0.1/16' // Addresses 10.2.0.0/16 matching the format *.*.*.0 or *.*.*.255 are reserved and cannot be used
-param serviceRuntimeSubnetName string = 'snet-svc-run'
-param appSubnetName string = 'snet-app'
-
-@description('The resource group where all network resources for apps will be created in')
-param appNetworkResourceGroup string 
-
-@description('The resource group where all network resources for Azure Spring Apps service runtime will be created in')
-param serviceRuntimeNetworkResourceGroup string 
-
 @description('The Log Analytics workspace name used by Azure Spring Apps instance')
 param logAnalyticsWorkspaceName string = 'log-${appName}'
 
 param appInsightsName string = 'appi-${appName}'
 
-@description('The Azure Spring Apps instance name')
-param azureSpringAppsInstanceName string = 'asa-${appName}'
-
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.operationalinsights/workspaces?tabs=bicep
-resource logAnalyticsWorkspace  'Microsoft.OperationalInsights/workspaces@2020-10-01' = {
+resource logAnalyticsWorkspace  'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: logAnalyticsWorkspaceName
   location: location
 }
@@ -122,68 +85,27 @@ output appInsightsAppId string = appInsights.properties.AppId
 output appInsightsInstrumentationKey string = appInsights.properties.InstrumentationKey
 output appInsightsConnectionString string = appInsights.properties.ConnectionString
 
-// https://docs.microsoft.com/en-us/azure/spring-cloud/how-to-deploy-in-azure-virtual-network?tabs=azure-portal#virtual-network-requirements
-module vnetModule './modules/asa/vnet.bicep' = if (deployToVNet) {
-  name: 'vnet-azurespringapps'
-  // scope: resourceGroup(rg.name)
+
+module identities './modules/asa/identity.bicep' = {
+  name: 'asa-identities'
   params: {
-     location: location
-     vnetName: vnetName
-     serviceRuntimeSubnetName: serviceRuntimeSubnetName
-     serviceRuntimeSubnetCidr: serviceRuntimeSubnetCidr
-     appSubnetName: appSubnetName
-     appSubnetCidr: appSubnetCidr
-     vnetCidr: vnetCidr
-  }   
+    location: location
+  }
 }
 
-module dnsprivatezone './modules/asa/dns.bicep' = if (deployToVNet) {
-  name: 'dns-private-zone'
+
+// https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/scope-extension-resources
+module roleAssignments './modules/asa/roleAssignments.bicep' = {
+  name: 'role-assignments'
   params: {
-    appName: appName
-    location: location
-    vnetName: vnetName
-    appNetworkResourceGroup: appNetworkResourceGroup
-    azureSpringAppsInstanceName: azureSpringAppsInstanceName
-    serviceRuntimeNetworkResourceGroup: serviceRuntimeNetworkResourceGroup
+    kvName: kvName
+    kvRGName: kvRGName
+    kvRoleType: 'KeyVaultSecretsUser'
+    asaCustomersServicePrincipalId: identities.outputs.customersServicePrincipalId
+    asaVetsServicePrincipalId: identities.outputs.vetsServicePrincipalId
+    asaVisitsServicePrincipalId: identities.outputs.visitsServicePrincipalId
   }
   dependsOn: [
-    vnetModule 
-  ]     
-}
-
-resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' existing = if (deployToVNet) {
-  name: vnetName
-}
-
-resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
-  name: kvRGName
-  scope: subscription()
-}
-
-resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
-  name: kvName
-  scope: kvRG
-}
-
-module clientVM './modules/asa/client-vm.bicep' = if (deployToVNet) {
-  name: 'vm-client'
-  params: {
-     location: location
-     appName: appName
-     vnetName: vnetName
-     infrastructureSubnetID: vnet.properties.subnets[0].id
-     windowsVMName: windowsVMName
-     autoShutdownNotificationEmail: autoShutdownNotificationEmail
-     adminUsername: kv.getSecret('VM-ADMIN-USER-NAME')
-     adminPassword: kv.getSecret('VM-ADMIN-PASSWORD')
-     nsgRuleSourceAddressPrefix: nsgRuleSourceAddressPrefix
-     nicName: nicName
-     nsgName: nsgName
-     nsgRuleName: nsgRuleName
-  }   
-  dependsOn: [
-    vnetModule
-    dnsprivatezone    
-  ]   
+    identities
+  ] 
 }

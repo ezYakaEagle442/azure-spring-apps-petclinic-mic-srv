@@ -29,6 +29,8 @@ param azureSpringAppsRp string
 @description('The name of the KV, must be UNIQUE.  A vault name must be between 3-24 alphanumeric characters.')
 param kvName string // = 'kv-${appName}'
 
+param setKVAccessPolicies bool = false
+
 @description('The name of the KV RG')
 param kvRGName string
 
@@ -52,19 +54,7 @@ param tenantId string = subscription().tenantId
 @description('Should the service be deployed to a Corporate VNet ?')
 param deployToVNet bool = false
 
-param vnetName string = 'vnet-azure-spring-apps'
-
-@description('Comma-separated list of IP address ranges in CIDR format. The IP ranges are reserved to host underlying Azure Spring Apps infrastructure, which should be 3 at least /16 unused IP ranges, must not overlap with any Subnet IP ranges. Addresses 10.2.0.0/16 matching the format *.*.*.0 or *.*.*.255 are reserved and cannot be used')
-param serviceCidr string = '10.0.0.1/16,10.1.0.1/16,10.2.0.1/16' // Addresses 10.2.0.0/16 matching the format *.*.*.0 or *.*.*.255 are reserved and cannot be used
-param serviceRuntimeSubnetName string = 'snet-svc-run'
-param appSubnetName string = 'snet-app'
 param zoneRedundant bool = false
-
-@description('The resource group where all network resources for apps will be created in')
-param appNetworkResourceGroup string 
-
-@description('The resource group where all network resources for Azure Spring Apps service runtime will be created in')
-param serviceRuntimeNetworkResourceGroup string 
 
 @description('The Log Analytics workspace name used by Azure Spring Apps instance')
 param logAnalyticsWorkspaceName string = 'log-${appName}'
@@ -141,11 +131,6 @@ module rg 'rg.bicep' = {
 }
 */
 
-
-resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' existing = if (deployToVNet) {
-  name: vnetName
-}
-
 resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: kvRGName
   scope: subscription()
@@ -168,12 +153,7 @@ module azurespringapps './modules/asa/asa.bicep' = {
     azureSpringAppsSkuCapacity: azureSpringAppsSkuCapacity
     azureSpringAppsSkuName: azureSpringAppsSkuName
     azureSpringAppsTier: azureSpringAppsTier
-    appNetworkResourceGroup: appNetworkResourceGroup
-    appSubnetId: vnet.properties.subnets[1].id
     monitoringSettingsName: monitoringSettingsName
-    serviceRuntimeNetworkResourceGroup: serviceRuntimeNetworkResourceGroup
-    serviceRuntimeSubnetId: vnet.properties.subnets[0].id
-    serviceCidr: serviceCidr
     configServerName: configServerName
     gitConfigURI: gitConfigURI
     serviceRegistryName: serviceRegistryName
@@ -181,71 +161,27 @@ module azurespringapps './modules/asa/asa.bicep' = {
     appInsightsName: appInsightsName
     appInsightsDiagnosticSettingsName: appInsightsDiagnosticSettingsName
     zoneRedundant: zoneRedundant
-    serverName: kv.getSecret('MYSQL-SERVER-NAME')
-    administratorLogin: kv.getSecret('SPRING-DATASOURCE-USERNAME')
-    administratorLoginPassword: kv.getSecret('SPRING-DATASOURCE-PASSWORD')   
-    clientIPAddress: clientIPAddress
-    startIpAddress: startIpAddress
-    endIpAddress: endIpAddress
     deployToVNet: deployToVNet
-    setFwRuleClient: setFwRuleClient
   }
-  dependsOn: [
-    roleAssignments
-  ]
 }
 
-module asaCorpVNet './modules/asa/asa.bicep' = if (deployToVNet) {
-  name: 'asa-corp-vnet'
-  // scope: resourceGroup(rg.name)
+module mysqlPub './modules/mysql/mysql.bicep' = {
+  name: 'mysqldbpub'
   params: {
     appName: appName
     location: location
-    kvName: kvName
-    kvRGName: kvRGName    
-    azureSpringAppsInstanceName: azureSpringAppsInstanceName
-    azureSpringAppsSkuCapacity: azureSpringAppsSkuCapacity
-    azureSpringAppsSkuName: azureSpringAppsSkuName
-    azureSpringAppsTier: azureSpringAppsTier
-    appNetworkResourceGroup: appNetworkResourceGroup
-    appSubnetId: vnet.properties.subnets[1].id
-    monitoringSettingsName: monitoringSettingsName
-    serviceRuntimeNetworkResourceGroup: serviceRuntimeNetworkResourceGroup
-    serviceRuntimeSubnetId: vnet.properties.subnets[0].id
-    serviceCidr: serviceCidr
-    configServerName: configServerName
-    gitConfigURI: gitConfigURI
-    serviceRegistryName: serviceRegistryName
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
-    appInsightsName: appInsightsName
-    appInsightsDiagnosticSettingsName: appInsightsDiagnosticSettingsName
-    zoneRedundant: zoneRedundant
-    serverName: kv.getSecret('MYSQL-SERVER-NAME')
-    administratorLogin: kv.getSecret('SPRING-DATASOURCE-USERNAME')
-    administratorLoginPassword: kv.getSecret('SPRING-DATASOURCE-PASSWORD')   
+    setFwRuleClient: setFwRuleClient
     clientIPAddress: clientIPAddress
     startIpAddress: startIpAddress
     endIpAddress: endIpAddress
-    deployToVNet: deployToVNet
-    setFwRuleClient: setFwRuleClient
+    serverName: kv.getSecret('MYSQL-SERVER-NAME')
+    administratorLogin: kv.getSecret('SPRING-DATASOURCE-USERNAME')
+    administratorLoginPassword: kv.getSecret('SPRING-DATASOURCE-PASSWORD') 
+    azureSpringAppsOutboundPubIP: azurespringapps.outputs.azureSpringAppsOutboundPubIP
   }
   dependsOn: [
-    roleAssignments
+    azurespringapps
   ]
-}
-
-// https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/scope-extension-resources
-module roleAssignments './modules/asa/roleAssignments.bicep' = {
-  name: 'role-assignments'
-  params: {
-    vnetName: vnetName
-    subnetName: appSubnetName
-    kvName: kvName
-    kvRGName: kvRGName
-    networkRoleType: 'Owner'
-    kvRoleType: 'KeyVaultReader'
-    azureSpringAppsRp: azureSpringAppsRp
-  }
 }
 
 // https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/key-vault-parameter?tabs=azure-cli
@@ -310,7 +246,7 @@ var accessPoliciesObject = {
   ]
 }
 
-module KeyVaultAccessPolicies './modules/kv/kv_policies.bicep'= {
+module KeyVaultAccessPolicies './modules/kv/kv_policies.bicep'= if (setKVAccessPolicies)  {
   name: 'KeyVaultAccessPolicies'
   scope: resourceGroup(kvRGName)
   params: {

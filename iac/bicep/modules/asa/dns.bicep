@@ -33,7 +33,7 @@ resource asaPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   // properties: {}
 }
 
-resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' existing =  {
+resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' existing =  {
   name: vnetName
 }
 output vnetId string = vnet.id
@@ -63,7 +63,7 @@ resource serviceRuntimeNetworkRG 'Microsoft.Resources/resourceGroups@2021-04-01'
   scope: subscription()
 }
 
-resource appsAksLb 'Microsoft.Network/loadBalancers@2021-05-01' existing = {
+resource appsAksLb 'Microsoft.Network/loadBalancers@2022-05-01' existing = {
   scope: appNetworkRG
   name: 'kubernetes-internal'
 }
@@ -71,7 +71,7 @@ output appsAksLbFrontEndIpConfigId string = appsAksLb.properties.frontendIPConfi
 output appsAksLbFrontEndIpConfigName string = appsAksLb.properties.frontendIPConfigurations[0].name
 output appsAksLbFrontEndIpPrivateIpAddress string = appsAksLb.properties.frontendIPConfigurations[0].properties.privateIPAddress
 
-resource asaServiceRuntime_AksLb 'Microsoft.Network/loadBalancers@2021-05-01' existing = {
+resource asaServiceRuntime_AksLb 'Microsoft.Network/loadBalancers@2022-05-01' existing = {
   scope: serviceRuntimeNetworkRG
   name: 'kubernetes-internal'
 }

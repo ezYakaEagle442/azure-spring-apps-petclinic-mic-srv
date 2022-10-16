@@ -18,8 +18,8 @@ param tags object = {
 // id-<app or service name>-<environment>-<region name>-<###>
 // ex: id-appcn-keda-prod-eastus2-001
 
-@description('The admin-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param adminServerAppIdentityName string = 'id-asa-petclinic-admin-server-dev-westeurope-101'
+@description('The config-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
+param configServerAppIdentityName string = 'id-asa-petclinic-config-server-dev-westeurope-101'
 
 @description('The api-gateway Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
 param apiGatewayAppIdentityName string = 'id-asa-petclinic-api-gateway-dev-westeurope-101'
@@ -37,13 +37,13 @@ param visitsServiceAppIdentityName string = 'id-asa-petclinic-visits-service-dev
 // New resources
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.managedidentity/userassignedidentities?pivots=deployment-language-bicep
-resource adminServerIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
-  name: adminServerAppIdentityName
+resource configServerIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
+  name: configServerAppIdentityName
   location: location
   tags: tags
 }
-output adminServerIdentityId string = adminServerIdentity.id
-output adminServerPrincipalId string = adminServerIdentity.properties.principalId
+output configServerIdentityId string = configServerIdentity.id
+output configServerPrincipalId string = configServerIdentity.properties.principalId
 
 resource apiGatewayIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
   name: apiGatewayAppIdentityName

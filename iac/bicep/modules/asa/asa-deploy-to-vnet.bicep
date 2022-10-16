@@ -43,6 +43,12 @@ param azureSpringAppsTier string = 'Standard'
 @description('Should the service be deployed to a Corporate VNet ?')
 param deployToVNet bool = false
 
+param vnetName string = 'vnet-azure-spring-apps'
+param appNetworkResourceGroup string 
+param serviceRuntimeNetworkResourceGroup string 
+param appSubnetId string 
+param serviceRuntimeSubnetId string
+param serviceCidr string
 param zoneRedundant bool = false
 
 @description('The Azure Spring Apps Git Config Server name. Only "default" is supported')
@@ -76,6 +82,33 @@ param buildName string = '${appName}-build'
 
 @description('The Azure Spring Apps Build service name. Only "{azureSpringAppsInstanceName}/default" is supported') // to be checked
 param buildServiceName string = '${azureSpringAppsInstanceName}/default' // '{your-service-name}/default/default'  //{your-service-name}/{build-service-name}/{agenpool-name}
+
+@secure()
+@description('The MySQL DB server name.')
+param serverName string
+
+@secure()
+@description('The MySQL DB Admin Login.')
+param administratorLogin string = 'mys_adm'
+
+@secure()
+@description('The MySQL DB Admin Password.')
+param administratorLoginPassword string
+
+@description('Allow client workstation to MySQL for local Dev/Test only')
+param clientIPAddress string
+
+@description('Should a MySQL Firewall be set to allow client workstation for local Dev/Test only')
+param setFwRuleClient bool = false
+
+@description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
+param startIpAddress string = '10.42.1.0'
+
+@description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
+param endIpAddress string = '10.42.1.15'
+
+// @description('MySQL ResourceID')
+// param mySQLResourceID string
 
 @maxLength(24)
 @description('The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters.')
@@ -114,7 +147,7 @@ resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 }
 // pre-req: https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-azure-cli#prerequisites
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-09-01-preview' = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-09-01-preview' = if (!deployToVNet) {
   name: azureSpringAppsInstanceName
   location: location
   sku: {
@@ -123,6 +156,13 @@ resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-09-01-preview' = {
     tier: azureSpringAppsTier
   }
   properties: {
+    networkProfile: {
+      appNetworkResourceGroup: appNetworkResourceGroup
+      appSubnetId: appSubnetId
+      serviceCidr: serviceCidr
+      serviceRuntimeNetworkResourceGroup: serviceRuntimeNetworkResourceGroup
+      serviceRuntimeSubnetId: serviceRuntimeSubnetId
+    }
     zoneRedundant: zoneRedundant
   }
 }

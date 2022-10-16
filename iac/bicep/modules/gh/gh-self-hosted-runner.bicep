@@ -130,7 +130,7 @@ var linuxConfiguration = {
 var osDiskType = 'Standard_LRS'
 
 
-resource vnet 'Microsoft.Network/virtualNetworks@2021-08-01' existing =  {
+resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' existing =  {
   name: vnetName
 }
 
@@ -144,7 +144,7 @@ var infrastructureSubnetID = vnet.properties.subnets[0].id
 
 
 // https://docs.microsoft.com/en-us/azure/templates/microsoft.network/publicipaddresses?tabs=bicep#publicipaddresssku
-resource pip 'Microsoft.Network/publicIPAddresses@2021-08-01' = {
+resource pip 'Microsoft.Network/publicIPAddresses@2022-05-01' = {
   name: 'pip-vm-asa-petclinic-client'
   location: location
   sku: {
@@ -164,7 +164,7 @@ output pipId string = pip.id
 output hostname string = pip.properties.dnsSettings.fqdn
 output pipGUID string = pip.properties.resourceGuid
 
-resource NSG 'Microsoft.Network/networkSecurityGroups@2021-08-01' = {
+resource NSG 'Microsoft.Network/networkSecurityGroups@2022-05-01' = {
   name: nsgName
   location: location
   properties: {
@@ -204,7 +204,7 @@ output nsgsecurityRule0 string = NSG.properties.securityRules[0].name
 output nsgsecurityRule1 string = NSG.properties.securityRules[1].name
 
 // https://docs.microsoft.com/en-us/azure/templates/microsoft.network/networkinterfaces?tabs=bicep
-resource NIC1 'Microsoft.Network/networkInterfaces@2021-08-01' = {
+resource NIC1 'Microsoft.Network/networkInterfaces@2022-05-01' = {
   location: location
   name: nicName
   properties: {

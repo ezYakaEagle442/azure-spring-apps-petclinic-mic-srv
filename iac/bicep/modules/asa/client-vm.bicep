@@ -126,7 +126,7 @@ var unattendSetLocalRegionFirstRunXML = '<FirstLogonCommands><SynchronousCommand
 var customScript = 'Set-WinSystemLocale fr-FR\\r\\nSet-WinUserLanguageList -LanguageList fr-FR -Force\\r\\nSet-Culture -CultureInfo fr-FR\\r\\nSet-WinHomeLocation -GeoId 84\\r\\nRestart-Computer -Force'
 
 // https://docs.microsoft.com/en-us/azure/templates/microsoft.compute/virtualmachines?tabs=bicep
-resource windowsVM 'Microsoft.Compute/virtualMachines@2022-03-01' = {
+resource windowsVM 'Microsoft.Compute/virtualMachines@2022-08-01' = {
   name: windowsVMName
   location: location
   properties: {

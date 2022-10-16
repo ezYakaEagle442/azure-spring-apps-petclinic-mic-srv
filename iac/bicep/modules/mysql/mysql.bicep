@@ -37,7 +37,7 @@ var databaseSkuName = 'Standard_B1ms' //  'GP_Gen5_2' for single server
 var databaseSkuTier = 'Burstable' // 'GeneralPurpose'
 var mySqlVersion = '5.7' // https://docs.microsoft.com/en-us/azure/mysql/concepts-supported-versions
 
-resource mysqlserver 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
+resource mysqlserver 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' = {
   name: serverName
   location: location
   sku: {
@@ -65,7 +65,7 @@ output mySQLResourceID string = mysqlserver.id
 
 // Add firewall config to allow Azure Spring Apps :
 // virtualNetwor FirewallRules to Allow public access from Azure services 
-resource fwRuleAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-05-01' = {
+resource fwRuleAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = {
   name: 'Allow-Azure-Spring-Apps'
   parent: mysqlserver
   properties: {
@@ -75,7 +75,7 @@ resource fwRuleAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRul
 }
 
 // Allow client workstation with IP 'clientIPAddress' for local Dev/Test only
-resource fwRuleClientIPAddress 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-05-01' = if (setFwRuleClient)  {
+resource fwRuleClientIPAddress 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = if (setFwRuleClient)  {
   name: 'ClientIPAddress'
   parent: mysqlserver
   properties: {
@@ -85,7 +85,7 @@ resource fwRuleClientIPAddress 'Microsoft.DBforMySQL/flexibleServers/firewallRul
 }
 
  // Allow Azure Spring Apps
- resource fwRuleAllowAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-05-01' = {
+ resource fwRuleAllowAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = {
   name: 'Allow Azure Spring Apps'
   parent: mysqlserver
   properties: {
@@ -99,7 +99,7 @@ resource fwRuleClientIPAddress 'Microsoft.DBforMySQL/flexibleServers/firewallRul
  // Allow public access from any Azure service within Azure to this server
  // This option configures the firewall to allow connections from IP addresses allocated to any Azure service or asset,
  // including connections from the subscriptions of other customers.
- resource fwRuleAllowAnyHost 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-05-01' = {
+ resource fwRuleAllowAnyHost 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = {
   name: 'Allow Any Host'
   parent: mysqlserver
   properties: {
@@ -108,7 +108,7 @@ resource fwRuleClientIPAddress 'Microsoft.DBforMySQL/flexibleServers/firewallRul
   }
 }
 
- resource fwRuleAllowAnyHost 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-05-01' = {
+ resource fwRuleAllowAnyHost 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = {
   name: 'Allow Any Host'
   parent: mysqlserver
   properties: {

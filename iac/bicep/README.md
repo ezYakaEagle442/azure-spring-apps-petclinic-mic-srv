@@ -16,7 +16,7 @@ az term accept \
 
 ## Standard Tier
 
-TODO : Use [Pipelines with GitHub Actions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-github-actions?tabs=CLI)
+To use [Pipelines with GitHub Actions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-github-actions?tabs=CLI) see [../../../README.md](../../README.md)
 ```sh
 
 # See https://docs.microsoft.com/cli/azure/microsoft-graph-migration
@@ -45,14 +45,17 @@ In the [Bicep parameter file](./parameters.json) :
 
 ```sh
 # Check, choose a Region with AZ : https://docs.microsoft.com/en-us/azure/availability-zones/az-overview#azure-regions-with-availability-zones
-az group create --name rg-iac-kv --location centralindia
+az group create --name rg-iac-kv --location westeurope
 az group create --name rg-iac-asa-petclinic-mic-srv --location westeurope
 
 az deployment group create --name iac-101-kv -f ./modules/kv/kv.bicep -g rg-iac-kv \
     --parameters @./modules/kv/parameters-kv.json
 
-az deployment group create --name iac-101-asa -f ./asa/main.bicep -g rg-iac-asa-petclinic-mic-srv \
-    --parameters @./asa/parameters.json --debug # --what-if to test like a dry-run
+az deployment group create --name iac-101-pre-req -f ./pre-req.bicep -g rg-iac-asa-petclinic-mic-srv \
+    --parameters @./parameters.json --debug # --what-if to test like a dry-run
+
+az deployment group create --name iac-101-asa -f ./petclinic-apps.bicep -g rg-iac-asa-petclinic-mic-srv \
+    --parameters @./parameters.json --debug # --what-if to test like a dry-run    
 ```
 
 Note: you can Run a Bicep script to debug and output the results to Azure Storage, see the [doc](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/deployment-script-bicep#sample-bicep-files)

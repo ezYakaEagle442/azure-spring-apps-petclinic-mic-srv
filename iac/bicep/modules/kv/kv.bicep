@@ -48,7 +48,7 @@ param vNetRules array = []
 ]
 */
 
-resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
+resource kv 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: kvName
   location: location
   properties: {
