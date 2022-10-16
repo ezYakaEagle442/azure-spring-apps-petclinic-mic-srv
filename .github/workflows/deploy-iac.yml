@@ -55,7 +55,7 @@ on:
         description: the Image Tag ID
         required: true
         type: string
-        
+
 jobs:
   deploy-kv:
     runs-on: ubuntu-latest
@@ -266,11 +266,22 @@ jobs:
           # If you're deploying Azure Spring Apps Enterprise tier for the first time in the target subscription, 
           # use the following commands to register the provider and accept the legal terms and privacy statements for the Enterprise tier
           echo "see Azure Spring Apps Enterprise tier pre-req at https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-standard#prerequisites"
+          
+          # The client 'XXX' with object id 'XXX' does not have authorization to perform action 'Microsoft.SaaS/register/action' over scope '/subscriptions/***' or the scope is invalid
+          # https://learn.microsoft.com/en-us/azure/azure-resource-manager/troubleshooting/error-register-resource-provider?tabs=azure-cli#cause
           az provider register --namespace Microsoft.SaaS
-          az term accept \
-              --publisher vmware-inc \
-              --product azure-spring-cloud-vmware-tanzu-2 \
-              --plan tanzu-asc-ent-mtr
+          
+          echo "****************************************************************************************"
+          echo "*                                                                                      *"
+          echo "*                                                                                      *"
+          echo "The client 'XXX' with object id 'XXX' MUST have authorization to perform action        *"
+          echo "'Microsoft.SaaS/register/action' whne running az term accept ...                       *"
+          echo "*                                                                                      *"
+          echo "****************************************************************************************
+          # az term accept \
+          #    --publisher vmware-inc \
+          #    --product azure-spring-cloud-vmware-tanzu-2 \
+          #    --plan tanzu-asc-ent-mtr
               
           az deployment group create --name asa-petclinic-apps -f iac/bicep/petclinic-apps.bicep -g ${{ env.RG_APP }} \
             -p appName=${{ env.APP_NAME }} \
