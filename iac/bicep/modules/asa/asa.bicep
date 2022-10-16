@@ -71,7 +71,7 @@ param gitConfigURI string
   'default'
 ])
 param buildAgentPoolName string = 'default'
-param builderName string = 'Java-Builder'
+param builderName string = 'java-builder'
 param buildName string = '${appName}-build'
 
 @description('The Azure Spring Apps Build service name. Only "{azureSpringAppsInstanceName}/default" is supported') // to be checked
@@ -86,22 +86,22 @@ param kvRGName string
 
 
 @description('The config-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param configServerAppIdentityName string = 'id-aca-petclinic-config-server-dev-westeurope-101'
+param configServerAppIdentityName string = 'id-asa-petclinic-config-server-dev-westeurope-101'
 
 @description('The api-gateway Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param apiGatewayAppIdentityName string = 'id-aca-petclinic-api-gateway-dev-westeurope-101'
+param apiGatewayAppIdentityName string = 'id-asa-petclinic-api-gateway-dev-westeurope-101'
 
 @description('The customers-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param customersServiceAppIdentityName string = 'id-aca-petclinic-customers-service-dev-westeurope-101'
+param customersServiceAppIdentityName string = 'id-asa-petclinic-customers-service-dev-westeurope-101'
 
 @description('The vets-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param vetsServiceAppIdentityName string = 'id-aca-petclinic-vets-service-dev-westeurope-101'
+param vetsServiceAppIdentityName string = 'id-asa-petclinic-vets-service-dev-westeurope-101'
 
 @description('The visits-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param visitsServiceAppIdentityName string = 'id-aca-petclinic-visits-service-dev-westeurope-101'
+param visitsServiceAppIdentityName string = 'id-asa-petclinic-visits-service-dev-westeurope-101'
 
 @description('The discovery-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param discoveryServerAppIdentityName string = 'id-aca-petclinic-discovery-server-dev-westeurope-101'
+param discoveryServerAppIdentityName string = 'id-asa-petclinic-discovery-server-dev-westeurope-101'
 
 resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: kvRGName
