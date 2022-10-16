@@ -32,8 +32,6 @@ env:
   # ==== Secrets ====
   credentials: ${{ secrets.AZURE_CREDENTIALS }}
   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  SPN_ID: ${{ secrets.SPN_ID }}
-  SPN_PWD: ${{ secrets.SPN_PWD }}
   
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callinputs
 
