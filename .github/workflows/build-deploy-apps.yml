@@ -114,6 +114,12 @@ jobs:
         echo "VETS_SERVICE_JAR=spring-petclinic-${{ env.VETS_SERVICE }}/target/$VETS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "VISITS_SERVICE_JAR=spring-petclinic-${{ env.VISITS_SERVICE }}/target/$VISITS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
 
+
+        echo ""
+        echo "GH_WORKSPACE Check ..."
+        ls -al ${{ env.GH_WORKSPACE }}
+        echo ""
+
         echo "API_GATEWAY_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.API_GATEWAY }}/${{ env.API_GATEWAY_JAR_ARTIFACT }}" >> $GITHUB_ENV
         echo "ADMIN_SERVER_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.ADMIN_SERVER }}/${{ env.ADMIN_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
         echo "CONFIG_SERVER_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.CONFIG_SERVER }}/${{ env.CONFIG_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
@@ -281,6 +287,19 @@ jobs:
         echo "github.workspace = ${{ github.workspace }}"
         pwd
         ls -al
+
+        echo ""
+        echo "GH_WORKSPACE Check ..."
+        ls -al ${{ env.GH_WORKSPACE }}
+        echo ""
+
+        echo "API_GATEWAY_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.API_GATEWAY }}/${{ env.API_GATEWAY_JAR_ARTIFACT }}"
+        echo "ADMIN_SERVER_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.ADMIN_SERVER }}/${{ env.ADMIN_SERVER_JAR_ARTIFACT }}"
+        echo "CONFIG_SERVER_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.CONFIG_SERVER }}/${{ env.CONFIG_SERVER_JAR_ARTIFACT }}"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.CUSTOMERS_SERVICE }}/${{ env.CUSTOMERS_SERVICE_JAR_ARTIFACT }}"
+        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.DISCOVERY_SERVER }}/${{ env.DISCOVERY_SERVER_JAR_ARTIFACT }}"
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}"
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}"
 
         echo "****************************************************************************************"
         echo "*                                                                                      *"
