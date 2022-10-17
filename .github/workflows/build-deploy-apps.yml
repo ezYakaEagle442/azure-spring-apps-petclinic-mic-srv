@@ -201,7 +201,7 @@ jobs:
         ls -al spring-petclinic-visits-service/target/*.jar
 
   upload-artifacts:
-    needs: call-maven-build-workflow
+    # needs: call-maven-build-workflow
     runs-on: ubuntu-latest
 
   # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts
@@ -256,7 +256,7 @@ jobs:
         retention-days: 5
 
   deploy-apps:
-    needs: [call-maven-build-workflow, upload-artifacts]
+    needs: [upload-artifacts]
     runs-on: ubuntu-latest # [self-hosted, linux, x64]
     steps: 
 
