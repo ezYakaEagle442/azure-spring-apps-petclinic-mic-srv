@@ -34,7 +34,7 @@ env:
   # DEPLOYMENT_RG: rg-iac-asa-petclinic-mic-srv
   DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://kv-petcliasa21.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
   
-  DEPLOYMENT_VERSION: 2.6.3
+  DEPLOYMENT_VERSION: 2.6.6
   DEPLOYMENT_RUNTIME_VERSION: Java_11
   DEPLOYMENT_CPU: 500m
   DEPLOYMENT_MEMORY: 512Mi
