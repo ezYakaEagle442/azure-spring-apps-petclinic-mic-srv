@@ -67,9 +67,17 @@ env:
 
 on: # [push]
   workflow_dispatch:
-
+    
 jobs:
   build:
+    outputs:
+      API_GATEWAY_JAR_ARTIFACT: ${{ steps.set-var.outputs.API_GATEWAY_JAR_ARTIFACT }}
+      ADMIN_SERVER_JAR_ARTIFACT: ${{ steps.set-var.outputs.ADMIN_SERVER_JAR_ARTIFACT }}
+      CONFIG_SERVER_JAR_ARTIFACT: ${{ steps.set-var.outputs.CONFIG_SERVER_JAR_ARTIFACT }}
+      CUSTOMERS_SERVICE_DEPLOYMENT: ${{ steps.set-var.outputs.CUSTOMERS_SERVICE_DEPLOYMENT }}
+      VETS_SERVICE_JAR_ARTIFACT: ${{ steps.set-var.outputs.VETS_SERVICE_JAR_ARTIFACT }}
+      VISITS_SERVICE_JAR_ARTIFACT: ${{ steps.set-var.outputs.VISITS_SERVICE_JAR_ARTIFACT }}
+
     runs-on: ubuntu-latest
     # environment: production // https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
     # https://github.com/marketplace/actions/azure-login
@@ -78,6 +86,7 @@ jobs:
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
     # /!\ IMPORTANT:  The step that creates or updates the environment variable does not have access to the new value, but all subsequent steps in a job will have access.
     - name: Set Base environment variables
+      id: set-var
       run: |
         echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
         
@@ -98,6 +107,14 @@ jobs:
         echo "VISITS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.VISITS_SERVICE }}" >> $GITHUB_ENV
 
         GH_WORKSPACE=${{ github.workspace }} # "/github/workspace"
+
+        echo "API_GATEWAY_JAR_ARTIFACT={{ env.API_GATEWAY_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "ADMIN_SERVER_JAR_ARTIFACT={{ env.ADMIN_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "CONFIG_SERVER_JAR_ARTIFACT={{ env.CONFIG_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "CUSTOMERS_SERVICE_DEPLOYMENT={{ env.CUSTOMERS_SERVICE_DEPLOYMENT }}" >> $GITHUB_OUTPUT
+        echo "DISCOVERY_SERVER_DEPLOYMENT={{ env.DISCOVERY_SERVER_DEPLOYMENT }}" >> $GITHUB_OUTPUT
+        echo "VETS_SERVICE_DEPLOYMENT={{ env.VETS_SERVICE_DEPLOYMENT }}" >> $GITHUB_OUTPUT
+        echo "VISITS_SERVICE_DEPLOYMENT={{ env.VISITS_SERVICE_DEPLOYMENT }}" >> $GITHUB_OUTPUT
 
       shell: bash
 
@@ -120,13 +137,13 @@ jobs:
         ls -al ${{ env.GH_WORKSPACE }}
         echo ""
 
-        echo "API_GATEWAY_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.API_GATEWAY }}/${{ env.API_GATEWAY_JAR_ARTIFACT }}" >> $GITHUB_ENV
-        echo "ADMIN_SERVER_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.ADMIN_SERVER }}/${{ env.ADMIN_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
-        echo "CONFIG_SERVER_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.CONFIG_SERVER }}/${{ env.CONFIG_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.CUSTOMERS_SERVICE }}/${{ env.CUSTOMERS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
-        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.DISCOVERY_SERVER }}/${{ env.DISCOVERY_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
-        echo "VETS_SERVICE_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
-        echo "VISITS_SERVICE_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ env.API_GATEWAY_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ env.ADMIN_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "CONFIG_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.CONFIG_SERVER }}/${{ env.CONFIG_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}/${{ env.CUSTOMERS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ env.DISCOVERY_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
 
       shell: bash
 
@@ -293,13 +310,13 @@ jobs:
         ls -al ${{ env.GH_WORKSPACE }}
         echo ""
 
-        echo "API_GATEWAY_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.API_GATEWAY }}/${{ env.API_GATEWAY_JAR_ARTIFACT }}"
-        echo "ADMIN_SERVER_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.ADMIN_SERVER }}/${{ env.ADMIN_SERVER_JAR_ARTIFACT }}"
-        echo "CONFIG_SERVER_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.CONFIG_SERVER }}/${{ env.CONFIG_SERVER_JAR_ARTIFACT }}"
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.CUSTOMERS_SERVICE }}/${{ env.CUSTOMERS_SERVICE_JAR_ARTIFACT }}"
-        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.DISCOVERY_SERVER }}/${{ env.DISCOVERY_SERVER_JAR_ARTIFACT }}"
-        echo "VETS_SERVICE_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}"
-        echo "VISITS_SERVICE_PACKAGE_PATH=${{ env.GH_WORKSPACE }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}"
+        echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ needs.build.outputs.API_GATEWAY_JAR_ARTIFACT }}"
+        echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ needs.build.outputs.ADMIN_SERVER_JAR_ARTIFACT }}"
+        echo "CONFIG_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.CONFIG_SERVER }}/${{ needs.build.outputs.CONFIG_SERVER_JAR_ARTIFACT }}"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}/${{ needs.build.outputs.CUSTOMERS_SERVICE_JAR_ARTIFACT }}"
+        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ needs.build.outputs.DISCOVERY_SERVER_JAR_ARTIFACT }}"
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ needs.build.outputs.VETS_SERVICE_JAR_ARTIFACT }}"
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ needs.build.outputs.VISITS_SERVICE_JAR_ARTIFACT }}"
 
         echo "****************************************************************************************"
         echo "*                                                                                      *"
