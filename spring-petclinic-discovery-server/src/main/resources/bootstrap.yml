@@ -12,3 +12,41 @@ spring:
   cloud:
     config:
       uri: http://config-server:8888
+---
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    enabled-by-default: false
+    web:
+      base-path: "/manage"
+      exposure: # https://docs.spring.io/spring-boot/docs/2.6.3/reference/html/actuator.html#actuator.endpoints.exposing
+        include: "health,info,env,mappings" # "*"
+        exclude: "beans"    
+  endpoint:
+    health:
+      enabled: true
+      status:
+        http-mapping:
+          down: 503
+          fatal: 503
+          out-of-service: 503
+      group:
+        readiness:
+          include: "readinessState"
+        liveness:
+          include: "livenessState"                      
+    probes:
+        enabled: true      
+    info:
+      enabled: true
+    env:
+      enabled: true
+    mappings:
+      enabled: true            
+  server:
+    port: 8081
+---

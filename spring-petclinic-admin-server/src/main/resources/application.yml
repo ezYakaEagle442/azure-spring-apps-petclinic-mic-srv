@@ -1,18 +1,3 @@
-spring:
-  cloud:
-    config:
-      uri: http://localhost:8888
-  application:
-    name: customers-service
----
-spring:
-  config:
-    activate:
-      on-profile: docker
-  cloud:
-    config:
-      uri: http://config-server:8888
----
 management:
   health:
     livenessstate:
@@ -49,4 +34,3 @@ management:
       enabled: true            
   server:
     port: 8081
----
