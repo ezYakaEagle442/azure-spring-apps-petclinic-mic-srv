@@ -74,9 +74,26 @@ jobs:
       API_GATEWAY_JAR_ARTIFACT: ${{ steps.set-var.outputs.API_GATEWAY_JAR_ARTIFACT }}
       ADMIN_SERVER_JAR_ARTIFACT: ${{ steps.set-var.outputs.ADMIN_SERVER_JAR_ARTIFACT }}
       CONFIG_SERVER_JAR_ARTIFACT: ${{ steps.set-var.outputs.CONFIG_SERVER_JAR_ARTIFACT }}
-      CUSTOMERS_SERVICE_DEPLOYMENT: ${{ steps.set-var.outputs.CUSTOMERS_SERVICE_DEPLOYMENT }}
+      CUSTOMERS_SERVICE_JAR_ARTIFACT: ${{ steps.set-var.outputs.CUSTOMERS_SERVICE_JAR_ARTIFACT }}
       VETS_SERVICE_JAR_ARTIFACT: ${{ steps.set-var.outputs.VETS_SERVICE_JAR_ARTIFACT }}
       VISITS_SERVICE_JAR_ARTIFACT: ${{ steps.set-var.outputs.VISITS_SERVICE_JAR_ARTIFACT }}
+      DISCOVERY_SERVER_JAR_ARTIFACT: ${{ steps.set-var.outputs.DISCOVERY_SERVER_JAR_ARTIFACT }}
+
+      API_GATEWAY_PACKAGE_PATH: ${{ steps.set-var.outputs.API_GATEWAY_PACKAGE_PATH }}
+      ADMIN_SERVER_PACKAGE_PATH: ${{ steps.set-var.outputs.ADMIN_SERVER_PACKAGE_PATH }}
+      CONFIG_SERVER_PACKAGE_PATH: ${{ steps.set-var.outputs.CONFIG_SERVER_PACKAGE_PATH }}
+      CUSTOMERS_SERVICE_PACKAGE_PATH: ${{ steps.set-var.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}
+      VETS_SERVICE_PACKAGE_PATH: ${{ steps.set-var.outputs.VETS_SERVICE_PACKAGE_PATH }}
+      VISITS_SERVICE_PACKAGE_PATH: ${{ steps.set-var.outputs.VISITS_SERVICE_PACKAGE_PATH }}
+      DISCOVERY_SERVER_PACKAGE_PATH: ${{ steps.set-var.outputs.DISCOVERY_SERVER_PACKAGE_PATH }}
+
+      API_GATEWAY_DEPLOYMENT: ${{ steps.set-var.outputs.API_GATEWAY_DEPLOYMENT }}
+      ADMIN_SERVER_DEPLOYMENT: ${{ steps.set-var.outputs.ADMIN_SERVER_DEPLOYMENT }}
+      CONFIG_SERVER_DEPLOYMENT: ${{ steps.set-var.outputs.CONFIG_SERVER_DEPLOYMENT }}
+      CUSTOMERS_SERVICE_DEPLOYMENT: ${{ steps.set-var.outputs.CUSTOMERS_SERVICE_DEPLOYMENT }}
+      DISCOVERY_SERVER_DEPLOYMENT: ${{ steps.set-var.outputs.DISCOVERY_SERVER_DEPLOYMENT }}
+      VETS_SERVICE_DEPLOYMENT: ${{ steps.set-var.outputs.VETS_SERVICE_DEPLOYMENT }}
+      VISITS_SERVICE_DEPLOYMENT: ${{ steps.set-var.outputs.VISITS_SERVICE_DEPLOYMENT }}
 
     runs-on: ubuntu-latest
     # environment: production // https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
@@ -111,6 +128,14 @@ jobs:
         echo "API_GATEWAY_JAR_ARTIFACT={{ env.API_GATEWAY_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
         echo "ADMIN_SERVER_JAR_ARTIFACT={{ env.ADMIN_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
         echo "CONFIG_SERVER_JAR_ARTIFACT={{ env.CONFIG_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "CUSTOMERS_SERVICE_JAR_ARTIFACT={{ env.CUSTOMERS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "DISCOVERY_SERVER_JAR_ARTIFACT={{ env.DISCOVERY_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "VETS_SERVICE_JAR_ARTIFACT={{ env.VETS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "VISITS_SERVICE_JAR_ARTIFACT={{ env.VISITS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+
+        echo "API_GATEWAY_DEPLOYMENT={{ env.API_GATEWAY_DEPLOYMENT }}" >> $GITHUB_OUTPUT
+        echo "ADMIN_SERVER_DEPLOYMENT={{ env.ADMIN_SERVER_DEPLOYMENT }}" >> $GITHUB_OUTPUT
+        echo "CONFIG_SERVER_DEPLOYMENT={{ env.CONFIG_SERVER_DEPLOYMENT }}" >> $GITHUB_OUTPUT
         echo "CUSTOMERS_SERVICE_DEPLOYMENT={{ env.CUSTOMERS_SERVICE_DEPLOYMENT }}" >> $GITHUB_OUTPUT
         echo "DISCOVERY_SERVER_DEPLOYMENT={{ env.DISCOVERY_SERVER_DEPLOYMENT }}" >> $GITHUB_OUTPUT
         echo "VETS_SERVICE_DEPLOYMENT={{ env.VETS_SERVICE_DEPLOYMENT }}" >> $GITHUB_OUTPUT
@@ -131,7 +156,6 @@ jobs:
         echo "VETS_SERVICE_JAR=spring-petclinic-${{ env.VETS_SERVICE }}/target/$VETS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "VISITS_SERVICE_JAR=spring-petclinic-${{ env.VISITS_SERVICE }}/target/$VISITS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
 
-
         echo ""
         echo "GH_WORKSPACE Check ..."
         ls -al ${{ env.GH_WORKSPACE }}
@@ -144,6 +168,14 @@ jobs:
         echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ env.DISCOVERY_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
         echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
         echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
+
+        echo "API_GATEWAY_PACKAGE_PATH={{ env.API_GATEWAY_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
+        echo "ADMIN_SERVER_PACKAGE_PATH={{ env.ADMIN_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
+        echo "CONFIG_SERVER_PACKAGE_PATH={{ env.CONFIG_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
+        echo "VISITS_SERVICE_DEPLOYMENT={{ env.VISITS_SERVICE_DEPLOYMENT }}" >> $GITHUB_OUTPUT
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH={{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
+        echo "VETS_SERVICE_PACKAGE_PATH={{ env.VETS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
+        echo "DISCOVERY_SERVER_PACKAGE_PATH={{ env.DISCOVERY_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
 
       shell: bash
 
@@ -329,43 +361,43 @@ jobs:
         echo ""
         ls ${{ env.ADMIN_SERVER }}
         echo ""
-        ls ${{ env.ADMIN_SERVER_PACKAGE_PATH }}
+        ls ${{ needs.build.outputs.ADMIN_SERVER_PACKAGE_PATH }} # ${{ env.ADMIN_SERVER_PACKAGE_PATH }}
         echo ""
 
         echo ""
         ls ${{ env.CONFIG_SERVER }}
         echo ""
-        ls ${{ env.CONFIG_SERVER_PACKAGE_PATH }}        
+        ls ${{ needs.build.outputs.CONFIG_SERVER_PACKAGE_PATH }} # ${{ env.CONFIG_SERVER_PACKAGE_PATH }}        
         echo ""
 
         echo ""
         ls ${{ env.DISCOVERY_SERVER }}
         echo ""
-        ls ${{ env.DISCOVERY_SERVER_PACKAGE_PATH }}          
+        ls ${{ needs.build.outputs.DISCOVERY_SERVER_PACKAGE_PATH }} # ${{ env.DISCOVERY_SERVER_PACKAGE_PATH }}          
         echo ""
 
         echo ""
         ls ${{ env.API_GATEWAY }}
         echo ""
-        ls ${{ env.API_GATEWAY_PACKAGE_PATH }}           
+        ls ${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }} # ${{ env.API_GATEWAY_PACKAGE_PATH }}           
         echo ""
 
         echo ""
         ls ${{ env.CUSTOMERS_SERVICE }}
         echo ""
-        ls ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}        
+        ls ${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }} # ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}        
         echo ""
 
         echo ""
         ls  ${{ env.VETS_SERVICE }}
         echo ""
-        ls ${{ env.VETS_SERVICE_PACKAGE_PATH }}          
+        ls ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }}# ${{ env.VETS_SERVICE_PACKAGE_PATH }}          
         echo ""
 
         echo ""
         ls  ${{ env.VISITS_SERVICE }}
         echo ""
-        ls ${{ env.VISITS_SERVICE_PACKAGE_PATH }}   
+        ls ${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }} # ${{ env.VISITS_SERVICE_PACKAGE_PATH }}   
         echo ""    
 
     # https://github.com/marketplace/actions/azure-spring-apps
@@ -377,11 +409,11 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.VETS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ env.VETS_SERVICE_PACKAGE_PATH }}
+        package: ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }} # ${{ env.VETS_SERVICE_PACKAGE_PATH }}
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
-        deployment-name: $VETS_SERVICE_DEPLOYMENT
+        deployment-name: ${{ needs.build.outputs.VETS_SERVICE_DEPLOYMENT }} # $VETS_SERVICE_DEPLOYMENT
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
         version: ${{ env.DEPLOYMENT_VERSION }} 
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
@@ -394,11 +426,11 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.VISITS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ env.VISITS_SERVICE_PACKAGE_PATH }}
+        package: ${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }} # ${{ env.VISITS_SERVICE_PACKAGE_PATH }}
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
-        deployment-name: $VISITS_SERVICE_DEPLOYMENT
+        deployment-name: ${{ needs.build.outputs.VISITS_SERVICE_DEPLOYMENT }} # $VISITS_SERVICE_DEPLOYMENT
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
         version: ${{ env.DEPLOYMENT_VERSION }} 
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
@@ -411,11 +443,11 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.CUSTOMERS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}
+        package: ${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }} # ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
-        deployment-name: $CUSTOMERS_SERVICE_DEPLOYMENT
+        deployment-name: ${{ needs.build.outputs.CUSTOMERS_SERVICE_DEPLOYMENT }} # $CUSTOMERS_SERVICE_DEPLOYMENT
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
         version: ${{ env.DEPLOYMENT_VERSION }} 
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
@@ -428,9 +460,9 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.API_GATEWAY }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ env.API_GATEWAY_PACKAGE_PATH }}
+        package: ${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }} # ${{ env.API_GATEWAY_PACKAGE_PATH }}
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
-        deployment-name: $API_GATEWAY_DEPLOYMENT
+        deployment-name: ${{ needs.build.outputs.API_GATEWAY_DEPLOYMENT }} # $API_GATEWAY_DEPLOYMENT
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
         version: ${{ env.DEPLOYMENT_VERSION }} 
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }} 
