@@ -26,7 +26,7 @@ env:
   VETS_SERVICE: vets-service
   VISITS_SERVICE: visits-service
 
-  PRJ_PREFIX: spring-petclinic
+  PRJ_PREFIX: asa-spring-petclinic
 
   # ==== Azure Spring Apps / Apps Deployment params ====:
 
@@ -177,12 +177,28 @@ jobs:
 
   # https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
   # invalid value workflow reference: references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
-  call-maven-build-workflow:
-    name: Trigger Maven
-    needs: set-var
-    uses: ./.github/workflows/maven-build.yml # .github/workflows/maven-build.yml@main ==> references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
-    secrets: inherit # pass all secrets
-      # envPAT: ${{ secrets.envPAT }} # pass just this secret
+  #call-maven-build-workflow:
+  #  name: Trigger Maven
+  #  needs: set-var
+  #  uses: ./.github/workflows/maven-build.yml # .github/workflows/maven-build.yml@main ==> references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
+  #  secrets: inherit # pass all secrets
+  #    # envPAT: ${{ secrets.envPAT }} # pass just this secret
+  
+    - name: Build with Maven
+      id: mvn_build
+      run: | 
+        mvn -B clean package --file pom.xml -DskipTests -Denv=cloud
+        
+        echo "github.workspace = ${{ github.workspace }}"
+        pwd
+
+        ls -al
+        ls -al spring-petclinic-admin-server/target/*.jar
+        ls -al spring-petclinic-api-gateway/target/*.jar
+        ls -al spring-petclinic-config-server/target/*.jar
+        ls -al spring-petclinic-customers-service/target/*.jar
+        ls -al spring-petclinic-vets-service/target/*.jar
+        ls -al spring-petclinic-visits-service/target/*.jar
 
   upload-artifacts:
     needs: call-maven-build-workflow
