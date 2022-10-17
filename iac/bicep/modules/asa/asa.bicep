@@ -84,6 +84,7 @@ param kvName string = 'kv-${appName}'
 @description('The name of the KV RG')
 param kvRGName string
 
+var kvURL = 'https://${kvName}.vault.azure.net'
 
 @description('The config-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
 param configServerAppIdentityName string = 'id-asa-petclinic-config-server-dev-westeurope-101'
@@ -251,6 +252,86 @@ resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-previ
   ]  
 }
 output customersServiceIdentity string = customersserviceapp.identity.principalId
+
+/*
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep
+resource customersserviceappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-09-01-preview' = {
+  name: 'aca-${appName}-customers-service-init-v.0.1.0'
+  parent: customersserviceapp
+  sku: {
+    name: azureSpringAppsSkuName
+  }
+  properties: {
+    active: true
+    deploymentSettings: {
+      addonConfigs: {}
+      environmentVariables: {
+        XXX: 'foo'
+        ZZZ: 'bar'
+      }
+      containerProbeSettings: {
+        disableProbe: false
+      }
+      livenessProbe: {
+        disableProbe: false
+        failureThreshold: 5
+        initialDelaySeconds: 30
+        periodSeconds: 60
+        probeAction: {
+          type: 'HTTPGetAction'
+        }
+        successThreshold: 1
+        timeoutSeconds: 30
+
+      }
+      readinessProbe: {
+        disableProbe: false
+        failureThreshold: 5
+        initialDelaySeconds: 30
+        periodSeconds: 60
+        probeAction: {
+          type: 'HTTPGetAction'
+        }
+        successThreshold: 1
+        timeoutSeconds: 30
+      }
+      resourceRequests: {
+          cpu: any(1)
+          memory: any(1)
+      }
+    }
+    
+    source: {
+      version: '1.0.0'
+      
+      
+      type: 'Jar' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
+      jvmOptions: '-Dazure.keyvault.uri=${kvURL} -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud'
+      relativePath: 'spring-petclinic-customers-service' // './target/petclinic-customers-service-2.6.6.jar'
+      runtimeVersion: 'Java_11'
+      
+      type: 'Container' 
+      customContainer:  {
+        containerImage: 'https://acrpetcliasa.azurecr.io/petclinic/petclinic-customers-service:4242' // Container image of the custom container. This should be in the form of {repository}:{tag} without the server name of the registry	
+        command: ['java', '-jar petclinic-customers-service-2.6.6.jar', '--server.port=8080', '--spring.profiles.active=docker,mysql'] 
+        server: 'acrpetcliasa.azurecr.io' // 	The name of the registry that contains the container image
+        imageRegistryCredential: {
+          username: 'AcrUserName'
+          password: 'AcrPassword'
+        }
+        languageFramework: 'Java'
+        args: '' // Arguments to the entrypoint. The docker image's CMD is used if this is not provided.
+      }
+      
+      type: 'Source' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
+      relativePath: 'spring-petclinic-customers-service'
+      runtimeVersion: 'Java_11'
+      artifactSelector: 'spring-petclinic-customers-service' // Selector for the artifact to be used for the deployment for multi-module projects. This should be the relative path to the target module/project.
+      
+    }
+  }
+}
+*/
 
 resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' = {
   name: 'vets-service'
