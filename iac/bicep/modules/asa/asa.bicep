@@ -268,7 +268,11 @@ resource customersserviceappdeployment 'Microsoft.AppPlatform/Spring/apps/deploy
   properties: {
     active: true
     deploymentSettings: {
-      addonConfigs: {}
+      addonConfigs: {
+        azureMonitor: {
+          enabled: true
+        }
+      }
       environmentVariables: {
         XXX: 'foo'
         ZZZ: 'bar'
@@ -378,7 +382,7 @@ resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview
     }  
   }
   properties: {
-    c: {
+    addonConfigs: {
       azureMonitor: {
         enabled: true
       }
@@ -408,7 +412,11 @@ resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' = 
     }  
   }
   properties: {
-    addonConfigs: {}
+    addonConfigs: {
+      azureMonitor: {
+        enabled: true
+      }
+    }
     httpsOnly: false
     public: true
     temporaryDisk: {
