@@ -274,7 +274,49 @@ jobs:
     # You can  download all artifacts in a workflow run by not specifying a name.
     - name: Download ALL Jar artifacts
       uses: actions/download-artifact@v3
-    
+
+    - name: Check Artifacts
+      run: | 
+        echo "github.workspace = ${{ github.workspace }}"
+        pwd
+        ls -al
+
+        echo "****************************************************************************************"
+        echo "*                                                                                      *"
+        echo "*                                                                                      *"
+        echo "*Checking Artifacts ...                                                                *"
+        echo "*                                                                                      *"
+        echo "*                                                                                      *"
+        echo "****************************************************************************************"
+
+        echo ""
+        ls ${{ env.ADMIN_SERVER }}
+        echo ""
+
+        echo ""
+        ls ${{ env.CONFIG_SERVER }}
+        echo ""
+
+        echo ""
+        ls ${{ env.DISCOVERY_SERVER }}
+        echo ""
+
+        echo ""
+        ls ${{ env.API_GATEWAY }}
+        echo ""
+
+        echo ""
+        ls ${{ env.CUSTOMERS_SERVICE }}
+        echo ""
+
+        echo ""
+        ls  ${{ env.VETS_SERVICE }}
+        echo ""
+
+        echo ""
+        ls  ${{ env.VISITS_SERVICE }}
+        echo ""    
+
     # https://github.com/marketplace/actions/azure-spring-apps
     - name: Deploy vets-service
       uses: Azure/spring-apps-deploy@v1
