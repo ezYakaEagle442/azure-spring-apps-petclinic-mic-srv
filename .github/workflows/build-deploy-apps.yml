@@ -251,6 +251,11 @@ jobs:
     runs-on: ubuntu-latest # [self-hosted, linux, x64]
     steps: 
 
+    - name: Azure Login
+      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
     - name: Authorize local IP to access the Azure Key Vault
       uses: azure/CLI@v1
       with:
@@ -265,18 +270,6 @@ jobs:
     # You can  download all artifacts in a workflow run by not specifying a name.
     - name: Download ALL Jar artifacts
       uses: actions/download-artifact@v3
-
-    - name: Azure Login
-      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Get service SP from Key Vault
-      uses: Azure/get-keyvault-secrets@v1
-      with:
-        keyvault: ${{ env.KEYVAULT }}
-        secrets: "AZURE-CREDENTIALS-FOR-SPRING"
-      id: keyvaultaction  
     
     # https://github.com/marketplace/actions/azure-spring-apps
     - name: Deploy vets-service
