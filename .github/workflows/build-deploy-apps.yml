@@ -169,14 +169,6 @@ jobs:
         echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
         echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
 
-        echo "API_GATEWAY_PACKAGE_PATH={{ env.API_GATEWAY_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
-        echo "ADMIN_SERVER_PACKAGE_PATH={{ env.ADMIN_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
-        echo "CONFIG_SERVER_PACKAGE_PATH={{ env.CONFIG_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
-        echo "VISITS_SERVICE_DEPLOYMENT={{ env.VISITS_SERVICE_DEPLOYMENT }}" >> $GITHUB_OUTPUT
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH={{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
-        echo "VETS_SERVICE_PACKAGE_PATH={{ env.VETS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
-        echo "DISCOVERY_SERVER_PACKAGE_PATH={{ env.DISCOVERY_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
-
       shell: bash
 
     - name: Display environment variables
@@ -201,13 +193,13 @@ jobs:
         echo "VETS_SERVICE_JAR=$VETS_SERVICE_JAR"
         echo "VISITS_SERVICE_JAR=$VISITS_SERVICE_JAR"
 
-        echo "API_GATEWAY_PACKAGE_PATH=$API_GATEWAY_PACKAGE_PATH"
-        echo "ADMIN_SERVER_PACKAGE_PATH=$ADMIN_SERVER_PACKAGE_PATH"
-        echo "CONFIG_SERVER_PACKAGE_PATH=$CONFIG_SERVER_PACKAGE_PATH"
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=$CUSTOMERS_SERVICE_PACKAGE_PATH"
-        echo "DISCOVERY_SERVER_PACKAGE_PATH=$DISCOVERY_SERVER_PACKAGE_PATH"
-        echo "VETS_SERVICE_PACKAGE_PATH=$VETS_SERVICE_PACKAGE_PATH"
-        echo "VISITS_SERVICE_PACKAGE_PATH=$VISITS_SERVICE_PACKAGE_PATH"
+        echo "API_GATEWAY_PACKAGE_PATH={{ env.API_GATEWAY_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
+        echo "ADMIN_SERVER_PACKAGE_PATH={{ env.ADMIN_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
+        echo "CONFIG_SERVER_PACKAGE_PATH={{ env.CONFIG_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
+        echo "VISITS_SERVICE_DEPLOYMENT={{ env.VISITS_SERVICE_DEPLOYMENT }}" >> $GITHUB_OUTPUT
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH={{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
+        echo "VETS_SERVICE_PACKAGE_PATH={{ env.VETS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
+        echo "DISCOVERY_SERVER_PACKAGE_PATH={{ env.DISCOVERY_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
 
         echo "API_GATEWAY_DEPLOYMENT=$API_GATEWAY_DEPLOYMENT"
         echo "ADMIN_SERVER_DEPLOYMENT=$ADMIN_SERVER_DEPLOYMENT"
@@ -357,6 +349,14 @@ jobs:
         echo "*                                                                                      *"
         echo "*                                                                                      *"
         echo "****************************************************************************************"
+
+        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }}"
+        echo "ADMIN_SERVER_PACKAGE_PATH=${{ needs.build.outputs.ADMIN_SERVER_PACKAGE_PATH }}"
+        echo "CONFIG_SERVER_PACKAGE_PATH=${{ needs.build.outputs.CONFIG_SERVER_PACKAGE_PATH }}"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
+        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ needs.build.outputs.DISCOVERY_SERVER_PACKAGE_PATH }}"
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }}"
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }}"
 
         echo ""
         ls ${{ env.ADMIN_SERVER }}
