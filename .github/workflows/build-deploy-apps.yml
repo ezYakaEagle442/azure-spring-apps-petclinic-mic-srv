@@ -239,13 +239,6 @@ jobs:
         path: ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }}
         retention-days: 5
 
-    - name: Disable local IP access to the Key Vault
-      uses: azure/CLI@v1
-      with:
-        azcliversion: ${{ env.AZ_CLI_VERSION }}
-        inlineScript: |
-          az keyvault network-rule remove --ip-address $LOCAL_IP --name ${{ env.KEYVAULT }} --only-show-errors
-
   deploy-apps:
     needs: [call-maven-build-workflow, upload-artifacts]
     runs-on: ubuntu-latest # [self-hosted, linux, x64]
@@ -255,17 +248,6 @@ jobs:
       uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Authorize local IP to access the Azure Key Vault
-      uses: azure/CLI@v1
-      with:
-        azcliversion: ${{ env.AZ_CLI_VERSION }}
-        inlineScript: |
-          LOCAL_IP=$(curl whatismyip.akamai.com)
-          echo "LOCAL_IP" $LOCAL_IP
-          echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
-          az keyvault network-rule add --ip-address $LOCAL_IP --name ${{ env.KEYVAULT }} --only-show-errors
-          sleep 30
 
     # You can  download all artifacts in a workflow run by not specifying a name.
     - name: Download ALL Jar artifacts
@@ -338,9 +320,12 @@ jobs:
         version: ${{ env.DEPLOYMENT_VERSION }} 
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }} 
         
-    - name: Disable local IP access to the Key Vault
-      uses: azure/CLI@v1
-      with:
-        azcliversion: ${{ env.AZ_CLI_VERSION }}
-        inlineScript: |
-          az keyvault network-rule remove --ip-address $LOCAL_IP --name ${{ env.KEYVAULT }} --only-show-errors
+    # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
+    # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners
+    # if the runner is self-hosted which is not github provided it is recommended to manually logout at the end of the workflow as shown below.
+    - name: Azure Logout security hardening
+      run: |
+          az logout
+          az cache purge
+          az account clear
+      shell: bash
