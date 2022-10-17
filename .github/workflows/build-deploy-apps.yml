@@ -79,13 +79,13 @@ jobs:
       VISITS_SERVICE_JAR_ARTIFACT: ${{ steps.set-var.outputs.VISITS_SERVICE_JAR_ARTIFACT }}
       DISCOVERY_SERVER_JAR_ARTIFACT: ${{ steps.set-var.outputs.DISCOVERY_SERVER_JAR_ARTIFACT }}
 
-      API_GATEWAY_PACKAGE_PATH: ${{ steps.set-var.outputs.API_GATEWAY_PACKAGE_PATH }}
-      ADMIN_SERVER_PACKAGE_PATH: ${{ steps.set-var.outputs.ADMIN_SERVER_PACKAGE_PATH }}
-      CONFIG_SERVER_PACKAGE_PATH: ${{ steps.set-var.outputs.CONFIG_SERVER_PACKAGE_PATH }}
-      CUSTOMERS_SERVICE_PACKAGE_PATH: ${{ steps.set-var.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}
-      VETS_SERVICE_PACKAGE_PATH: ${{ steps.set-var.outputs.VETS_SERVICE_PACKAGE_PATH }}
-      VISITS_SERVICE_PACKAGE_PATH: ${{ steps.set-var.outputs.VISITS_SERVICE_PACKAGE_PATH }}
-      DISCOVERY_SERVER_PACKAGE_PATH: ${{ steps.set-var.outputs.DISCOVERY_SERVER_PACKAGE_PATH }}
+      API_GATEWAY_PACKAGE_PATH: ${{ steps.set-var2.outputs.API_GATEWAY_PACKAGE_PATH }}
+      ADMIN_SERVER_PACKAGE_PATH: ${{ steps.set-var2.outputs.ADMIN_SERVER_PACKAGE_PATH }}
+      CONFIG_SERVER_PACKAGE_PATH: ${{ steps.set-var2.outputs.CONFIG_SERVER_PACKAGE_PATH }}
+      CUSTOMERS_SERVICE_PACKAGE_PATH: ${{ steps.set-var2.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}
+      VETS_SERVICE_PACKAGE_PATH: ${{ steps.set-var2.outputs.VETS_SERVICE_PACKAGE_PATH }}
+      VISITS_SERVICE_PACKAGE_PATH: ${{ steps.set-var2.outputs.VISITS_SERVICE_PACKAGE_PATH }}
+      DISCOVERY_SERVER_PACKAGE_PATH: ${{ steps.set-var2.outputs.DISCOVERY_SERVER_PACKAGE_PATH }}
 
       API_GATEWAY_DEPLOYMENT: ${{ steps.set-var.outputs.API_GATEWAY_DEPLOYMENT }}
       ADMIN_SERVER_DEPLOYMENT: ${{ steps.set-var.outputs.ADMIN_SERVER_DEPLOYMENT }}
@@ -145,6 +145,7 @@ jobs:
 
     # Variables in the env map cannot be defined in terms of other variables in the map
     - name: Set dependent environment variables
+      id: set-var2
       run: |
 
         # ==== JARS ====: PWD already in /home/runner/work/azure-spring-cloud-petclinic-mic-srv >> $GITHUB_ENV
@@ -169,6 +170,14 @@ jobs:
         echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
         echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
 
+        echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ env.API_GATEWAY_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ env.ADMIN_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "CONFIG_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.CONFIG_SERVER }}/${{ env.CONFIG_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}/${{ env.CUSTOMERS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ env.DISCOVERY_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+
       shell: bash
 
     - name: Display environment variables
@@ -192,14 +201,6 @@ jobs:
         echo "DISCOVERY_SERVER_JAR=$DISCOVERY_SERVER_JAR"
         echo "VETS_SERVICE_JAR=$VETS_SERVICE_JAR"
         echo "VISITS_SERVICE_JAR=$VISITS_SERVICE_JAR"
-
-        echo "API_GATEWAY_PACKAGE_PATH={{ env.API_GATEWAY_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
-        echo "ADMIN_SERVER_PACKAGE_PATH={{ env.ADMIN_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
-        echo "CONFIG_SERVER_PACKAGE_PATH={{ env.CONFIG_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
-        echo "VISITS_SERVICE_DEPLOYMENT={{ env.VISITS_SERVICE_DEPLOYMENT }}" >> $GITHUB_OUTPUT
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH={{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
-        echo "VETS_SERVICE_PACKAGE_PATH={{ env.VETS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
-        echo "DISCOVERY_SERVER_PACKAGE_PATH={{ env.DISCOVERY_SERVER_PACKAGE_PATH }}" >> $GITHUB_OUTPUT
 
         echo "API_GATEWAY_DEPLOYMENT=$API_GATEWAY_DEPLOYMENT"
         echo "ADMIN_SERVER_DEPLOYMENT=$ADMIN_SERVER_DEPLOYMENT"
