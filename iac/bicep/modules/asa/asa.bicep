@@ -239,7 +239,11 @@ resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-previ
     }      
   }
   properties: {
-    addonConfigs: {}
+    addonConfigs: {
+      azureMonitor: {
+        enabled: true
+      }
+    }
     httpsOnly: false
     public: true
     temporaryDisk: {
@@ -310,6 +314,7 @@ resource customersserviceappdeployment 'Microsoft.AppPlatform/Spring/apps/deploy
       relativePath: 'spring-petclinic-customers-service' // './target/petclinic-customers-service-2.6.6.jar'
       runtimeVersion: 'Java_11'
       
+
       type: 'Container' 
       customContainer:  {
         containerImage: 'https://acrpetcliasa.azurecr.io/petclinic/petclinic-customers-service:4242' // Container image of the custom container. This should be in the form of {repository}:{tag} without the server name of the registry	
@@ -344,7 +349,11 @@ resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' =
     }  
   }
   properties: {
-    addonConfigs: {}
+    addonConfigs: {
+      azureMonitor: {
+        enabled: true
+      }
+    }
     httpsOnly: false
     public: true
     temporaryDisk: {
@@ -369,7 +378,11 @@ resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview
     }  
   }
   properties: {
-    addonConfigs: {}
+    c: {
+      azureMonitor: {
+        enabled: true
+      }
+    }
     httpsOnly: false
     public: true
     temporaryDisk: {
