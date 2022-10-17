@@ -69,7 +69,7 @@ on: # [push]
   workflow_dispatch:
 
 jobs:
-  Build:
+  build:
     runs-on: ubuntu-latest
     # environment: production // https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
     # https://github.com/marketplace/actions/azure-login
@@ -262,7 +262,7 @@ jobs:
         retention-days: 5
 
   deploy-apps:
-    needs: [upload-artifacts]
+    needs: [build]
     runs-on: ubuntu-latest # [self-hosted, linux, x64]
     steps: 
 
