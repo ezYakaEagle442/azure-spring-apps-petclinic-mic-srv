@@ -52,11 +52,12 @@ env:
 
 on:
   workflow_dispatch:
-    inputs: # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_dispatchinputs
-      tag_id:
-        description: the Image Tag ID
-        required: true
-        type: string
+  
+    # inputs: # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_dispatchinputs
+    #  tag_id:
+    #    description: the Image Tag ID
+    #    required: true
+    #    type: string
 
 jobs:
   deploy-kv:
