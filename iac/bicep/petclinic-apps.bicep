@@ -133,11 +133,6 @@ resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   scope: subscription()
 }
 
-resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
-  name: kvName
-  scope: kvRG
-}
-
 module azurespringapps './modules/asa/asa.bicep' = {
   name: 'asa-pub'
   // scope: resourceGroup(rg.name)
@@ -160,6 +155,41 @@ module azurespringapps './modules/asa/asa.bicep' = {
     zoneRedundant: zoneRedundant
     deployToVNet: deployToVNet
   }
+}
+
+var  vNetRules = []
+// Must allow ASA to access Existing KV
+resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
+  name: kvName
+  // scope: kvRG
+  location: location
+  properties: {
+    /*sku: {
+      family: 'A'
+      name: skuName
+    }*/
+    tenantId: tenantId
+    publicNetworkAccess: publicNetworkAccess
+    enabledForDeployment: false // Property to specify whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault.
+    enabledForDiskEncryption: true // When enabledForDiskEncryption is true, networkAcls.bypass must include \"AzureServices\
+    enabledForTemplateDeployment: true
+    enablePurgeProtection: true
+    enableSoftDelete: true
+    enableRbacAuthorization: true // /!\ Preview feature: When true, the key vault will use RBAC for authorization of data actions, and the access policies specified in vault properties will be ignored
+    // When enabledForDeployment is true, networkAcls.bypass must include \"AzureServices\"
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Deny'
+      ipRules: [
+        {
+          value: azurespringapps.outputs.azureSpringAppsOutboundPubIP
+        }
+      ]
+      // virtualNetworkRules: vNetRules
+    }
+    softDeleteRetentionInDays: 7 // 30 must be greater or equal than '7' but less or equal than '90'.
+    //accessPolicies: []
+  }  
 }
 
 module mysqlPub './modules/mysql/mysql.bicep' = {
