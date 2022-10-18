@@ -33,6 +33,7 @@
         <assertj.version>3.17.1</assertj.version>
         <lombok.version>1.18.22</lombok.version>
 
+        <!-- https://github.com/Azure/azure-sdk-for-java/wiki/Spring-Versions-Mapping#which-version-of-spring-cloud-azure-should-i-use -->
         <spring-cloud-azure.version>4.0.0</spring-cloud-azure.version>
         <spring-boot.version>2.6.3</spring-boot.version>
         <spring-cloud.version>2021.0.0</spring-cloud.version>
@@ -282,6 +283,7 @@
                     <scope>import</scope>
                 </dependency>
 
+                <!-- https://microsoft.github.io/spring-cloud-azure/4.2.0/reference/html/appendix.html#configuration-spring-cloud-azure-starter-keyvault-secrets -->
                 <dependency>
                     <groupId>com.azure.spring</groupId>
                     <artifactId>spring-cloud-azure-starter-keyvault-secrets</artifactId>
