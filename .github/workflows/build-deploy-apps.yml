@@ -31,8 +31,13 @@ env:
   # ==== Azure Spring Apps / Apps Deployment params ====:
 
   # customize this
-  # DEPLOYMENT_RG: rg-iac-asa-petclinic-mic-srv
-  DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://kv-petcliasa21.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
+  # DEPLOYMENT_RG: rg-iac-asa-petclinic-mic-srv 
+  # https://microsoft.github.io/spring-cloud-azure/current/reference/html/appendix.html#azure_key_vault_secrets_proeprties
+  # spring.cloud.azure.keyvault.secret.enabled MUST bBE true
+  # spring.cloud.azure.keyvault.secret.endpoint
+  # SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT / https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#all-configurable-properties
+  # spring.cloud.azure.keyvault.secret.property-sources[].endpoint
+  DEPLOYMENT_JVM_OPTIONS: -Dspring.cloud.azure.keyvault.secret.endpoint=https://kv-petcliasa21.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
   
   DEPLOYMENT_VERSION: 2.6.6
   DEPLOYMENT_RUNTIME_VERSION: Java_11
@@ -361,46 +366,58 @@ jobs:
         echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }}"
 
         echo ""
-        ls ${{ env.ADMIN_SERVER }}
+        ls -al ${{ env.ADMIN_SERVER }}
         echo ""
-        ls ${{ needs.build.outputs.ADMIN_SERVER_PACKAGE_PATH }} # ${{ env.ADMIN_SERVER_PACKAGE_PATH }}
-        echo ""
-
-        echo ""
-        ls ${{ env.CONFIG_SERVER }}
-        echo ""
-        ls ${{ needs.build.outputs.CONFIG_SERVER_PACKAGE_PATH }} # ${{ env.CONFIG_SERVER_PACKAGE_PATH }}        
+        ls -al ${{ needs.build.outputs.ADMIN_SERVER_PACKAGE_PATH }} # ${{ env.ADMIN_SERVER_PACKAGE_PATH }}
         echo ""
 
         echo ""
-        ls ${{ env.DISCOVERY_SERVER }}
+        ls -al ${{ env.CONFIG_SERVER }}
         echo ""
-        ls ${{ needs.build.outputs.DISCOVERY_SERVER_PACKAGE_PATH }} # ${{ env.DISCOVERY_SERVER_PACKAGE_PATH }}          
-        echo ""
-
-        echo ""
-        ls ${{ env.API_GATEWAY }}
-        echo ""
-        ls ${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }} # ${{ env.API_GATEWAY_PACKAGE_PATH }}           
+        ls -al ${{ needs.build.outputs.CONFIG_SERVER_PACKAGE_PATH }} # ${{ env.CONFIG_SERVER_PACKAGE_PATH }}        
         echo ""
 
         echo ""
-        ls ${{ env.CUSTOMERS_SERVICE }}
+        ls -al ${{ env.DISCOVERY_SERVER }}
         echo ""
-        ls ${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }} # ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}        
-        echo ""
-
-        echo ""
-        ls  ${{ env.VETS_SERVICE }}
-        echo ""
-        ls ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }} # ${{ env.VETS_SERVICE_PACKAGE_PATH }}          
+        ls -al ${{ needs.build.outputs.DISCOVERY_SERVER_PACKAGE_PATH }} # ${{ env.DISCOVERY_SERVER_PACKAGE_PATH }}          
         echo ""
 
         echo ""
-        ls  ${{ env.VISITS_SERVICE }}
+        ls -al ${{ env.API_GATEWAY }}
         echo ""
-        ls ${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }} # ${{ env.VISITS_SERVICE_PACKAGE_PATH }}   
+        ls -al ${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }} # ${{ env.API_GATEWAY_PACKAGE_PATH }}           
+        echo ""
+
+        echo ""
+        ls -al ${{ env.CUSTOMERS_SERVICE }}
+        echo ""
+        ls -al ${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }} # ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}        
+        echo ""
+
+        echo ""
+        ls -al  ${{ env.VETS_SERVICE }}
+        echo ""
+        ls -al ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }} # ${{ env.VETS_SERVICE_PACKAGE_PATH }}          
+        echo ""
+
+        echo ""
+        ls -al  ${{ env.VISITS_SERVICE }}
+        echo ""
+        ls -al ${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }} # ${{ env.VISITS_SERVICE_PACKAGE_PATH }}   
         echo ""    
+
+        echo ""
+        echo "VETS_SERVICE_DEPLOYMENT=${{ needs.build.outputs.VETS_SERVICE_DEPLOYMENT }}"
+        echo "VISITS_SERVICE_DEPLOYMENT=${{ needs.build.outputs.VISITS_SERVICE_DEPLOYMENT }}"
+        echo "CUSTOMERS_SERVICE_DEPLOYMENT=${{ needs.build.outputs.CUSTOMERS_SERVICE_DEPLOYMENT }}"
+        echo "API_GATEWAY_DEPLOYMENT=${{ needs.build.outputs.API_GATEWAY_DEPLOYMENT }}"
+        echo ""
+
+        echo ""
+        echo "KV URI=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}"
+        echo "TENANT=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
+        echo ""
 
     # https://github.com/marketplace/actions/azure-spring-apps
     - name: Deploy vets-service
