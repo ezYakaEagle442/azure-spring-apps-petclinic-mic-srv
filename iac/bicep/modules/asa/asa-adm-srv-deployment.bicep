@@ -155,11 +155,12 @@ resource adminserverapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' e
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep
 resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-09-01-preview' = {
-  name: 'aca-${appName}-adm-srv-init-v.0.1.0'
+  name: 'aca-${appName}-adm-srv-init-v0-1-0'
   parent: adminserverapp
   sku: {
     name: azureSpringAppsSkuName
   }
+  
   properties: {
     active: true
     deploymentSettings: {
