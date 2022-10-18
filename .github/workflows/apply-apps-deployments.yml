@@ -84,7 +84,12 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v3.0.2 # https://github.com/actions/checkout
-      
+
+    - name: Login with GHA Runner SP
+      uses: azure/login@v1.4.6 # fails https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ env.credentials }} # ${{ secrets.AZURE_CREDENTIALS }}
+              
     - name: Deploy Admin Server
       run: |
           az deployment group create --name asa-petclinic-apps -f iac/bicep/modules/asa/asa-adm-srv-deployment.bicep -g ${{ env.RG_APP }} \
