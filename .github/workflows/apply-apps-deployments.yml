@@ -75,7 +75,7 @@ on: # [push]
   workflow_dispatch:
     
 jobs:
-  build:
+  deploy:
 
     runs-on: ubuntu-latest
     # environment: production // https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
