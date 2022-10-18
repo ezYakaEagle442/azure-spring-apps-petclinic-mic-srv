@@ -91,8 +91,7 @@ jobs:
             -p appName=${{ env.APP_NAME }} \
             -p location=${{ env.LOCATION }} \
             -p kvName=${{ env.KV_NAME }} \
-            -p kvRGName=${{ env.RG_KV }} \
-            -p kvSkuName=standard \
+            -p kvRGName=${{ env.RG_KV }}
       shell: bash
         
     # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
