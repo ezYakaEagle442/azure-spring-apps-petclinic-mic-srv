@@ -51,12 +51,12 @@ env:
 
   # https://github.com/marketplace/actions/azure-spring-cloud#arguments
   # Choose either the Blue or Green settings below
-  DEPLOYMENT_NAME: Blue
+  DEPLOYMENT_NAME: blue # Deployment name can contain only lowercase letters, numbers and hyphens
   DEPLOYMENT_STAGING: true
   DEPLOYMENT_ACTION: deploy
 
   # Choose either Blue or Green
-  # DEPLOYMENT_NAME: Green
+  # DEPLOYMENT_NAME: green
   # DEPLOYMENT_STAGING: false
   # DEPLOYMENT_ACTION: set-production
 
