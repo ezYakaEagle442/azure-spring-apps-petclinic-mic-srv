@@ -211,10 +211,20 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
         failureThreshold: 5
         initialDelaySeconds: 30
         periodSeconds: 60
+        /*
         probeAction: {
           type: 'HTTPGetAction'
-          path: '/manage/health/startup' /* /actuator */
+          path: '/manage/health/startup'
           scheme: 'HTTP'
+        }
+        */
+        probeAction: {
+          type: 'ExecAction'
+          command: [
+            'ls'
+            '-al'
+            '/tmp/app/*.jar'
+          ]
         }
         successThreshold: 1
         timeoutSeconds: 30
