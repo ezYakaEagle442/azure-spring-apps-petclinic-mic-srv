@@ -18,12 +18,6 @@ param appInsightsDiagnosticSettingsName string = 'dgs-${appName}-send-logs-and-m
 @description('The Azure Spring Apps instance name')
 param azureSpringAppsInstanceName string = 'asa-${appName}'
 
-// Check SKU REST API : https://learn.microsoft.com/en-us/rest/api/azureSpringApps/skus/list#code-try-0
-@description('The Azure Spring Apps SKU Capacity, ie Max App instances')
-@minValue(8)
-@maxValue(25)
-param azureSpringAppsSkuCapacity int = 25
-
 @description('The Azure Spring Apps SKU name. Check it out at https://learn.microsoft.com/en-us/rest/api/azureSpringApps/skus/list#code-try-0')
 @allowed([
   'BO'
@@ -32,18 +26,9 @@ param azureSpringAppsSkuCapacity int = 25
 ])
 param azureSpringAppsSkuName string = 'S0'
 
-@allowed([
-  'Basic'
-  'Standard'
-  'Enterprise'
-])
-@description('The Azure Spring Apps SKU Tier. Check it out at https://learn.microsoft.com/en-us/rest/api/azureSpringApps/skus/list#code-try-0')
-param azureSpringAppsTier string = 'Standard'
 
 @description('Should the service be deployed to a Corporate VNet ?')
 param deployToVNet bool = false
-
-param zoneRedundant bool = false
 
 @description('The Azure Spring Apps Git Config Server name. Only "default" is supported')
 @allowed([
@@ -62,9 +47,6 @@ param monitoringSettingsName string = 'default'
   'default'
 ])
 param serviceRegistryName string = 'default' // The resource name 'Azure Spring Apps Service Registry' is not valid
-
-@description('The Azure Spring Apps Config Server Git URI (The repo must be public).')
-param gitConfigURI string
 
 @description('The Azure Spring Apps Build Agent pool name. Only "default" is supported') // to be checked
 @allowed([
