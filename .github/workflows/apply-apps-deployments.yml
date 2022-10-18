@@ -82,6 +82,9 @@ jobs:
     # https://github.com/marketplace/actions/azure-login
     steps:
 
+    - name: Checkout
+      uses: actions/checkout@v3.0.2 # https://github.com/actions/checkout
+      
     - name: Deploy Admin Server
       run: |
           az deployment group create --name asa-petclinic-apps -f iac/bicep/modules/asa/asa-adm-srv-deployment.bicep -g ${{ env.RG_APP }} \
