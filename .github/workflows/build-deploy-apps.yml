@@ -20,7 +20,7 @@ env:
 
   # ==== Azure storage to store Artifacts , values must be consistent with he ones in storage.bicep ====:
   AZ_STORAGE_NAME : stasapetcliasa # customize this
-  AZ_BLOB_CONTAINER_NAME: petclinic # customize this
+  AZ_BLOB_CONTAINER_NAME: petcliasa-blob # customize this
   # AZ_BLOB_SVC_NAME: default # MUST NOT BE MODIFIED
 
   # ==== APPS ====:
@@ -337,7 +337,7 @@ jobs:
         echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
         az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }} 
         sleep 30
-        
+
         echo "About to upload Artifcats to Azure BLOB Storage"
 
         az storage blob upload --name ${{ env.ADMIN_SERVER }} --file ${{ github.workspace }}/${{ env.ADMIN_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
