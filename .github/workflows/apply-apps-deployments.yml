@@ -38,7 +38,7 @@ env:
 
   # customize this
   # DEPLOYMENT_RG: rg-iac-asa-petclinic-mic-srv
-  DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://kv-petcliasa21.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
+  DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[0].endpoint=https://kv-petcliasa21.vault.azure.net  -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
   
   DEPLOYMENT_VERSION: 2.6.6
   DEPLOYMENT_RUNTIME_VERSION: Java_11
@@ -52,12 +52,12 @@ env:
 
   # https://github.com/marketplace/actions/azure-spring-cloud#arguments
   # Choose either the Blue or Green settings below
-  DEPLOYMENT_NAME: Blue
+  DEPLOYMENT_NAME: blue
   DEPLOYMENT_STAGING: true
   DEPLOYMENT_ACTION: deploy
 
-  # Choose either Blue or Green
-  # DEPLOYMENT_NAME: Green
+  # Choose either blue or green
+  # DEPLOYMENT_NAME: green
   # DEPLOYMENT_STAGING: false
   # DEPLOYMENT_ACTION: set-production
 
