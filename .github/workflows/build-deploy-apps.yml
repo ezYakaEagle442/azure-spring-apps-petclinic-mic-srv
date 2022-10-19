@@ -321,6 +321,11 @@ jobs:
         path: ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }}
         retention-days: 5
 
+    - name: Azure Login
+      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
     - name: Upload Artifacts to Azure BLOB Storage
       id: blob_upload
       run: | 
