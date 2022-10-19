@@ -21,7 +21,7 @@ param tenantId string = subscription().tenantId
 param azureStorageName string = 'stasa${appName}'
 
 @description('The BLOB Storage service name')
-param azureBlobServiceName string = '${appName}-blob-svc'
+param azureBlobServiceName string = 'default' // '${appName}-blob-svc'
 
 @description('The BLOB Storage Container name')
 param blobContainerName string = '${appName}-blob'
@@ -159,7 +159,7 @@ resource azureblobservice 'Microsoft.Storage/storageAccounts/blobServices@2022-0
       days: 180
       enabled: true
     }
-    isVersioningEnabled: true
+    isVersioningEnabled: false
     lastAccessTimeTrackingPolicy: {
       blobType: [
         'blockBlob'
