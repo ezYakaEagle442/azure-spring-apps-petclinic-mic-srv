@@ -16,7 +16,8 @@ env:
   AZ_CLI_VERSION: 2.40.0
   AZURE_SPRING_APPS_SERVICE: asa-petcliasa # customize this
   KEYVAULT: kv-petcliasa21 # customize this
-  
+  RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
+
   # ==== Azure storage to store Artifacts , values must be consistent with he ones in storage.bicep ====:
   AZ_STORAGE_NAME : stasapetcliasa # customize this
   AZ_BLOB_CONTAINER_NAME: petclinic # customize this
@@ -325,11 +326,17 @@ jobs:
       uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
+
     - name: Upload Artifacts to Azure BLOB Storage
       id: blob_upload
       run: | 
         # https://learn.microsoft.com/en-us/azure/storage/blobs/blob-cli
+
+        # Runne rwill be blocked by network rules of storage account. Must Allow its IP
+        # TODO in Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account
+        echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
+        az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }} 
+
         echo "About to upload Artifcats to Azure BLOB Storage"
 
         az storage blob upload --name ${{ env.ADMIN_SERVER }} --file ${{ github.workspace }}/${{ env.ADMIN_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
@@ -339,6 +346,9 @@ jobs:
         az storage blob upload --name  ${{ env.CUSTOMERS_SERVICE }} --file ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
         az storage blob upload --name ${{ env.VETS_SERVICE }} --file ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
         az storage blob upload --name  ${{ env.VISITS_SERVICE }} --file ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
+
+        echo "About to REMOVE network-rule ALLOWING $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
+        az storage account network-rule remove --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }} -g ${{ env.RG_APP }} 
 
   deploy-apps:
     needs: [build]
