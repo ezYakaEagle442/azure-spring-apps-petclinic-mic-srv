@@ -235,9 +235,8 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
       version: '1.0.0'
       type: 'Jar' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
       jvmOptions: '-Dazure.keyvault.uri=${kvURL} -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud'
-      relativePath: 'spring-petclinic-admin-server' // './target/petclinic-customers-service-2.6.6.jar'
+      relativePath: 'https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar' // 'spring-petclinic-admin-server/target/petclinic-customers-service-2.6.6.jar' // should be a link to a BLOB storage
       runtimeVersion: 'Java_11'
-      
     }
   }
 }
