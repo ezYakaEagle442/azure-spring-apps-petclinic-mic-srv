@@ -74,6 +74,7 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     allowedCopyScope: 'AAD'
     allowSharedKeyAccess: true
     defaultToOAuthAuthentication: false
+    // https://learn.microsoft.com/en-us/azure/storage/blobs/storage-feature-support-in-storage-accounts
     dnsEndpointType: 'Standard' // AzureDnsZone in Preview  https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/storage/common/storage-account-overview.md#azure-dns-zone-endpoints-preview
     // Immutability policies are not supported in accounts that have the Network File System (NFS) 3.0 protocol or the SSH File Transfer Protocol (SFTP) enabled on them. https://learn.microsoft.com/en-us/azure/storage/blobs/immutable-policy-configure-version-scope?tabs=azure-portal
     /*immutableStorageWithVersioning: {
