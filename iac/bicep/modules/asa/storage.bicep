@@ -75,7 +75,7 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     allowSharedKeyAccess: true
 
     defaultToOAuthAuthentication: false
-    dnsEndpointType: 'AzureDnsZone'
+    dnsEndpointType: 'Standard' // AzureDnsZone in Preview  https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/storage/common/storage-account-overview.md#azure-dns-zone-endpoints-preview
     immutableStorageWithVersioning: {
       enabled: false
       immutabilityPolicy: {
@@ -134,9 +134,10 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
 }
 
 output azurestorageId string = azurestorage.id
-output azurestorageSasToken string = azurestorage.listAccountSas().accountSasToken
-output azurestorageKey0 string = azurestorage.listKeys().keys[0].value
-output azurestorageKey1 string = azurestorage.listKeys().keys[1].value
+// outputs-should-not-contain-secrets
+// output azurestorageSasToken string = azurestorage.listAccountSas().accountSasToken
+// output azurestorageKey0 string = azurestorage.listKeys().keys[0].value
+// output azurestorageKey1 string = azurestorage.listKeys().keys[1].value
 output azurestorageHttpEndpoint string = azurestorage.properties.primaryEndpoints.blob
 output azurestorageFileEndpoint string = azurestorage.properties.primaryEndpoints.file
 
