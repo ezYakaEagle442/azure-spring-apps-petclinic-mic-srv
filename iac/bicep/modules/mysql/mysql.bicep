@@ -78,7 +78,7 @@ resource fwRuleAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRul
 
 // Allow client workstation with IP 'clientIPAddress' for local Dev/Test only
 resource fwRuleClientIPAddress 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = if (setFwRuleClient)  {
-  name: 'ClientIPAddress'
+  name: 'client-ip-address'
   parent: mysqlserver
   properties: {
     startIpAddress: clientIPAddress
@@ -88,10 +88,10 @@ resource fwRuleClientIPAddress 'Microsoft.DBforMySQL/flexibleServers/firewallRul
 
  // Allow Azure Spring Apps
  resource fwRuleAllowAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = {
-  name: 'Allow Azure Spring Apps'
+  name: 'allow-asa'
   parent: mysqlserver
   properties: {
-    startIpAddress: azureSpringAppsOutboundPubIP
+    startIpAddress: azureSpringAppsOutboundPubIP // /!\ has 2 IP separated from a coma, ex: 20.31.114.2,20.238.165.131
     endIpAddress: azureSpringAppsOutboundPubIP
   }
 }
