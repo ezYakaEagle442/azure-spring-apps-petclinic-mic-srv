@@ -17,6 +17,7 @@ package org.springframework.samples.petclinic.vets;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.samples.petclinic.vets.system.VetsProperties;
@@ -48,28 +49,17 @@ public class VetsServiceApplication {
 	public static void main(String[] args) {
 	
 		System.out.println("Checking ENV variables ..."+ "\n");
+		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" + System.getenv("SPRING_PROFILES_ACTIVE") + "|\n");
 		
 		System.out.println("Checking ENV variable AZURE_KEYVAULT_ENDPOINT : |" + System.getenv("AZURE_KEYVAULT_ENDPOINT") + "|\n");
+		System.out.println("Checking ENV variable AZURE_KEYVAULT_URI : |" + System.getenv("AZURE_KEYVAULT_URI") + "|\n");
 
-		System.out.println("Checking ENV variable AZURE KV ENDPOINT : |" + System.getenv("ENDPOINT") + "|\n");
-		System.out.println("Checking ENV variable AZURE_TENANT_ID : |" + System.getenv("AZURE_TENANT_ID") + "|\n");
-		System.out.println("Checking ENV variable AZURE_CLIENT_ID : |" + System.getenv("AZURE_CLIENT_ID") + "|\n");
 
 		System.out.println("JDBC URL from config file: " + url);
 		System.out.println("cache name: " + cacheName);
 		System.out.println("SQL Init mode: " + sqlInitMode);
 		System.out.println("JDBC URL from config file: " + url);
 		
-		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" + System.getenv("SPRING_PROFILES_ACTIVE") + "|\n");
-		System.out.println("Checking ENV variable AZURE_KEYVAULT_URI : |" + System.getenv("AZURE_KEYVAULT_URI") + "|\n");
-
-		System.out.println("Checking property azure.keyvault.uri : |" + System.getProperty("azure.keyvault.uri") + "|\n");
-		System.out.println("Checking property spring.profiles.active : |" + System.getProperty("spring.profiles.active") + "|\n");
-
-		System.out.println("Checking ENV variable MYSQL_SERVER_FULL_NAME : |" + System.getenv("MYSQL_SERVER_FULL_NAME") + "|\n");
-		System.out.println("Checking ENV variable MYSQL_DATABASE_NAME : |" + System.getenv("MYSQL_DATABASE_NAME") + "|\n");
-		System.out.println("Checking ENV variable MYSQL_SERVER_ADMIN_LOGIN_NAME : |" + System.getenv("MYSQL_SERVER_ADMIN_LOGIN_NAME") + "|\n");
-		System.out.println("Checking ENV variable MYSQL_SERVER_ADMIN_PASSWORD : |" + System.getenv("MYSQL_SERVER_ADMIN_PASSWORD") + "|\n");
 
         String systemipaddress = "";
         try {
@@ -117,6 +107,11 @@ public class VetsServiceApplication {
 			e.printStackTrace();
         }
 		*/
-		SpringApplication.run(VetsServiceApplication.class, args);
+        // Set StatrtUp Probe
+        // https://docs.spring.io/spring-boot/docs/2.7.x/reference/htmlsingle/#features.spring-application.startup-tracking
+
+        SpringApplication application = new SpringApplication(VetsServiceApplication.class);
+        application.setApplicationStartup(new BufferingApplicationStartup(2048));
+        application.run(args);	
 	}
 }

@@ -18,6 +18,7 @@ package org.springframework.samples.petclinic.admin;
 import de.codecentric.boot.admin.server.config.EnableAdminServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
@@ -25,7 +26,12 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @EnableDiscoveryClient
 public class SpringBootAdminApplication {
     public static void main(String[] args) {
-        SpringApplication.run(SpringBootAdminApplication.class, args);
+
+        // Set StatrtUp Probe
+        // https://docs.spring.io/spring-boot/docs/2.7.x/reference/htmlsingle/#features.spring-application.startup-tracking
+        SpringApplication application = new SpringApplication(SpringBootAdminApplication.class);
+        application.setApplicationStartup(new BufferingApplicationStartup(2048));
+        application.run(args);
     }
 
 }
