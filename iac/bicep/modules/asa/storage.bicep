@@ -73,18 +73,18 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     allowCrossTenantReplication: false
     allowedCopyScope: 'AAD'
     allowSharedKeyAccess: true
-
     defaultToOAuthAuthentication: false
     dnsEndpointType: 'Standard' // AzureDnsZone in Preview  https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/storage/common/storage-account-overview.md#azure-dns-zone-endpoints-preview
-    immutableStorageWithVersioning: {
+    /*immutableStorageWithVersioning: {
       enabled: false
       immutabilityPolicy: {
         allowProtectedAppendWrites: false
         immutabilityPeriodSinceCreationInDays: 5
         state: 'Disabled'
       }
-    }
-    // isNfsV3Enabled: true
+    }*/
+    isHnsEnabled: true
+    isNfsV3Enabled: true
     keyPolicy: {
       keyExpirationPeriodInDays: 180
     }
@@ -93,6 +93,7 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
+      /*
       ipRules: [
         {
           action: 'Allow'
@@ -103,6 +104,7 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
           value: azureSpringApps.properties.networkProfile.outboundIPs.publicIPs[1] // ASA
         }        
       ]
+      */
       resourceAccessRules: [
         {
           resourceId: azureSpringApps.id
@@ -121,9 +123,9 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     }
     publicNetworkAccess: 'Enabled'
     routingPreference: {
-      publishInternetEndpoints: false
+      publishInternetEndpoints: true
       publishMicrosoftEndpoints: true
-      routingChoice: 'MicrosoftRouting'
+      routingChoice: 'InternetRouting'
     }
     sasPolicy: {
       expirationAction: 'Log'
