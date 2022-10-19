@@ -84,7 +84,7 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
         state: 'Disabled'
       }
     }
-    isNfsV3Enabled: true
+    // isNfsV3Enabled: true
     keyPolicy: {
       keyExpirationPeriodInDays: 180
     }
