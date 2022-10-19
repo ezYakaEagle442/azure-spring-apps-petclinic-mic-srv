@@ -204,7 +204,7 @@ module mysqlPub './modules/mysql/mysql.bicep' = {
     serverName: kv.getSecret('MYSQL-SERVER-NAME')
     administratorLogin: kv.getSecret('SPRING-DATASOURCE-USERNAME')
     administratorLoginPassword: kv.getSecret('SPRING-DATASOURCE-PASSWORD') 
-    azureSpringAppsOutboundPubIP: azurespringapps.outputs.azureSpringAppsOutboundPubIP
+    azureSpringAppsOutboundPubIP: azurespringapps.outputs.azureSpringAppsOutboundPubIP // /!\ has 2 IP separated from a coma, ex: 20.31.114.2,20.238.165.131
   }
   dependsOn: [
     azurespringapps
