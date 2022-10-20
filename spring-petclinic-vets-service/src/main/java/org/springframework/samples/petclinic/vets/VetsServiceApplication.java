@@ -23,6 +23,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.samples.petclinic.vets.system.VetsProperties;
 
 import java.net.*;
+import java.util.Map;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
@@ -37,6 +38,13 @@ import org.springframework.beans.factory.annotation.Value;
 @EnableConfigurationProperties(VetsProperties.class)
 public class VetsServiceApplication {
 
+
+	@Value("${spring.cloud.azure.keyvault.secret.endpoint}")
+    private static String kvSecretEndpoint;
+
+	@Value("${spring.cloud.azure.keyvault.secret.property-sources[0].endpoint}")
+    private static String kvSecretPropertySourcesEndpoint;
+
 	@Value("${spring.datasource.url}")
     private static String url;
 
@@ -49,11 +57,24 @@ public class VetsServiceApplication {
 	public static void main(String[] args) {
 	
 		System.out.println("Checking ENV variables ..."+ "\n");
+
+		Map envMap = System.getenv();
+		for (Object key : envMap.keySet()) {
+			System.out.println(key + " : " + envMap.get(key));
+		}
+
+		System.out.println("Checking ENV variable  : |" + "|\n");
+
 		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" + System.getenv("SPRING_PROFILES_ACTIVE") + "|\n");
 		
 		System.out.println("Checking ENV variable AZURE_KEYVAULT_ENDPOINT : |" + System.getenv("AZURE_KEYVAULT_ENDPOINT") + "|\n");
 		System.out.println("Checking ENV variable AZURE_KEYVAULT_URI : |" + System.getenv("AZURE_KEYVAULT_URI") + "|\n");
 
+		System.out.println("Checking ENV variable spring.cloud.azure.keyvault.secret.endpoint : |" + System.getenv("SPRING_CLOUD_AZURE_KEYVAULT_SECRET_SECRET_ENDPOINT") + "|\n");
+		System.out.println("Checking ENV variable spring.cloud.azure.keyvault.secret.property-sources[0].endpoint : |" + System.getenv("SPRING_CLOUD_AZURE_KEYVAULT_SECRET_SECRET_PROPERTYSOURCES_ENDPOINT") + "|\n");
+
+		System.out.println("kvSecretEndpoint from config file: " + kvSecretEndpoint);
+		System.out.println("kvSecretPropertySourcesEndpoint from config file: " + kvSecretPropertySourcesEndpoint);
 
 		System.out.println("JDBC URL from config file: " + url);
 		System.out.println("cache name: " + cacheName);
