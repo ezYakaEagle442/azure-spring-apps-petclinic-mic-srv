@@ -224,6 +224,9 @@ resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers
     configServer: {
       gitProperty: {
         uri: gitConfigURI
+        // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-config-server
+        // Config Server takes master (on Git) as the default label if you don't specify one. However, GitHub has recently changed the default branch from master to main. To avoid Azure Spring Apps Config Server failure, be sure to pay attention to the default label when setting up Config Server with GitHub, especially for newly-created repositories.
+        label: 'main'
       }
     }
   }
