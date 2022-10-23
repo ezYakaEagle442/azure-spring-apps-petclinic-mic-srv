@@ -117,6 +117,12 @@ param startIpAddress string = '10.42.1.0'
 @description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
 param endIpAddress string = '10.42.1.15'
 
+@description('The KV ipRules')
+param ipRules array = [] 
+
+@description('The KV vNetRules')
+param vNetRules array = [] 
+
 /*
 module rg 'rg.bicep' = {
   name: 'rg-bicep-${appName}'
@@ -157,7 +163,7 @@ module azurespringapps './modules/asa/asa.bicep' = {
   }
 }
 
-var  vNetRules = []
+
 // Must allow ASA to access Existing KV
 resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
   name: kvName
@@ -180,12 +186,12 @@ resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
-      ipRules: [
-        {
-          value: azurespringapps.outputs.azureSpringAppsOutboundPubIP
-        }
-      ]
-      // virtualNetworkRules: vNetRules
+      ipRules:  [for ipRule in ipRules: {
+        value: ipRule
+      }]
+      virtualNetworkRules:  [for vNetRule in vNetRules: {
+        id: vNetRule.id
+      }]   
     }
     softDeleteRetentionInDays: 7 // 30 must be greater or equal than '7' but less or equal than '90'.
     //accessPolicies: []
