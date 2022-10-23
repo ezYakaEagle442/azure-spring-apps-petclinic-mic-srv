@@ -22,7 +22,8 @@ env:
   AZ_STORAGE_NAME : stasapetcliasa # customize this
   AZ_BLOB_CONTAINER_NAME: petcliasa-blob # customize this
   # AZ_BLOB_SVC_NAME: default # MUST NOT BE MODIFIED
-
+  # https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
+  
   # ==== APPS ====:
   API_GATEWAY: api-gateway
   ADMIN_SERVER: admin-server
