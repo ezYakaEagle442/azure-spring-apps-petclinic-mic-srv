@@ -137,13 +137,13 @@ jobs:
       run: |
 
         # ==== JARS ====: PWD already in /home/runner/work/azure-spring-cloud-petclinic-mic-srv >> $GITHUB_ENV
-        echo "API_GATEWAY_JAR=spring-petclinic-${{ env.API_GATEWAY }}/target/$API_GATEWAY_JAR_ARTIFACT" >> $GITHUB_ENV
-        echo "ADMIN_SERVER_JAR=spring-petclinic-${{ env.ADMIN_SERVER }}/target/$ADMIN_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
-        echo "CONFIG_SERVER_JAR=spring-petclinic-${{ env.CONFIG_SERVER }}/target/$CONFIG_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
-        echo "CUSTOMERS_SERVICE_JAR=spring-petclinic-${{ env.CUSTOMERS_SERVICE }}/target/$CUSTOMERS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
-        echo "DISCOVERY_SERVER_JAR=spring-petclinic-${{ env.DISCOVERY_SERVER }}/target/$DISCOVERY_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
-        echo "VETS_SERVICE_JAR=spring-petclinic-${{ env.VETS_SERVICE }}/target/$VETS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
-        echo "VISITS_SERVICE_JAR=spring-petclinic-${{ env.VISITS_SERVICE }}/target/$VISITS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
+        #echo "API_GATEWAY_JAR=spring-petclinic-${{ env.API_GATEWAY }}/target/$API_GATEWAY_JAR_ARTIFACT" >> $GITHUB_ENV
+        #echo "ADMIN_SERVER_JAR=spring-petclinic-${{ env.ADMIN_SERVER }}/target/$ADMIN_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
+        #echo "CONFIG_SERVER_JAR=spring-petclinic-${{ env.CONFIG_SERVER }}/target/$CONFIG_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
+        #echo "CUSTOMERS_SERVICE_JAR=spring-petclinic-${{ env.CUSTOMERS_SERVICE }}/target/$CUSTOMERS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
+        #echo "DISCOVERY_SERVER_JAR=spring-petclinic-${{ env.DISCOVERY_SERVER }}/target/$DISCOVERY_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
+        #echo "VETS_SERVICE_JAR=spring-petclinic-${{ env.VETS_SERVICE }}/target/$VETS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
+        #echo "VISITS_SERVICE_JAR=spring-petclinic-${{ env.VISITS_SERVICE }}/target/$VISITS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
 
         echo ""
         echo "GH_WORKSPACE Check ..."
@@ -222,9 +222,9 @@ jobs:
         az storage blob download --name ${{ env.CONFIG_SERVER }} --file ${{ github.workspace }}/${{ env.CONFIG_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
         az storage blob download --name ${{ env.DISCOVERY_SERVER }} --file ${{ github.workspace }}/${{ env.DISCOVERY_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
         az storage blob download --name ${{ env.API_GATEWAY }} --file ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob download --name  ${{ env.CUSTOMERS_SERVICE }} --file ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
+        az storage blob download --name ${{ env.CUSTOMERS_SERVICE }} --file ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
         az storage blob download --name ${{ env.VETS_SERVICE }} --file ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob download --name  ${{ env.VISITS_SERVICE }} --file ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
+        az storage blob download --name ${{ env.VISITS_SERVICE }} --file ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
 
         echo "About to REMOVE network-rule ALLOWING $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
         az storage account network-rule remove --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }} -g ${{ env.RG_APP }} 
