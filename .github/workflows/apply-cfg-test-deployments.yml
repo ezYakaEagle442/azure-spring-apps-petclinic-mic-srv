@@ -1,0 +1,56 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Apply Config Test deployment
+
+env:
+
+  APP_NAME: petcliasa
+  LOCATION: westeurope
+  RG_KV: rg-iac-kv21 # RG where to deploy KV
+  RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
+
+  AZ_CLI_VERSION: 2.40.0
+  AZURE_SPRING_APPS_SERVICE: asa-petcliasa # customize this
+  KEYVAULT: kv-petcliasa21 # customize this
+  
+  # ==== Secrets ====
+  credentials: ${{ secrets.AZURE_CREDENTIALS }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+on: # [push]
+  workflow_dispatch:
+    
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+    # environment: production // https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
+    # https://github.com/marketplace/actions/azure-login
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3.0.2 # https://github.com/actions/checkout
+
+    - name: Login with GHA Runner SP
+      uses: azure/login@v1.4.6 # fails https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ env.credentials }} # ${{ secrets.AZURE_CREDENTIALS }}
+              
+    - name: Deploy Config Test Container
+      run: |
+          az deployment group create --name asa-petclinic-apps -f iac/bicep/modules/asa/asa-shell-cfg-test.bicep -g ${{ env.RG_APP }} \
+            -p appName=${{ env.APP_NAME }} \
+            -p location=${{ env.LOCATION }}
+      shell: bash
+        
+    # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
+    # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners
+    # if the runner is self-hosted which is not github provided it is recommended to manually logout at the end of the workflow as shown below.
+    - name: Azure Logout security hardening
+      run: |
+          az logout
+          az cache purge
+          az account clear
+      shell: bash
