@@ -158,15 +158,6 @@ jobs:
         echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
         echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
 
-        echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ env.API_GATEWAY_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
-        echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ env.ADMIN_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
-        echo "CONFIG_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.CONFIG_SERVER }}/${{ env.CONFIG_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}/${{ env.CUSTOMERS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
-        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ env.DISCOVERY_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
-        echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
-        echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
-
-
       shell: bash
 
     - name: Display environment variables
@@ -218,13 +209,10 @@ jobs:
 
         echo "About to download Artifcats from Azure BLOB Storage"
         # --blob-url  ? https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
-        az storage blob download --name ${{ env.ADMIN_SERVER }} --file ${{ github.workspace }}/${{ env.ADMIN_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob download --name ${{ env.CONFIG_SERVER }} --file ${{ github.workspace }}/${{ env.CONFIG_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob download --name ${{ env.DISCOVERY_SERVER }} --file ${{ github.workspace }}/${{ env.DISCOVERY_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob download --name ${{ env.API_GATEWAY }} --file ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob download --name ${{ env.CUSTOMERS_SERVICE }} --file ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob download --name ${{ env.VETS_SERVICE }} --file ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob download --name ${{ env.VISITS_SERVICE }} --file ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
+        az storage blob download --name ${{ env.VETS_SERVICE }} --file $VETS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
+        az storage blob download --name ${{ env.CUSTOMERS_SERVICE }} --file $CUSTOMERS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
+        az storage blob download --name ${{ env.VISITS_SERVICE }} --file $VISITS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
+        az storage blob download --name ${{ env.API_GATEWAY }} --file $API_GATEWAY_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
 
         echo "About to REMOVE network-rule ALLOWING $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
         az storage account network-rule remove --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }} -g ${{ env.RG_APP }} 
@@ -243,7 +231,7 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.VETS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }}
+        package: $VETS_SERVICE_PACKAGE_PATH
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT https://kv-petcliasa21.vault.azure.net/ -SPRING_CLOUD_AZURE_KEYVAULT_SECRET_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
@@ -260,7 +248,7 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.VISITS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }}
+        package: $VISITS_SERVICE_PACKAGE_PATH
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: "-AZURE_KEYVAULT_URI=https://kv-petcliasa21.vault.azure.net -SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
@@ -277,7 +265,7 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.CUSTOMERS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }}
+        package: $CUSTOMERS_SERVICE_PACKAGE_PATH
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
@@ -294,7 +282,7 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.API_GATEWAY }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }}
+        package: $API_GATEWAY_PACKAGE_PATH
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
         deployment-name: ${{ needs.build.outputs.API_GATEWAY_DEPLOYMENT }} # $API_GATEWAY_DEPLOYMENT
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
