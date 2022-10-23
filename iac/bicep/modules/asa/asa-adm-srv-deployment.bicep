@@ -173,8 +173,8 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
         BAR: 'bar'
       }
       resourceRequests: {
-        cpu: any(1)
-        memory: any(1)
+        cpu: '1'
+        memory: '1Gi'
       }      
       containerProbeSettings: {
         disableProbe: false
