@@ -172,6 +172,10 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
         FOO: 'foo'
         BAR: 'bar'
       }
+      resourceRequests: {
+        cpu: any(1)
+        memory: any(1)
+      }      
       containerProbeSettings: {
         disableProbe: false
       }
@@ -200,10 +204,6 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
         }
         successThreshold: 1
         timeoutSeconds: 30
-      }
-      resourceRequests: {
-          cpu: any(1)
-          memory: any(1)
       }
       startupProbe: {
         disableProbe: false

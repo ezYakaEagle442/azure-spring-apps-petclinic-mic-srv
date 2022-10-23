@@ -95,7 +95,7 @@ resource shellcfgtestappdeployment 'Microsoft.AppPlatform/Spring/apps/deployment
           password: 'string'
           username: 'string'
         }*/
-        languageFramework: 'string'
+        languageFramework: 'Java'
         server: 'https://index.docker.io/v1' // The name of the registry that contains the container image
       }
     }
