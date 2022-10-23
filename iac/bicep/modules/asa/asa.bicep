@@ -226,6 +226,8 @@ resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers
         uri: gitConfigURI
         // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-config-server
         // Config Server takes master (on Git) as the default label if you don't specify one. However, GitHub has recently changed the default branch from master to main. To avoid Azure Spring Apps Config Server failure, be sure to pay attention to the default label when setting up Config Server with GitHub, especially for newly-created repositories.
+        // https://docs.spring.io/spring-cloud-config/docs/3.1.4/reference/html/#_default_label
+        // The default label used for Git is main. If you do not set spring.cloud.config.server.git.defaultLabel and a branch named main does not exist, the config server will by default also try to checkout a branch named master. If you would like to disable to the fallback branch behavior you can set spring.cloud.config.server.git.tryMasterBranch to false.
         label: 'main'
       }
     }
