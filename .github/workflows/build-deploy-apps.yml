@@ -339,15 +339,15 @@ jobs:
         az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }} 
         sleep 30
 
-        echo "About to upload Artifcats to Azure BLOB Storage"
+        echo "About to upload Artifcats to Azure BLOB Storage. /!\ --overwrite' is in preview and under development"
 
-        az storage blob upload --name ${{ env.ADMIN_SERVER }} --file ${{ github.workspace }}/${{ env.ADMIN_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob upload --name ${{ env.CONFIG_SERVER }} --file ${{ github.workspace }}/${{ env.CONFIG_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob upload --name ${{ env.DISCOVERY_SERVER }} --file ${{ github.workspace }}/${{ env.DISCOVERY_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob upload --name ${{ env.API_GATEWAY }} --file ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob upload --name  ${{ env.CUSTOMERS_SERVICE }} --file ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob upload --name ${{ env.VETS_SERVICE }} --file ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
-        az storage blob upload --name  ${{ env.VISITS_SERVICE }} --file ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
+        az storage blob upload --name ${{ env.ADMIN_SERVER }} --file ${{ github.workspace }}/${{ env.ADMIN_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite
+        az storage blob upload --name ${{ env.CONFIG_SERVER }} --file ${{ github.workspace }}/${{ env.CONFIG_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite
+        az storage blob upload --name ${{ env.DISCOVERY_SERVER }} --file ${{ github.workspace }}/${{ env.DISCOVERY_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite
+        az storage blob upload --name ${{ env.API_GATEWAY }} --file ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite
+        az storage blob upload --name  ${{ env.CUSTOMERS_SERVICE }} --file ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite
+        az storage blob upload --name ${{ env.VETS_SERVICE }} --file ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite
+        az storage blob upload --name  ${{ env.VISITS_SERVICE }} --file ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite
 
         echo "About to REMOVE network-rule ALLOWING $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
         az storage account network-rule remove --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }} -g ${{ env.RG_APP }} 
