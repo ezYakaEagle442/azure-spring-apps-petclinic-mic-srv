@@ -71,10 +71,9 @@ resource shellcfgtestappdeployment 'Microsoft.AppPlatform/Spring/apps/deployment
       containerProbeSettings: {
         disableProbe: true
       }
-
       resourceRequests: {
-          cpu: any(1)
-          memory: any(1)
+        cpu: any(1)
+        memory: any(1)
       }
     }
     
