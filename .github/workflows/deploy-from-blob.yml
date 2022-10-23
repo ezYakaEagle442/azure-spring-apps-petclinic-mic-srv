@@ -169,7 +169,7 @@ jobs:
         echo "VETS_SERVICE_PACKAGE_PATH=$VETS_SERVICE_PACKAGE_PATH"
         echo "CUSTOMERS_SERVICE_PACKAGE_PATH=$CUSTOMERS_SERVICE_PACKAGE_PATH"
         echo "VISITS_SERVICE_PACKAGE_PATH=$VISITS_SERVICE_PACKAGE_PATH"
-        echo "API_GATEWAY=$API_GATEWAY"        
+        echo "API_GATEWAY_PACKAGE_PATH=$API_GATEWAY_PACKAGE_PATH"        
       shell: bash
         
     - name: Azure Login
@@ -196,6 +196,11 @@ jobs:
         mkdir ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
         mkdir ${{ github.workspace }}/${{ env.API_GATEWAY }}
 
+        ls -al ${{ github.workspace }}/${{ env.VETS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
+
         echo "About to download Artifcats from Azure BLOB Storage"
         # --blob-url  ? https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
         az storage blob download --name ${{ env.VETS_SERVICE }} --file $VETS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login
@@ -210,6 +215,11 @@ jobs:
         ls -al ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
         ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
         ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
+
+        ls -al $VETS_SERVICE_PACKAGE_PATH 
+        ls -al $CUSTOMERS_SERVICE_PACKAGE_PATH
+        ls -al $VISITS_SERVICE_PACKAGE_PATH 
+        ls -al $API_GATEWAY_PACKAGE_PATH
 
         echo ""
         echo "KV URI=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}"
