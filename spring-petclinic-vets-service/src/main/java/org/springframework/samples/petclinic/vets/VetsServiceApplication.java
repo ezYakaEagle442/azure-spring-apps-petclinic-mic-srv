@@ -54,6 +54,12 @@ public class VetsServiceApplication {
 	@Value("${spring.sql.init.mode}")
     private static String sqlInitMode;
 
+	@Value("${spring.sql.datasource.initialization-mode}")
+	private static String sqlDataSourceInitMode;
+
+	@Value("${spring.jpa.hibernate.ddl-auto}")
+	private static String jpaHibernateDdlAuto;
+
 	public static void main(String[] args) {
 	
 		System.out.println("Checking ENV variables ..."+ "\n");
@@ -79,6 +85,10 @@ public class VetsServiceApplication {
 		System.out.println("JDBC URL from config file: " + url);
 		System.out.println("cache name: " + cacheName);
 		System.out.println("SQL Init mode: " + sqlInitMode);
+
+		System.out.println("sqlDataSourceInitMode: " + sqlDataSourceInitMode);
+		System.out.println("jpaHibernateDdlAuto: " + jpaHibernateDdlAuto);
+
 		System.out.println("JDBC URL from config file: " + url);
 		
 

@@ -142,6 +142,25 @@ SELECT name FROM mysql.time_zone_name;
 ```
 
 
+### Understand the Spring Cloud Config
+
+Read [https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-setup-config-server?tabs=Azure-portal&pivots=programming-language-java](https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-setup-config-server?tabs=Azure-portal&pivots=programming-language-java)
+<!-- https://www.canchito-dev.com/public/blog/2019/07/22/spring-cloud-config-server-and-client-side-support-for-externalized-configuration/ >
+-->
+
+Spring Boot is a framework aimed to help developers to easily create and build stand-alone, production-grade Spring based Applications that you can “just run”.
+
+Spring Cloud Config provides server and client-side support for externalized configuration in a distributed system. With the Spring Cloud Config Server you have a central place to manage external properties for applications across all environments.
+
+Spring Cloud Config Server is a centralized service that via HTTP provides all the applications configuration (name-value pairs or equivalent YAML content). The server is embeddable in a Spring Boot application, by using the @EnableConfigServer annotation.
+
+In other words, the Spring Cloud Config Server is simply a Spring Boot application, configured as a Spring Cloud Config Server, and that is able to retrieve the properties from the configured property source. The property source can be a Git repository, svn or Consul service. 
+
+A Spring Boot application properly configured, can take immediate advantage of the Spring Config Server. It also picks up some additional useful features related to Environment change events. Any Spring Boot application can easily be configured as a Spring Cloud Config Client.
+
+
+
+
 ### Deploy Spring Boot applications and set environment variables
 
 Deploy Spring Boot applications to Azure 
@@ -370,6 +389,15 @@ Read :
 Read those doc/samples below :
 - [https://github.com/Azure-Samples/azure-spring-boot-samples/tree/spring-cloud-azure_4.0.0/keyvault/spring-cloud-azure-starter-keyvault-secrets](https://github.com/Azure-Samples/azure-spring-boot-samples/tree/spring-cloud-azure_4.0.0/keyvault/spring-cloud-azure-starter-keyvault-secrets)
 - [https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#secret-management](https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#secret-management)
+- [https://learn.microsoft.com/en-us/azure/spring-apps/tutorial-managed-identities-key-vault?tabs=system-assigned-managed-identity](https://learn.microsoft.com/en-us/azure/spring-apps/tutorial-managed-identities-key-vault?tabs=system-assigned-managed-identity)
+
+<!-- https://learn.microsoft.com/en-us/azure/spring-apps/tutorial-managed-identities-key-vault?tabs=system-assigned-managed-identity -->
+To use managed identity for Azure Spring Apps apps, add properties with the following content to src/main/resources/application.properties.
+```bash
+azure.keyvault.enabled=true
+azure.keyvault.uri=${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT} # https://<your-keyvault-name>.vault.azure.net
+```
+
 
 The Config-server uses the config declared on the repo at [https://github.com/ezYakaEagle442/spring-petclinic-microservices-config/blob/main/application.yml](https://github.com/ezYakaEagle442/spring-petclinic-microservices-config/blob/main/application.yml) and need a Service Principal to be able to read secrets from KeyVault.
   'Key Vault Administrator'

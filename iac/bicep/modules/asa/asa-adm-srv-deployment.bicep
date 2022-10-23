@@ -160,7 +160,6 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
   sku: {
     name: azureSpringAppsSkuName
   }
-  
   properties: {
     active: true
     deploymentSettings: {
