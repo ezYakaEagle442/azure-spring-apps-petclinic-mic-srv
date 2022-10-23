@@ -289,7 +289,7 @@ jobs:
           #    --publisher vmware-inc \
           #    --product azure-spring-cloud-vmware-tanzu-2 \
           #    --plan tanzu-asc-ent-mtr
-              
+
           az deployment group create --name asa-petclinic-apps -f iac/bicep/petclinic-apps.bicep -g ${{ env.RG_APP }} \
             -p appName=${{ env.APP_NAME }} \
             -p location=${{ env.LOCATION }} \
