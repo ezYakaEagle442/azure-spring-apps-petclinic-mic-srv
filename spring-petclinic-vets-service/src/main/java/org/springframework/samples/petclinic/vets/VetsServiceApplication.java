@@ -64,20 +64,23 @@ public class VetsServiceApplication {
 	
 		System.out.println("Checking ENV variables ..."+ "\n");
 
-		Map envMap = System.getenv();
-		for (Object key : envMap.keySet()) {
-			System.out.println(key + " : " + envMap.get(key));
-		}
+		System.out.println("Checking ALL ENV variable  : |" + "|\n");
+		System.getenv().forEach((key, value) -> {
+			System.out.println(key + ":" + value);
+		});
+
+		System.out.println("Checking ALL ENV Properties  : |" + "|\n");
+		System.getProperties().forEach((key, value) -> {
+			System.out.println(key + ":" + value);
+		});
 
 		System.out.println("Checking ENV variable  : |" + "|\n");
 
-		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" + ("SPRING_PROFILES_ACTIVE") + "|\n");
+		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" +  System.getenv("SPRING_PROFILES_ACTIVE") + "|\n");
 		
-		System.out.println("Checking ENV variable AZURE_KEYVAULT_ENDPOINT : |" + System.getenv("AZURE_KEYVAULT_ENDPOINT") + "|\n");
+		System.out.println("Checking ENV variable SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT : |" + System.getenv("SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT") + "|\n");
 		System.out.println("Checking ENV variable AZURE_KEYVAULT_URI : |" + System.getenv("AZURE_KEYVAULT_URI") + "|\n");
 
-		System.out.println("Checking ENV variable spring.cloud.azure.keyvault.secret.endpoint : |" + System.getenv("SPRING_CLOUD_AZURE_KEYVAULT_SECRET_SECRET_ENDPOINT") + "|\n");
-		System.out.println("Checking ENV variable spring.cloud.azure.keyvault.secret.property-sources[0].endpoint : |" + System.getenv("SPRING_CLOUD_AZURE_KEYVAULT_SECRET_SECRET_PROPERTYSOURCES_ENDPOINT") + "|\n");
 
 		System.out.println("kvSecretEndpoint from config file: " + kvSecretEndpoint);
 		System.out.println("kvSecretPropertySourcesEndpoint from config file: " + kvSecretPropertySourcesEndpoint);
