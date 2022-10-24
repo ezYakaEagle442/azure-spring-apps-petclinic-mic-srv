@@ -186,7 +186,7 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
         periodSeconds: 60
         probeAction: {
           type: 'HTTPGetAction'
-          path:  '/manage/health/liveness' /* /actuator */
+          path:  '/actuator/health/liveness' /* /actuator */
         }
         successThreshold: 1
         timeoutSeconds: 30
@@ -199,7 +199,7 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
         periodSeconds: 60
         probeAction: {
           type: 'HTTPGetAction'
-          path: '/manage/health/readiness' /* /actuator */
+          path: '/actuator/health/readiness' /* /actuator */
           scheme: 'HTTP'
         }
         successThreshold: 1
@@ -210,13 +210,6 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
         failureThreshold: 5
         initialDelaySeconds: 30
         periodSeconds: 60
-        /*
-        probeAction: {
-          type: 'HTTPGetAction'
-          path: '/manage/health/startup'
-          scheme: 'HTTP'
-        }
-        */
         probeAction: {
           type: 'ExecAction'
           command: [
