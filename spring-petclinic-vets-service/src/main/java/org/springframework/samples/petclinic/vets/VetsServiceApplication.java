@@ -71,7 +71,7 @@ public class VetsServiceApplication {
 
 		System.out.println("Checking ENV variable  : |" + "|\n");
 
-		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" + System.getenv("SPRING_PROFILES_ACTIVE") + "|\n");
+		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" + ("SPRING_PROFILES_ACTIVE") + "|\n");
 		
 		System.out.println("Checking ENV variable AZURE_KEYVAULT_ENDPOINT : |" + System.getenv("AZURE_KEYVAULT_ENDPOINT") + "|\n");
 		System.out.println("Checking ENV variable AZURE_KEYVAULT_URI : |" + System.getenv("AZURE_KEYVAULT_URI") + "|\n");
