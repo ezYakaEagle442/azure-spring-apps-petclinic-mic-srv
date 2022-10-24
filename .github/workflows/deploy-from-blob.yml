@@ -205,6 +205,15 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    - name: Authorize local IP access to the Azure BLOB Storage 
+      if: ${{ always() }}
+      run: |
+        echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
+        az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }}  --only-show-errors
+        sleep 30        
+      shell: bash
+
+
     - name: Download Artifacts from Azure BLOB Storage
       id: blob_download
       run: | 
@@ -212,9 +221,6 @@ jobs:
 
         # Runne rwill be blocked by network rules of storage account. Must Allow its IP
         # TODO in Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account
-        echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
-        az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }} 
-        sleep 30
 
         pwd
         ls -al
@@ -254,6 +260,13 @@ jobs:
         echo "TENANT=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
         echo ""
 
+    - name: Disable local IP access to the Azure BLOB Storage 
+      if: ${{ always() }}
+      run: |
+        echo "About to REMOVE network-rule ALLOWING $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
+        az storage account network-rule remove --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }} -g ${{ env.RG_APP }} --only-show-errors
+      shell: bash
+      
     # https://github.com/marketplace/actions/azure-spring-apps
     - name: Deploy vets-service
       uses: Azure/spring-apps-deploy@v1
