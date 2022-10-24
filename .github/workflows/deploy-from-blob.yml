@@ -91,6 +91,11 @@ jobs:
     # https://github.com/marketplace/actions/azure-login
     steps:
 
+    - name: Azure Login
+      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
     # /!\ IMPORTANT:  The step that creates or updates the environment variable does not have access to the new value, but all subsequent steps in a job will have access.
     - name: Set Base environment variables
