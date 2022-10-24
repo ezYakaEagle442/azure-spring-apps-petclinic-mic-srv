@@ -5,7 +5,10 @@ spring:
       server:
         git:
           uri: https://github.com/ezYakaEagle442/spring-petclinic-microservices-config # https://github.com/spring-petclinic/spring-petclinic-microservices-config
-          default-label: main
+          # https://docs.spring.io/spring-cloud-config/docs/3.1.4/reference/html/#_default_label
+          # The default label used for Git is main. If you do not set spring.cloud.config.server.git.defaultLabel and a branch named main does not exist, the config server will by default also try to checkout a branch named master. If you would like to disable to the fallback branch behavior you can set spring.cloud.config.server.git.tryMasterBranch to false.
+          # default-label: main
+          defaultLabel: main
         # Use the File System Backend to avoid git pulling. Enable "native" profile in the Config Server.
         native:
           searchLocations: file:///${GIT_REPO}
@@ -19,7 +22,7 @@ management:
   endpoints:
     enabled-by-default: false
     web:
-      base-path: "/manage"
+      base-path: "/actuator"
       exposure: # https://docs.spring.io/spring-boot/docs/2.6.3/reference/html/actuator.html#actuator.endpoints.exposing
         include: "health,info,startup,env,mappings,metrics" # "*"
         exclude: "beans"    
@@ -49,5 +52,5 @@ management:
     mappings:
       enabled: true            
   server:
-    port: 8081
+    port: 1025 #  probe port, on standard tier, it's 1025 while on enterprise tier, it should be 8080.
 ---

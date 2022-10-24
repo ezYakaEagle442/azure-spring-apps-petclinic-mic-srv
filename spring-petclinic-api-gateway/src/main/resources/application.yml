@@ -40,7 +40,7 @@ management:
   endpoints:
     enabled-by-default: false
     web:
-      base-path: "/manage"
+      base-path: "/actuator"
       exposure: # https://docs.spring.io/spring-boot/docs/2.6.3/reference/html/actuator.html#actuator.endpoints.exposing
         include: "health,info,startup,env,mappings,metrics" # "*"
         exclude: "beans"    
@@ -70,4 +70,4 @@ management:
     mappings:
       enabled: true            
   server:
-    port: 8081
+    port: 1025 #  probe port, on standard tier, it's 1025 while on enterprise tier, it should be 8080.
