@@ -51,6 +51,8 @@ management:
       enabled: true
     mappings:
       enabled: true            
-  server:
-    port: 1025 #  probe port, on standard tier, it's 1025 while on enterprise tier, it should be 8080.
+    # internal port will be taken care of by ASA so you don't need specify it
+    # probe port, on standard tier, it's 1025 while on enterprise tier, it should be 8080.
+    # server:
+    #  port: 1025
 ---
