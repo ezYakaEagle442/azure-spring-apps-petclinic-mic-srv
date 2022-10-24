@@ -66,6 +66,9 @@ param serviceRegistryName string = 'default' // The resource name 'Azure Spring 
 @description('The Azure Spring Apps Config Server Git URI (The repo must be public).')
 param gitConfigURI string
 
+@description('The Azure Spring Apps Config Server Git label (branch/tag). Config Server takes master (on Git) as the default label if you do not specify one. To avoid Azure Spring Apps Config Server failure, be sure to pay attention to the default label when setting up Config Server with GitHub, especially for newly-created repositories. See https://learn.microsoft.com/en-us/azure/spring-apps/how-to-config-server https://docs.spring.io/spring-cloud-config/docs/3.1.4/reference/html/#_default_label . The default label used for Git is main. If you do not set spring.cloud.config.server.git.defaultLabel and a branch named main does not exist, the config server will by default also try to checkout a branch named master. If you would like to disable to the fallback branch behavior you can set spring.cloud.config.server.git.tryMasterBranch to false.')
+param configServerLabel string = 'main'
+
 @description('The Azure Spring Apps Build Agent pool name. Only "default" is supported') // to be checked
 @allowed([
   'default'
@@ -228,7 +231,8 @@ resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers
         // Config Server takes master (on Git) as the default label if you don't specify one. However, GitHub has recently changed the default branch from master to main. To avoid Azure Spring Apps Config Server failure, be sure to pay attention to the default label when setting up Config Server with GitHub, especially for newly-created repositories.
         // https://docs.spring.io/spring-cloud-config/docs/3.1.4/reference/html/#_default_label
         // The default label used for Git is main. If you do not set spring.cloud.config.server.git.defaultLabel and a branch named main does not exist, the config server will by default also try to checkout a branch named master. If you would like to disable to the fallback branch behavior you can set spring.cloud.config.server.git.tryMasterBranch to false.
-        label: 'main'
+        label: configServerLabel
+
       }
     }
   }
