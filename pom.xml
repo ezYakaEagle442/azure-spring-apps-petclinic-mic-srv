@@ -34,7 +34,7 @@
         <lombok.version>1.18.22</lombok.version>
 
         <!-- https://github.com/Azure/azure-sdk-for-java/wiki/Spring-Versions-Mapping#which-version-of-spring-cloud-azure-should-i-use -->
-        <spring-cloud-azure.version>4.0.0</spring-cloud-azure.version>
+        <spring-cloud-azure.version>4.4.0</spring-cloud-azure.version>
         <spring-boot.version>2.6.3</spring-boot.version>
         <spring-cloud.version>2021.0.0</spring-cloud.version>
         <chaos-monkey-spring-boot.version>2.3.10</chaos-monkey-spring-boot.version>
