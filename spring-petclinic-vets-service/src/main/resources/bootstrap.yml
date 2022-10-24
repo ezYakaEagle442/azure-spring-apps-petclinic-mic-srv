@@ -11,7 +11,7 @@ spring:
       on-profile: docker
   #cloud:
   #  config:
-  #    uri: http://config-server:8888 or  https://asa-petcliasa.svc.azuremicroservices.io/eureka/eureka ?
+  #    uri: http://config-server:8888 or http://CloudConfigServerApplication or  https://asa-petcliasa.svc.azuremicroservices.io/eureka/eureka ?
 ---
 management:
   health:
