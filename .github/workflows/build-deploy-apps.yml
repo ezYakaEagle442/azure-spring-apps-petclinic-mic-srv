@@ -521,7 +521,7 @@ jobs:
 
     # https://github.com/marketplace/actions/azure-spring-apps
     - name: Deploy vets-service
-      uses: Azure/spring-apps-deploy@v1
+      uses: Azure/spring-apps-deploy@v1.1.0
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
@@ -538,7 +538,7 @@ jobs:
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
 
     - name: Deploy visits-service
-      uses: Azure/spring-apps-deploy@v1
+      uses: Azure/spring-apps-deploy@v1.1.0
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
@@ -555,7 +555,7 @@ jobs:
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
 
     - name: Deploy customers-service
-      uses: Azure/spring-apps-deploy@v1
+      uses: Azure/spring-apps-deploy@v1.1.0
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
@@ -572,7 +572,7 @@ jobs:
         runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
 
     - name: Deploy api-gateway
-      uses: Azure/spring-apps-deploy@v1
+      uses: Azure/spring-apps-deploy@v1.1.0
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
         action: deploy
