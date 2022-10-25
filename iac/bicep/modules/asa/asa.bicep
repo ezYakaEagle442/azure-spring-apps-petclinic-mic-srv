@@ -232,7 +232,6 @@ resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers
         // https://docs.spring.io/spring-cloud-config/docs/3.1.4/reference/html/#_default_label
         // The default label used for Git is main. If you do not set spring.cloud.config.server.git.defaultLabel and a branch named main does not exist, the config server will by default also try to checkout a branch named master. If you would like to disable to the fallback branch behavior you can set spring.cloud.config.server.git.tryMasterBranch to false.
         label: configServerLabel
-
       }
     }
   }
@@ -265,92 +264,7 @@ resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-previ
     azureSpringAppsconfigserver
   ]  
 }
-output customersServiceIdentity string = customersserviceapp.identity.principalId
-
-/*
-// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep
-resource customersserviceappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-09-01-preview' = {
-  name: 'aca-${appName}-customers-service-init-v.0.1.0'
-  parent: customersserviceapp
-  sku: {
-    name: azureSpringAppsSkuName
-  }
-  properties: {
-    active: true
-    deploymentSettings: {
-      addonConfigs: {
-        azureMonitor: {
-          enabled: true
-        }
-      }
-      environmentVariables: {
-        XXX: 'foo'
-        ZZZ: 'bar'
-      }
-      containerProbeSettings: {
-        disableProbe: false
-      }
-      livenessProbe: {
-        disableProbe: false
-        failureThreshold: 5
-        initialDelaySeconds: 30
-        periodSeconds: 60
-        probeAction: {
-          type: 'HTTPGetAction'
-        }
-        successThreshold: 1
-        timeoutSeconds: 30
-
-      }
-      readinessProbe: {
-        disableProbe: false
-        failureThreshold: 5
-        initialDelaySeconds: 30
-        periodSeconds: 60
-        probeAction: {
-          type: 'HTTPGetAction'
-        }
-        successThreshold: 1
-        timeoutSeconds: 30
-      }
-      resourceRequests: {
-          cpu: any(1)
-          memory: any(1)
-      }
-    }
-    
-    source: {
-      version: '1.0.0'
-      
-      
-      type: 'Jar' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
-      jvmOptions: '-Dazure.keyvault.uri=${kvURL} -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud'
-      relativePath: 'spring-petclinic-customers-service' // './target/petclinic-customers-service-2.6.6.jar'
-      runtimeVersion: 'Java_11'
-      
-
-      type: 'Container' 
-      customContainer:  {
-        containerImage: 'https://acrpetcliasa.azurecr.io/petclinic/petclinic-customers-service:4242' // Container image of the custom container. This should be in the form of {repository}:{tag} without the server name of the registry	
-        command: ['java', '-jar petclinic-customers-service-2.6.6.jar', '--server.port=8080', '--spring.profiles.active=docker,mysql'] 
-        server: 'acrpetcliasa.azurecr.io' // 	The name of the registry that contains the container image
-        imageRegistryCredential: {
-          username: 'AcrUserName'
-          password: 'AcrPassword'
-        }
-        languageFramework: 'Java'
-        args: '' // Arguments to the entrypoint. The docker image's CMD is used if this is not provided.
-      }
-      
-      type: 'Source' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
-      relativePath: 'spring-petclinic-customers-service'
-      runtimeVersion: 'Java_11'
-      artifactSelector: 'spring-petclinic-customers-service' // Selector for the artifact to be used for the deployment for multi-module projects. This should be the relative path to the target module/project.
-      
-    }
-  }
-}
-*/
+output customersServiceIdentity string = customersserviceapp.identity.userAssignedIdentities['${customersServicedentity.id}'].principalId
 
 resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' = {
   name: 'vets-service'
@@ -379,7 +293,7 @@ resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' =
     azureSpringAppsconfigserver
   ]  
 }
-output vetsServiceIdentity string = vetsserviceapp.identity.principalId
+output vetsServiceIdentity string = vetsserviceapp.identity.userAssignedIdentities['${vetsServiceAppIdentity.id}'].principalId
 
 resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' = {
   name: 'visits-service'
@@ -408,7 +322,7 @@ resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview
     azureSpringAppsconfigserver
   ]
 }
-output visitsServiceIdentity string = visitsservicerapp.identity.principalId
+output visitsServiceIdentity string = visitsservicerapp.identity.userAssignedIdentities['${visitsServiceIdentity.id}'].principalId
 
 
 resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' = {
@@ -441,7 +355,7 @@ resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' = 
     visitsservicerapp
   ]  
 }
-output apiGatewayIdentity string = apigatewayapp.identity.principalId
+output apiGatewayIdentity string = apigatewayapp.identity.userAssignedIdentities['${apiGatewayIdentity.id}'].principalId
 
 /*
 
