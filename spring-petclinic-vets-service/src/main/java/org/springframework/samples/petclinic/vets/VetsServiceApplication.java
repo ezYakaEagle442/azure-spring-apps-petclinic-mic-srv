@@ -60,10 +60,11 @@ public class VetsServiceApplication {
 	@Value("${spring.jpa.hibernate.ddl-auto}")
 	private static String jpaHibernateDdlAuto;
 
+	@Value("${logging.level.org.springframework}")
+    private static String logLevelSpring;
+
 	public static void main(String[] args) {
 	
-		System.out.println("Checking ENV variables ..."+ "\n");
-
 		System.out.println("Checking ALL ENV variable  : |" + "|\n");
 		System.getenv().forEach((key, value) -> {
 			System.out.println(key + ":" + value);
@@ -75,6 +76,8 @@ public class VetsServiceApplication {
 		});
 
 		System.out.println("Checking ENV variable  : |" + "|\n");
+
+		System.out.println("Spring log level from config file: " + logLevelSpring);
 
 		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" +  System.getenv("SPRING_PROFILES_ACTIVE") + "|\n");
 		
