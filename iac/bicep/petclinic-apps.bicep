@@ -118,14 +118,6 @@ param startIpAddress string = '10.42.1.0'
 param endIpAddress string = '10.42.1.15'
 
 /*
-@description('The KV ipRules')
-param ipRules array = [] 
-
-@description('The KV vNetRules')
-param vNetRules array = [] 
-*/
-
-/*
 module rg 'rg.bicep' = {
   name: 'rg-bicep-${appName}'
   scope: subscription()
@@ -135,32 +127,6 @@ module rg 'rg.bicep' = {
   }
 }
 */
-
-resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
-  name: kvRGName
-  scope: subscription()
-}
-
-resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
-  name: kvName
-  scope: kvRG
-}  
-
-
-var  vNetRules = []
-var  ipRules = [azurespringapps.outputs.azureSpringAppsOutboundPubIP]
-
-// Must allow ASA to access Existing KV
-module kvsetiprules './modules/kv/kv.bicep' = {
-  name: 'kv-set-iprules'
-  scope: kvRG
-  params: {
-    kvName: kvName
-    location: location
-    ipRules: ipRules
-    vNetRules: vNetRules
-  }
-}
 
 
 module azurespringapps './modules/asa/asa.bicep' = {
@@ -187,39 +153,33 @@ module azurespringapps './modules/asa/asa.bicep' = {
   }
 }
 
+resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  name: kvRGName
+  scope: subscription()
+}
+
+resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+  name: kvName
+  scope: kvRG
+}  
+
+
+var  vNetRules = []
+var  ipRules = azurespringapps.outputs.azureSpringAppsOutboundPubIP // /!\ has 2 IP separated from a coma, ex: 20.31.114.2,20.238.165.131
 
 // Must allow ASA to access Existing KV
-resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
-  name: kvName
-  // scope: kvRG
-  location: location
-  properties: {
-    sku: {
-      family: 'A'
-      name: kvSkuName
-    }
-    tenantId: tenantId
-    publicNetworkAccess: publicNetworkAccess
-    enabledForDeployment: false // Property to specify whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault.
-    enabledForDiskEncryption: true // When enabledForDiskEncryption is true, networkAcls.bypass must include \"AzureServices\
-    enabledForTemplateDeployment: true
-    enablePurgeProtection: true
-    enableSoftDelete: true
-    enableRbacAuthorization: true // /!\ Preview feature: When true, the key vault will use RBAC for authorization of data actions, and the access policies specified in vault properties will be ignored
-    // When enabledForDeployment is true, networkAcls.bypass must include \"AzureServices\"
-    networkAcls: {
-      bypass: 'AzureServices'
-      defaultAction: 'Deny'
-      ipRules:  [for ipRule in ipRules: {
-        value: ipRule
-      }]
-      virtualNetworkRules:  [for vNetRule in vNetRules: {
-        id: vNetRule.id
-      }]   
-    }
-    softDeleteRetentionInDays: 7 // 30 must be greater or equal than '7' but less or equal than '90'.
-    //accessPolicies: []
-  }  
+module kvsetiprules './modules/kv/kv.bicep' = {
+  name: 'kv-set-iprules'
+  scope: kvRG
+  params: {
+    kvName: kvName
+    location: location
+    ipRules: ipRules
+    vNetRules: vNetRules
+  }
+  dependsOn: [
+    azurespringapps
+  ]  
 }
 
 module mysqlPub './modules/mysql/mysql.bicep' = {
@@ -234,7 +194,7 @@ module mysqlPub './modules/mysql/mysql.bicep' = {
     serverName: kv.getSecret('MYSQL-SERVER-NAME')
     administratorLogin: kv.getSecret('SPRING-DATASOURCE-USERNAME')
     administratorLoginPassword: kv.getSecret('SPRING-DATASOURCE-PASSWORD') 
-    azureSpringAppsOutboundPubIP: azurespringapps.outputs.azureSpringAppsOutboundPubIP // /!\ has 2 IP separated from a coma, ex: 20.31.114.2,20.238.165.131
+    azureSpringAppsOutboundPubIP: ipRules // /!\ has 2 IP separated from a coma, ex: 20.31.114.2,20.238.165.131
   }
   dependsOn: [
     azurespringapps

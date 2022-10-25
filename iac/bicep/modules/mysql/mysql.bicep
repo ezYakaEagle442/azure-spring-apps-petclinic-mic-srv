@@ -18,8 +18,8 @@ param administratorLoginPassword string
 @description('The MySQL DB Server name.')
 param serverName string
 
-@description('Azure Spring Apps Outbound Public IP')
-param azureSpringAppsOutboundPubIP string
+@description('Azure Spring Apps Outbound Public IPs as an Array')
+param azureSpringAppsOutboundPubIP array
 
 @description('Should a MySQL Firewall be set to allow client workstation for local Dev/Test only')
 param setFwRuleClient bool = false
@@ -87,14 +87,25 @@ resource fwRuleClientIPAddress 'Microsoft.DBforMySQL/flexibleServers/firewallRul
 }
 
  // Allow Azure Spring Apps
- resource fwRuleAllowAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = {
-  name: 'allow-asa'
+ resource fwRuleAllowAzureSpringAppsIP1 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = {
+  name: 'allow-asa-ip1'
   parent: mysqlserver
   properties: {
-    startIpAddress: azureSpringAppsOutboundPubIP // /!\ has 2 IP separated from a coma, ex: 20.31.114.2,20.238.165.131
-    endIpAddress: azureSpringAppsOutboundPubIP
+    startIpAddress: azureSpringAppsOutboundPubIP[0] // /!\ has 2 IP separated from a coma, ex: 20.31.114.2,20.238.165.131
+    endIpAddress: azureSpringAppsOutboundPubIP[0]
   }
 }
+
+resource fwRuleAllowAzureSpringAppsIP2 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = {
+  name: 'allow-asa-ip2'
+  parent: mysqlserver
+  properties: {
+    startIpAddress: azureSpringAppsOutboundPubIP[1] // /!\ has 2 IP separated from a coma, ex: 20.31.114.2,20.238.165.131
+    endIpAddress: azureSpringAppsOutboundPubIP[1]
+  }
+}
+
+
 
  // /!\ SECURITY Risk: Allow ANY HOST for local Dev/Test only
  /*
