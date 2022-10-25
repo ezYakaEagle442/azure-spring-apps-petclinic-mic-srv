@@ -133,7 +133,7 @@ resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-09-01-preview' = {
 
 output azureSpringAppsResourceId string = azureSpringApps.id
 output azureSpringAppsFQDN string = azureSpringApps.properties.fqdn
-output azureSpringAppsOutboundPubIP string = azureSpringApps.properties.networkProfile.outboundIPs.publicIPs[0]
+output azureSpringAppsOutboundPubIP array = azureSpringApps.properties.networkProfile.outboundIPs.publicIPs
 
 resource logAnalyticsWorkspace  'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
   name: logAnalyticsWorkspaceName

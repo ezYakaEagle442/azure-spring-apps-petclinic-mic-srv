@@ -117,11 +117,13 @@ param startIpAddress string = '10.42.1.0'
 @description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
 param endIpAddress string = '10.42.1.15'
 
+/*
 @description('The KV ipRules')
 param ipRules array = [] 
 
 @description('The KV vNetRules')
 param vNetRules array = [] 
+*/
 
 /*
 module rg 'rg.bicep' = {
@@ -138,6 +140,28 @@ resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: kvRGName
   scope: subscription()
 }
+
+resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+  name: kvName
+  scope: kvRG
+}  
+
+
+var  vNetRules = []
+var  ipRules = [azurespringapps.outputs.azureSpringAppsOutboundPubIP]
+
+// Must allow ASA to access Existing KV
+module kvsetiprules './modules/kv/kv.bicep' = {
+  name: 'kv-set-iprules'
+  scope: kvRG
+  params: {
+    kvName: kvName
+    location: location
+    ipRules: ipRules
+    vNetRules: vNetRules
+  }
+}
+
 
 module azurespringapps './modules/asa/asa.bicep' = {
   name: 'asa-pub'
