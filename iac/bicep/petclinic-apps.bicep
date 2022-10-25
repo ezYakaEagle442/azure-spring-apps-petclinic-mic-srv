@@ -170,10 +170,10 @@ resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
   // scope: kvRG
   location: location
   properties: {
-    /*sku: {
+    sku: {
       family: 'A'
-      name: skuName
-    }*/
+      name: kvSkuName
+    }
     tenantId: tenantId
     publicNetworkAccess: publicNetworkAccess
     enabledForDeployment: false // Property to specify whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault.
