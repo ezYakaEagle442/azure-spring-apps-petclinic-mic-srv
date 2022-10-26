@@ -452,6 +452,9 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    - name: Checkout your repo
+      uses: actions/checkout@v2
+      
     # You can  download all artifacts in a workflow run by not specifying a name.
     - name: Download ALL Jar artifacts
       uses: actions/download-artifact@v3
@@ -620,7 +623,7 @@ jobs:
             if [[ ${{ env.DEPLOYMENT_CREATE_NEW }} ]]
             then
               echo "About to create a new Deployment for vets-service"
-
+              
               az spring app deployment create \
               --name $DEPLOYMENT_NAME \
               --app ${{ env.VETS_SERVICE }} \
@@ -637,7 +640,8 @@ jobs:
               --readiness-probe-config $VETS_SERVICE_READINESS_PROBE_CFG \
               --termination-grace-period-seconds ${{ env.GRACE_PERIOD }} \
               --version ${{ env.DEPLOYMENT_VERSION }} \
-              --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }}  
+              --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }} \
+              --skip-clone-settings
             else
               echo "ERROR Input param DEPLOYMENT_CREATE_NEW is set to false, no new Deployment will be created"
               exit 1
