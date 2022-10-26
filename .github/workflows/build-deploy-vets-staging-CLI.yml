@@ -380,7 +380,7 @@ jobs:
             --name ${{ env.VETS_SERVICE }} \
             --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
             --artifact-path ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }} \
-            --deployment ${{ steps.set-var.outputs.VETS_SERVICE_STAGING_DEPLOYMENT }} \
+            --deployment $DEPLOYMENT_NAME \
             --disable-probe ${{ env.DEPLOYMENT_DISABLE_PROBE }} \
             --enable-startup-probe ${{ env.DEPLOYMENT_ENABLE_STARTUP_PROBE }} \
             --enable-liveness-probe ${{ env.DEPLOYMENT_ENABLE_LIVENESS_PROBE }} \
