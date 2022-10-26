@@ -6,9 +6,9 @@
 			"failureThreshold": 10,
 			"successThreshold": 1,
 			"probeAction": {
-					"type": "HTTPGetAction",
-					"scheme": "HTTP",
-					"path": "/actuator/health/readiness"
+				"type": "HTTPGetAction",
+				"scheme": "HTTP",
+				"path": "/actuator/health/readiness"
 			}
 	}
 }
