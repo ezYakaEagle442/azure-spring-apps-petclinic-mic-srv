@@ -57,9 +57,9 @@ env:
 
   GRACE_PERIOD: 30
 
-  DEPLOYMENT_STARTUP_PROBE_CFG: src/main/resources/probe.json
-  DEPLOYMENT_LIVENESS_PROBE_CFG: src/main/resources/probe.json
-  DEPLOYMENT_READINESS_PROBE_CFG: src/main/resources/probe.json
+  DEPLOYMENT_STARTUP_PROBE_CFG: src/main/resources/startupProbe.json
+  DEPLOYMENT_LIVENESS_PROBE_CFG: src/main/resources/livenessProbe.json
+  DEPLOYMENT_READINESS_PROBE_CFG: src/main/resources/readinessProbe.json
 
 
   # If set to true and the deployment specified by deployment-name does not exist at execution time, it will be created.

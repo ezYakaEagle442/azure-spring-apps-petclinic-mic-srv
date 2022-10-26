@@ -66,9 +66,9 @@ env:
 
   GRACE_PERIOD: 30
 
-  DEPLOYMENT_STARTUP_PROBE_CFG: src/main/resources/probe.json
-  DEPLOYMENT_LIVENESS_PROBE_CFG: src/main/resources/probe.json
-  DEPLOYMENT_READINESS_PROBE_CFG: src/main/resources/probe.json
+  DEPLOYMENT_STARTUP_PROBE_CFG: src/main/resources/startupProbe.json
+  DEPLOYMENT_LIVENESS_PROBE_CFG: src/main/resources/livenessProbe.json
+  DEPLOYMENT_READINESS_PROBE_CFG: src/main/resources/readinessProbe.json
 
 
   # If set to true and the deployment specified by deployment-name does not exist at execution time, it will be created.
@@ -311,15 +311,6 @@ jobs:
         java-version: '11'
         distribution: 'microsoft'
         cache: maven
-
-  # https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
-  # invalid value workflow reference: references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
-  #call-maven-build-workflow:
-  #  name: Trigger Maven
-  #  needs: set-var
-  #  uses: ./.github/workflows/maven-build.yml # .github/workflows/maven-build.yml@main ==> references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
-  #  secrets: inherit # pass all secrets
-  #    # envPAT: ${{ secrets.envPAT }} # pass just this secret
   
     - name: Build with Maven
       id: mvn_build
@@ -454,7 +445,7 @@ jobs:
 
     - name: Checkout your repo
       uses: actions/checkout@v2
-      
+
     # You can  download all artifacts in a workflow run by not specifying a name.
     - name: Download ALL Jar artifacts
       uses: actions/download-artifact@v3
