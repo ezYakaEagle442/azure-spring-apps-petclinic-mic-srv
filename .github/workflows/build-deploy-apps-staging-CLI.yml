@@ -627,7 +627,7 @@ jobs:
               --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
               --instance-count ${{ env.DEPLOYMENT_INSTANCE_COUNT }} \
               --cpu ${{ env.DEPLOYMENT_CPU }} \
-              --memory${{ env.DEPLOYMENT_MEMORY }} \
+              --memory ${{ env.DEPLOYMENT_MEMORY }} \
               --disable-probe ${{ env.DEPLOYMENT_DISABLE_PROBE }} \
               --enable-startup-probe ${{ env.DEPLOYMENT_ENABLE_STARTUP_PROBE }} \
               --enable-liveness-probe ${{ env.DEPLOYMENT_ENABLE_LIVENESS_PROBE }} \
@@ -658,7 +658,7 @@ jobs:
         then
             echo "About to deploy vets-service to a Staging environment"
             az spring app deploy \
-            --name  ${{ env.VETS_SERVICE }} \
+            --name ${{ env.VETS_SERVICE }} \
             --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
             --artifact-path ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }} \
             --deployment ${{ steps.set-var.outputs.VETS_SERVICE_STAGING_DEPLOYMENT }} \
