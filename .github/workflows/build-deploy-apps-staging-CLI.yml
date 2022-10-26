@@ -567,6 +567,9 @@ jobs:
         # https://learn.microsoft.com/en-us/azure/spring-apps/concept-manage-monitor-app-spring-boot-actuator
         # https://learn.microsoft.com/en-us/azure/spring-apps/how-to-configure-health-probes-graceful-termination
         
+        az config set extension.use_dynamic_install=yes_without_prompt
+        c
+        az extension update --name spring
 
         echo "****************************************************************************************"
         echo "*                                                                                      *"
@@ -595,12 +598,12 @@ jobs:
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
           echo "Set deployment name to STAGING"
-          DEPLOYMENT_NAME=${{ steps.set-var.outputs.VETS_SERVICE_STAGING_DEPLOYMENT }}
+          DEPLOYMENT_NAME=${{ needs.build.outputs.VETS_SERVICE_STAGING_DEPLOYMENT }}
         else
           if [ !$DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "set-production" ]
           then
               echo "Set deployment name to PRODUCTION"
-              DEPLOYMENT_NAME=${{ steps.set-var.outputs.VETS_SERVICE_PRODUCTION_DEPLOYMENT }}
+              DEPLOYMENT_NAME=${{ needs.build.outputs.VETS_SERVICE_PRODUCTION_DEPLOYMENT }}
           else
               echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
               exit 1
