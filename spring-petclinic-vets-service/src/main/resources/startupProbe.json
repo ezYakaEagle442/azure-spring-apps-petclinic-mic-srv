@@ -7,7 +7,7 @@
 			"successThreshold": 1,
 			"probeAction": {
 				"type": "ExecAction",
-				"command":  ["sleep", "60"]
+				"command":  ["ls"]
 			}
 	}
 }
