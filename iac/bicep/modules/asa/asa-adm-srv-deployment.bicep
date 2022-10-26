@@ -3,6 +3,8 @@
 @maxLength(20)
 param appName string = '101-${uniqueString(deployment().name)}'
 
+param deploymentVersion string = '2.6.6'
+
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
 
@@ -66,7 +68,7 @@ param kvName string = 'kv-${appName}'
 @description('The name of the KV RG')
 param kvRGName string
 
-var kvURL = 'https://${kvName}.vault.azure.net'
+var kvURL = 'https://${kvName}.vault.azure.net/'
 
 @description('The config-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
 param configServerAppIdentityName string = 'id-asa-petclinic-config-server-dev-westeurope-101'
@@ -169,8 +171,9 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
         }
       }
       environmentVariables: {
-        FOO: 'foo'
-        BAR: 'bar'
+        SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT: kvURL
+        // VETS_SVC_APP_IDENTITY_CLIENT_ID: vetsServiceAppIdentity.properties.clientId
+        SPRING_CLOUD_AZURE_TENANT_ID: tenantId
       }
       resourceRequests: {
         cpu: '1'
@@ -213,9 +216,8 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
         probeAction: {
           type: 'ExecAction'
           command: [
-            'ls'
-            '-al'
-            '/tmp/app/*.jar'
+            'sleep'
+            '60'
           ]
         }
         successThreshold: 1
@@ -224,9 +226,9 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
     }
     
     source: {
-      version: '1.0.0'
+      version: deploymentVersion
       type: 'Jar' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
-      jvmOptions: '-Dazure.keyvault.uri=${kvURL} -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud'
+      jvmOptions: '-Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud'
       relativePath: 'https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar' // 'spring-petclinic-admin-server/target/petclinic-customers-service-2.6.6.jar' // should be a link to a BLOB storage
       runtimeVersion: 'Java_11'
     }
@@ -316,7 +318,7 @@ resource customersserviceappdeployment 'Microsoft.AppPlatform/Spring/apps/deploy
       customContainer:  {
         containerImage: 'https://acrpetcliasa.azurecr.io/petclinic/petclinic-customers-service:4242' // Container image of the custom container. This should be in the form of {repository}:{tag} without the server name of the registry	
         command: ['java', '-jar petclinic-customers-service-2.6.6.jar', '--server.port=8080', '--spring.profiles.active=docker,mysql'] 
-        server: 'acrpetcliasa.azurecr.io' // 	The name of the registry that contains the container image
+        server: 'acrpetcliasa.azurecr.io' // 	The name of the registry that contains the container image, Default: docker.io
         imageRegistryCredential: {
           username: 'AcrUserName'
           password: 'AcrPassword'
