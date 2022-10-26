@@ -314,7 +314,7 @@ jobs:
         echo "****************************************************************************************"
         
         VETS_SERVICE_STARTUP_PROBE_CFG="spring-petclinic-${{ env.VETS_SERVICE }}/${{ env.DEPLOYMENT_STARTUP_PROBE_CFG }}"
-        VETS_SERVICE_LIVENESS_PROBE_CFG="spring-petclinic-${{ env.VETS_SERVICE }}/${{ env.DEPLOYMENT_LIVENESS_PROBE_CFGXX }}"
+        VETS_SERVICE_LIVENESS_PROBE_CFG="spring-petclinic-${{ env.VETS_SERVICE }}/${{ env.DEPLOYMENT_LIVENESS_PROBE_CFG }}"
         VETS_SERVICE_READINESS_PROBE_CFG="spring-petclinic-${{ env.VETS_SERVICE }}/${{ env.DEPLOYMENT_READINESS_PROBE_CFG }}"
 
         echo "VETS_SERVICE_STARTUP_PROBE_CFG=$VETS_SERVICE_STARTUP_PROBE_CFG"
