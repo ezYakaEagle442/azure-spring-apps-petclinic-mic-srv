@@ -1,35 +1,37 @@
-"startupProbe": {
-    "initialDelaySeconds": 120,
-    "periodSeconds": 60,
-    "timeoutSeconds": 30,
-    "failureThreshold": 10,
-    "successThreshold": 1,
-    "probeAction": {
-        "type": "ExecAction",
-        "command":  ["sleep", "60"]
-    }
-},
-"livenessProbe": {
-    "initialDelaySeconds": 120,
-    "periodSeconds": 60,
-    "timeoutSeconds": 30,
-    "failureThreshold": 10,
-    "successThreshold": 1,
-    "probeAction": {
-        "type": "HTTPGetAction",
-        "scheme": "HTTP",
-        "path": "/actuator/health/liveness"
-    }
-},
-"readinessProbe": {
-    "initialDelaySeconds": 120,
-    "periodSeconds": 60,
-    "timeoutSeconds": 30,
-    "failureThreshold": 10,
-    "successThreshold": 1,
-    "probeAction": {
-        "type": "HTTPGetAction",
-        "scheme": "HTTP",
-        "path": "/actuator/health/readiness"
-    }
+{
+	"startupProbe": {
+			"initialDelaySeconds": 120,
+			"periodSeconds": 60,
+			"timeoutSeconds": 30,
+			"failureThreshold": 10,
+			"successThreshold": 1,
+			"probeAction": {
+					"type": "ExecAction",
+					"command":  ["sleep", "60"]
+			}
+	},
+	"livenessProbe": {
+			"initialDelaySeconds": 120,
+			"periodSeconds": 60,
+			"timeoutSeconds": 30,
+			"failureThreshold": 10,
+			"successThreshold": 1,
+			"probeAction": {
+					"type": "HTTPGetAction",
+					"scheme": "HTTP",
+					"path": "/actuator/health/liveness"
+			}
+	},
+	"readinessProbe": {
+			"initialDelaySeconds": 120,
+			"periodSeconds": 60,
+			"timeoutSeconds": 30,
+			"failureThreshold": 10,
+			"successThreshold": 1,
+			"probeAction": {
+					"type": "HTTPGetAction",
+					"scheme": "HTTP",
+					"path": "/actuator/health/readiness"
+			}
+	}
 }
