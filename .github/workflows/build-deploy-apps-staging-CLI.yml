@@ -568,7 +568,7 @@ jobs:
         # https://learn.microsoft.com/en-us/azure/spring-apps/how-to-configure-health-probes-graceful-termination
         
         az config set extension.use_dynamic_install=yes_without_prompt
-        c
+        az extension add --name spring
         az extension update --name spring
 
         echo "****************************************************************************************"
