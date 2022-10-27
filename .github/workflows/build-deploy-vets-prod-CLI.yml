@@ -1,4 +1,4 @@
-name: Build & Deploy Vets-Service to ASA STAGING Deployments with CLI
+name: Build & Deploy Vets-Service to ASA PRODUCTION Deployments with CLI
 
 ###################################################################################################################
 #
