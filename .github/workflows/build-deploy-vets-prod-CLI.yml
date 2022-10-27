@@ -379,7 +379,7 @@ jobs:
             exit 1
           fi
         }
-        check if $DEPLOYMENT_NAME deployment already exists ...  
+        echo "check if $DEPLOYMENT_NAME deployment already exists ... "
         az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
 
         # Check the value of $?, which contains the result of executing the most recent command/function:
