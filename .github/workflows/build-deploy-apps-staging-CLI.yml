@@ -71,6 +71,8 @@ env:
   DEPLOYMENT_LIVENESS_PROBE_CFG: src/main/resources/livenessProbe.json
   DEPLOYMENT_READINESS_PROBE_CFG: src/main/resources/readinessProbe.json
 
+  # https://learn.microsoft.com/en-us/azure/spring-apps/concept-manage-monitor-app-spring-boot-actuator
+  # https://learn.microsoft.com/en-us/azure/spring-apps/how-to-configure-health-probes-graceful-termination
 
   # If set to true and the deployment specified by deployment-name does not exist at execution time, it will be created.
   DEPLOYMENT_CREATE_NEW: true
@@ -444,7 +446,7 @@ jobs:
     - name: Download ALL Jar artifacts
       uses: actions/download-artifact@v3
 
-    - name: Deploy Artifacts
+    - name: Check Artifacts
       run: | 
         echo "github.workspace = ${{ github.workspace }}"
         pwd
@@ -551,13 +553,13 @@ jobs:
         echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
         echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
         echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
-
-        # https://learn.microsoft.com/en-us/azure/spring-apps/concept-manage-monitor-app-spring-boot-actuator
-        # https://learn.microsoft.com/en-us/azure/spring-apps/how-to-configure-health-probes-graceful-termination
         
         az config set extension.use_dynamic_install=yes_without_prompt
         az extension add --name spring
         az extension update --name spring
+
+    - name: Deploy Vets-Service
+      run: | 
 
         echo "****************************************************************************************"
         echo "*                                                                                      *"
@@ -664,6 +666,9 @@ jobs:
         echo "About to assign endpoint to vets-service ... "
         az spring app update --name ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --assign-endpoint true
 
+    - name: Deploy Visits-Service
+      run: | 
+
         echo "****************************************************************************************"
         echo "*                                                                                      *"
         echo "*                                                                                      *"
@@ -769,7 +774,8 @@ jobs:
         echo "About to assign endpoint to vets-service ... "
         az spring app update --name ${{ env.VISITS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --assign-endpoint true
 
-
+    - name: Deploy Customers-service
+      run: | 
         echo "****************************************************************************************"
         echo "*                                                                                      *"
         echo "*                                                                                      *"
@@ -875,6 +881,9 @@ jobs:
         echo "About to assign endpoint to vets-service ... "
         az spring app update --name ${{ env.CUSTOMERS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --assign-endpoint true
 
+
+    - name: Deploy UI
+      run: | 
 
         echo "****************************************************************************************"
         echo "*                                                                                      *"
