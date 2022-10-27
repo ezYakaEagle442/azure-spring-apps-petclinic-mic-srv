@@ -355,15 +355,10 @@ jobs:
 
         # https://unix.stackexchange.com/questions/22726/how-to-conditionally-do-something-if-a-command-succeeded-or-failed
         # check if THIS $DEPLOYMENT_NAME already exists
-        az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
-
-        # Check the value of $?, which contains the result of executing the most recent command/function:
-        deployment_not_found=$?
-
-        if [ $deployment_not_found -eq 0 ]; then
-          echo "Found existing deployment "
-          az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
-        else
+  
+        trap 'catch $? $LINENO' ERR
+        catch() {
+          echo "Error $1 occurred on $2"
           echo "Deployment $DEPLOYMENT_NAME NOT found"
           if [[ ${{ env.DEPLOYMENT_CREATE_NEW }} ]]
           then
@@ -379,6 +374,23 @@ jobs:
             --version ${{ env.DEPLOYMENT_VERSION }} \
             --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }} \
             --skip-clone-settings
+          fi
+          else
+            echo "ERROR Input param DEPLOYMENT_CREATE_NEW is set to false, no new Deployment will be created"
+            exit 1
+          fi
+        }
+        check if $DEPLOYMENT_NAME deployment already exists ...  
+        az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+
+        # Check the value of $?, which contains the result of executing the most recent command/function:
+        deployment_not_found=$?
+
+        if [ $deployment_not_found -eq 0 ]; then
+          echo "Found existing deployment "
+          az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+        else
+          echo "*** THIS SNIPPET SHOULD NEVER BEEN CALLED *** Deployment $DEPLOYMENT_NAME NOT found"
           else
             echo "ERROR Input param DEPLOYMENT_CREATE_NEW is set to false, no new Deployment will be created"
             exit 1
