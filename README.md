@@ -594,7 +594,13 @@ url: jdbc:mysql://${MYSQL_SERVER_FULL_NAME}:3306/${MYSQL_DATABASE_NAME}??useSSL=
 url: jdbc:mysql://petclinic-mysql-server.mysql.database.azure.com:3306/petclinic?useSSL=true
 url: jdbc:mysql://petclinic-mysql-server.mysql.database.azure.com:3306/petclinic?useSSL=true&requireSSL=true&enabledTLSProtocols=TLSv1.2&verifyServerCertificate=true    
 
-
+If you face this Netty SSL Hadnshake issue :
+```console
+eactor.core.Exceptions$ReactiveException: io.netty.handler.ssl.SslHandshakeTimeoutException: handshake timed out after 10000ms
+```
+It means that you may need to upgrade your Spring Boot version to the latest one...
+See
+[https://github.com/netty/netty/issues/12343](https://github.com/netty/netty/issues/12343)
 
 ## Next Steps
 
