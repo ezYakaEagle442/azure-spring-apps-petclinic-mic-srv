@@ -344,25 +344,6 @@ jobs:
         if [[ $(echo $vets_deployment | jq -r 'length') -eq 0 ]]
         then
             echo "There is no existing deployment for ${{ env.VETS_SERVICE }}"
-            if [[ ${{ env.DEPLOYMENT_CREATE_NEW }} ]]
-            then
-              echo "About to create a new Deployment for ${{ env.VETS_SERVICE }}"
-              
-              az spring app deployment create \
-              --name $DEPLOYMENT_NAME \
-              --app ${{ env.VETS_SERVICE }} \
-              --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
-              --instance-count ${{ env.DEPLOYMENT_INSTANCE_COUNT }} \
-              --cpu ${{ env.DEPLOYMENT_CPU }} \
-              --memory ${{ env.DEPLOYMENT_MEMORY }} \
-              --version ${{ env.DEPLOYMENT_VERSION }} \
-              --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }} \
-              --skip-clone-settings
-            else
-              echo "ERROR Input param DEPLOYMENT_CREATE_NEW is set to false, no new Deployment will be created"
-              exit 1
-            fi
-   
         else
             echo "There are existing deployment(s) for ${{ env.VETS_SERVICE }}"
             for deployment in $(az spring app deployment list --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.[].name')
@@ -372,37 +353,67 @@ jobs:
             done
         fi
 
-        echo "In az spring app deploy , --deployment is the Name of an existing deployment of the app. Default to the production"
+        # https://unix.stackexchange.com/questions/22726/how-to-conditionally-do-something-if-a-command-succeeded-or-failed
+        # check if THIS $DEPLOYMENT_NAME already exists
+        az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+
+        # Check the value of $?, which contains the result of executing the most recent command/function:
+        deployment_not_found=$?
+
+        if [ $deployment_not_found -eq 0 ]; then
+          echo "Found existing deployment "
+          az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+        else
+          echo "Deployment $DEPLOYMENT_NAME NOT found"
+          if [[ ${{ env.DEPLOYMENT_CREATE_NEW }} ]]
+          then
+            echo "About to create a new Deployment $DEPLOYMENT_NAME"
+            
+            az spring app deployment create \
+            --name $DEPLOYMENT_NAME \
+            --app ${{ env.VETS_SERVICE }} \
+            --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
+            --instance-count ${{ env.DEPLOYMENT_INSTANCE_COUNT }} \
+            --cpu ${{ env.DEPLOYMENT_CPU }} \
+            --memory ${{ env.DEPLOYMENT_MEMORY }} \
+            --version ${{ env.DEPLOYMENT_VERSION }} \
+            --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }} \
+            --skip-clone-settings
+          else
+            echo "ERROR Input param DEPLOYMENT_CREATE_NEW is set to false, no new Deployment will be created"
+            exit 1
+          fi
+        fi        
+      
+        # https://github.com/Azure/Azure-Spring-Apps/issues/15
+        # --startup-probe-config $VETS_SERVICE_STARTUP_PROBE_CFG \
+        # --enable-startup-probe ${{ env.DEPLOYMENT_ENABLE_STARTUP_PROBE }} \
+        # 
+        #--disable-probe ${{ env.DEPLOYMENT_DISABLE_PROBE }} \
+        #--enable-liveness-probe ${{ env.DEPLOYMENT_ENABLE_LIVENESS_PROBE }} \
+        #--enable-readiness-probe ${{ env.DEPLOYMENT_ENABLE_READINESS_PROBE }} \
+        #--liveness-probe-config $VETS_SERVICE_LIVENESS_PROBE_CFG \
+        #--readiness-probe-config $VETS_SERVICE_READINESS_PROBE_CFG \
+        #--termination-grace-period-seconds ${{ env.GRACE_PERIOD }} \
+
+        az spring app deploy \
+        --name ${{ env.VETS_SERVICE }} \
+        --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
+        --artifact-path ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }} \
+        --deployment $DEPLOYMENT_NAME \
+        --disable-probe true \
+        --env SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID SPRING_CLOUD_AZURE_TENANT_ID=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }} \
+        --jvm-options="${{ env.DEPLOYMENT_JVM_OPTIONS }}" \
+        --version ${{ env.DEPLOYMENT_VERSION }} \
+        --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }}         
 
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
-            echo "About to deploy vets-service to a Staging environment"
-
-            # https://github.com/Azure/Azure-Spring-Apps/issues/15
-            # --startup-probe-config $VETS_SERVICE_STARTUP_PROBE_CFG \
-            # --enable-startup-probe ${{ env.DEPLOYMENT_ENABLE_STARTUP_PROBE }} \
-            # 
-            #--disable-probe ${{ env.DEPLOYMENT_DISABLE_PROBE }} \
-            #--enable-liveness-probe ${{ env.DEPLOYMENT_ENABLE_LIVENESS_PROBE }} \
-            #--enable-readiness-probe ${{ env.DEPLOYMENT_ENABLE_READINESS_PROBE }} \
-            #--liveness-probe-config $VETS_SERVICE_LIVENESS_PROBE_CFG \
-            #--readiness-probe-config $VETS_SERVICE_READINESS_PROBE_CFG \
-            #--termination-grace-period-seconds ${{ env.GRACE_PERIOD }} \
-
-            az spring app deploy \
-            --name ${{ env.VETS_SERVICE }} \
-            --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
-            --artifact-path ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }} \
-            --deployment $DEPLOYMENT_NAME \
-            --disable-probe true \
-            --env SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID SPRING_CLOUD_AZURE_TENANT_ID=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }} \
-            --jvm-options="${{ env.DEPLOYMENT_JVM_OPTIONS }}" \
-            --version ${{ env.DEPLOYMENT_VERSION }} \
-            --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }}         
+          echo "${{ env.VETS_SERVICE }} has been deployed to a Staging environment"
         else
           if [ !$DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "set-production" ]
           then
-              echo "About to Set Production deployment of vets-service App ..."
+              echo "About to Set $DEPLOYMENT_NAME as Production deployment ..."
               az spring app set-deployment -d $DEPLOYMENT_NAME -n ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
           else
               echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
