@@ -39,34 +39,7 @@ import org.springframework.beans.factory.annotation.Value;
 @SpringBootApplication
 @EnableConfigurationProperties(VetsProperties.class)
 public class VetsServiceApplication {
-
-    @Autowired
-    private YAMLConfig myConfig;
 	
-	@Value("${spring.cloud.azure.keyvault.secret.endpoint}")
-    private static String kvSecretEndpoint;
-
-	@Value("${spring.cloud.azure.keyvault.secret.property-sources[0].endpoint}")
-    private static String kvSecretPropertySourcesEndpoint;
-
-	@Value("${spring.datasource.url}")
-    private static String url;
-
-	@Value("${spring.cache.cache-names}")
-    private static String cacheName;
-	
-	@Value("${spring.sql.init.mode}")
-    private static String sqlInitMode;
-
-	@Value("${spring.sql.datasource.initialization-mode}")
-	private static String sqlDataSourceInitMode;
-
-	@Value("${spring.jpa.hibernate.ddl-auto}")
-	private static String jpaHibernateDdlAuto;
-
-	@Value("${logging.level.org.springframework}")
-    private static String logLevelSpring;
-
 	public static void main(String[] args) {
 	
 		System.out.println("Checking ALL ENV variable  : |" + "|\n");
@@ -82,19 +55,6 @@ public class VetsServiceApplication {
 		System.out.println("Checking ENV variable  : |" + "|\n");
 		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" +  System.getenv("SPRING_PROFILES_ACTIVE") + "|\n");		
 		System.out.println("Checking ENV variable SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT : |" + System.getenv("SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT") + "|\n");
-
-
-		System.out.println("Spring log level from config file: " + logLevelSpring);
-		System.out.println("kvSecretEndpoint from config file: " + kvSecretEndpoint);
-		System.out.println("kvSecretPropertySourcesEndpoint from config file: " + kvSecretPropertySourcesEndpoint);
-
-		System.out.println("JDBC URL from config file: " + url);
-		System.out.println("cache name from config file: " + cacheName);
-		System.out.println("SQL Init mode from config file: " + sqlInitMode);
-
-		System.out.println("sqlDataSourceInitMode from config file: " + sqlDataSourceInitMode);
-		System.out.println("jpaHibernateDdlAuto from config file: " + jpaHibernateDdlAuto);
-		
 
         String systemipaddress = "";
         try {
