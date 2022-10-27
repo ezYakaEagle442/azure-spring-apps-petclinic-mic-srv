@@ -98,7 +98,10 @@ jobs:
       VETS_SERVICE_PACKAGE_PATH: ${{ steps.set-var2.outputs.VETS_SERVICE_PACKAGE_PATH }}
       VETS_SERVICE_STAGING_DEPLOYMENT: ${{ steps.set-var.outputs.VETS_SERVICE_STAGING_DEPLOYMENT }}
       VETS_SERVICE_PRODUCTION_DEPLOYMENT: ${{ steps.set-var.outputs.VETS_SERVICE_PRODUCTION_DEPLOYMENT }}
+
       VETS_SVC_APP_IDENTITY_CLIENT_ID: ${{ steps.set-var.outputs.VETS_SVC_APP_IDENTITY_CLIENT_ID }}
+      VISITS_SVC_APP_IDENTITY_CLIENT_ID: ${{ steps.set-var.outputs.VISITS_SVC_APP_IDENTITY_CLIENT_ID }}
+      CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID: ${{ steps.set-var.outputs.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }}
 
     runs-on: ubuntu-latest
     # environment: production // https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
