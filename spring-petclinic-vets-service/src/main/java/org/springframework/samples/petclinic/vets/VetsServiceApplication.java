@@ -27,8 +27,7 @@ import java.util.Map;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 // import org.apache.commons.net.telnet.TelnetClient;
 
 /**
