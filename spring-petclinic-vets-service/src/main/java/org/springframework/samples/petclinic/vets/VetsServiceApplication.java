@@ -20,6 +20,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.samples.YAMLConfig;
 import org.springframework.samples.petclinic.vets.system.VetsProperties;
 
 import java.net.*;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 // import org.apache.commons.net.telnet.TelnetClient;
 
@@ -38,7 +40,9 @@ import org.springframework.beans.factory.annotation.Value;
 @EnableConfigurationProperties(VetsProperties.class)
 public class VetsServiceApplication {
 
-
+    @Autowired
+    private YAMLConfig myConfig;
+	
 	@Value("${spring.cloud.azure.keyvault.secret.endpoint}")
     private static String kvSecretEndpoint;
 
@@ -76,26 +80,20 @@ public class VetsServiceApplication {
 		});
 
 		System.out.println("Checking ENV variable  : |" + "|\n");
+		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" +  System.getenv("SPRING_PROFILES_ACTIVE") + "|\n");		
+		System.out.println("Checking ENV variable SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT : |" + System.getenv("SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT") + "|\n");
+
 
 		System.out.println("Spring log level from config file: " + logLevelSpring);
-
-		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" +  System.getenv("SPRING_PROFILES_ACTIVE") + "|\n");
-		
-		System.out.println("Checking ENV variable SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT : |" + System.getenv("SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT") + "|\n");
-		System.out.println("Checking ENV variable AZURE_KEYVAULT_URI : |" + System.getenv("AZURE_KEYVAULT_URI") + "|\n");
-
-
 		System.out.println("kvSecretEndpoint from config file: " + kvSecretEndpoint);
 		System.out.println("kvSecretPropertySourcesEndpoint from config file: " + kvSecretPropertySourcesEndpoint);
 
 		System.out.println("JDBC URL from config file: " + url);
-		System.out.println("cache name: " + cacheName);
-		System.out.println("SQL Init mode: " + sqlInitMode);
+		System.out.println("cache name from config file: " + cacheName);
+		System.out.println("SQL Init mode from config file: " + sqlInitMode);
 
-		System.out.println("sqlDataSourceInitMode: " + sqlDataSourceInitMode);
-		System.out.println("jpaHibernateDdlAuto: " + jpaHibernateDdlAuto);
-
-		System.out.println("JDBC URL from config file: " + url);
+		System.out.println("sqlDataSourceInitMode from config file: " + sqlDataSourceInitMode);
+		System.out.println("jpaHibernateDdlAuto from config file: " + jpaHibernateDdlAuto);
 		
 
         String systemipaddress = "";

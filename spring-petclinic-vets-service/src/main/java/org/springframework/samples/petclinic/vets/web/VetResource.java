@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.samples.petclinic.vets.model.Vet;
 import org.springframework.samples.petclinic.vets.model.VetRepository;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,8 +41,46 @@ class VetResource {
 
     private final VetRepository vetRepository;
 
+	
+	@Value("${spring.cloud.azure.keyvault.secret.endpoint}")
+    private String kvSecretEndpoint;
+
+	@Value("${spring.cloud.azure.keyvault.secret.property-sources[0].endpoint}")
+    private String kvSecretPropertySourcesEndpoint;
+
+	@Value("${spring.datasource.url}")
+    private String url;
+
+	@Value("${spring.cache.cache-names}")
+    private String cacheName;
+	
+	@Value("${spring.sql.init.mode}")
+    private String sqlInitMode;
+
+	@Value("${spring.sql.datasource.initialization-mode}")
+	private String sqlDataSourceInitMode;
+
+	@Value("${spring.jpa.hibernate.ddl-auto}")
+	private String jpaHibernateDdlAuto;
+
+	@Value("${logging.level.org.springframework}")
+    private String logLevelSpring;
+    
     @GetMapping
     public List<Vet> showResourcesVetList() {
+
+		System.out.println("Spring log level from config file: " + logLevelSpring);
+
+		System.out.println("sqlDataSourceInitMode from config file: " + sqlDataSourceInitMode);
+		System.out.println("jpaHibernateDdlAuto from config file: " + jpaHibernateDdlAuto);
+
+		System.out.println("cache name from config file: " + cacheName);
+		System.out.println("SQL Init mode from config file: " + sqlInitMode);
+
+        System.out.println("kvSecretEndpoint from config file: " + kvSecretEndpoint);
+		System.out.println("kvSecretPropertySourcesEndpoint from config file: " + kvSecretPropertySourcesEndpoint);
+		System.out.println("JDBC URL from config file: " + url);
+		
         return vetRepository.findAll();
     }
 }
