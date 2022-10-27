@@ -425,6 +425,7 @@ jobs:
         #--readiness-probe-config $VETS_SERVICE_READINESS_PROBE_CFG \
         #--termination-grace-period-seconds ${{ env.GRACE_PERIOD }} \
 
+        echo "About to deploy App ..."
         az spring app deploy \
         --name ${{ env.VETS_SERVICE }} \
         --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
