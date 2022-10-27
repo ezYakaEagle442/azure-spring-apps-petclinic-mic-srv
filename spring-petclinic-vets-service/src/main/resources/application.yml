@@ -1,0 +1,183 @@
+spring.cache.cache-names: vets
+
+spring:
+  sql:
+    init:
+      schema-locations: classpath*:db/hsqldb/schema.sql
+      data-locations: classpath*:db/hsqldb/data.sql
+    mode: always
+    config:
+      # Allow the microservices to override the remote properties with their own System properties or config file
+      allow-override: true
+      # Override configuration with any local property source
+      override-none: true
+      auto-refresh: true
+      refresh-interval: 60
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop # create-drop or none
+    # https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.data-initialization.using-basic-sql-scripts
+    # https://stackoverflow.com/questions/28042426/spring-boot-error-creating-bean-with-name-datasource-defined-in-class-path-r
+    # https://www.baeldung.com/spring-boot-data-sql-and-schema-sql
+    defer-datasource-initialization: true
+    # https://facingissuesonit.com/2019/07/15/org-hibernate-hibernateexception-access-to-dialectresolutioninfo-cannot-be-null-when-hibernate-dialect-not-set
+    # database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    # database-platform: org.hibernate.dialect.MySQLDialect
+    database: mysql
+
+  # https://learn.microsoft.com/en-us/azure/spring-apps/how-to-config-server#config-server-refresh
+  cloud:
+    config:
+      auto-refresh: true
+      refresh-interval: 60
+
+# Temporary hack required by the Spring Boot 2 / Spring Cloud Finchley branch
+# Waiting issue https://github.com/spring-projects/spring-boot/issues/13042
+# spring.cloud.refresh.refreshable: false
+
+#azure:
+#  keyvault:
+#    enabled: true
+#    uri: ${AZURE_KEY_VAULT_URI}
+---
+# # https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#configuration-17
+spring:
+  cloud:
+    azure:    
+      #profile: # spring.cloud.azure.profile
+        # subscription-id:
+        # tenant-id: ${SPRING_CLOUD_AZURE_TENANT_ID}
+      #credential:
+        #managed-identity-enabled: true        
+      keyvault:
+        secret:
+          enabled: true
+          property-source-enabled: true
+          # endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+          property-sources:
+            - name: kv-cfg-vets # KV Config for each App Vets-Service
+              endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+              credential:
+                managed-identity-enabled: true
+                client-id: ${VETS_SVC_APP_IDENTITY_CLIENT_ID}
+              #  client-secret: ${AZURE_CLIENT_SECRET} for SPN not for MI
+              # profile:
+              #  tenant-id: ${SPRING_CLOUD_AZURE_TENANT_ID}
+            - name: kv-cfg-visits # KV Config for each App Visits-Service
+              endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+              credential:
+                managed-identity-enabled: true
+                client-id: ${VISITS_SVC_APP_IDENTITY_CLIENT_ID}
+            - name: kv-cfg-customers # KV Config for each App Customers-Service
+              endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+              credential:
+                managed-identity-enabled: true
+                client-id: ${CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID}
+  profiles:
+    active: mysql                
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    schema: classpath*:db/mysql/schema.sql
+    data: classpath*:db/mysql/data.sql
+    # url: jdbc:mysql://localhost:3306/petclinic?useSSL=false
+    # url: jdbc:mysql://petcliaca-mysql-server.mysql.database.azure.com:3306/petclinic?useSSL=true
+    # https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-using-ssl.html
+    # url: jdbc:mysql://petclinic.mysql.database.azure.com:3306/petclinic?useSSL=true&requireSSL=true&enabledTLSProtocols=TLSv1.2&verifyServerCertificate=true
+    
+    # https://docs.spring.io/spring-boot/docs/2.7.3/reference/html/application-properties.html#appendix.application-properties.data
+    # spring.datasource.url, spring.datasource.username and spring.datasource.password will be automatically injected from KV secrets SPRING-DATASOURCE-URL, SPRING-DATASOURCE-USERNAME and SPRING-DATASOURCE-PASSWORD
+    # url: jdbc:mysql://${MYSQL-SERVER-FULL-NAME}:3306/${MYSQL-DATABASE-NAME}?useSSL=true&requireSSL=true&enabledTLSProtocols=TLSv1.2&verifyServerCertificate=true    
+    # username: ${MYSQL-SERVER-ADMIN-LOGIN-NAME} # ${MYSQL_SERVER_ADMIN_LOGIN_NAME}
+    # password: ${MYSQL-SERVER-ADMIN-PASSWORD} # ${MYSQL_SERVER_ADMIN_PASSWORD}
+    
+    initialization-mode: ALWAYS # NEVER
+    # https://javabydeveloper.com/spring-boot-loading-initial-data/
+    platform: mysql
+    #driver-class-name: com.mysql.jdbc.Driver
+---
+# Logging
+logging.level.com.azure.spring.cloud.starter.keyvault.secrets: debug
+logging.level.com.azure.security.keyvault.secrets: debug
+logging.level.org.springframework.samples.petclinic: debug
+
+logging.level.org.hibernate: debug
+logging.level.com.mysql: debug
+logging.level.javax.persistence: INFO
+
+logging.level.org.springframework: INFO
+logging.level.org.springframework.boot.autoconfigure.jdbc: debug
+logging.level.org.springframework.boot.sql.init: debug
+logging.level.org.springframework.data.jpa: debug
+logging.level.org.springframework.jdbc.datasource: debug
+logging.level.org.springframework.boot.jdbc.init.dependency.DataSourceInitializerDetector: debug
+logging.level.org.springframework.boot.jdbc.init.DataSourceScriptDatabaseInitializerDetector: debug
+logging.level.org.springframework.boot.orm.jpa.JpaDataSourceInitializerDetector: debug
+
+logging.level.org.springframework.web: debug
+
+logging.level.com.zaxxer.hikari.HikariDataSource: debug
+logging.level.com.zaxxer.hikari.pool.PoolBase: debug
+
+logging.level.o.s.b.context.config.ConfigDataLoader: debug
+logging.level.org.springframework.boot.context.config.ConfigDataLoader: debug
+logging.level.org.springframework.boot.context.config: debug
+
+logging.level.org.springframework.boot.env.PropertySourceLoader: debug
+logging.level.org.springframework.boot.env.PropertiesPropertySourceLoader: debug
+logging.level.org.springframework.boot.env.YamlPropertySourceLoader: debug
+
+logging.level.org.springframework.context.ApplicationContextInitializer: debug
+logging.level.org.springframework.boot.context.ConfigurationWarningsApplicationContextInitializer: debug
+logging.level.org.springframework.boot.context.ContextIdApplicationContextInitializer: debug
+
+---
+# Metrics: 
+# https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#actuator.metrics
+# https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#actuator.endpoints.exposing
+management:
+  security:
+    enabled: false
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+      # https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#actuator.metrics.export.dynatrace
+      # dynatrace:
+      #   uri: "https://example.live.dynatrace.com/api/v2/metrics/ingest"
+      #   api-token: "YOUR_TOKEN"        
+      # https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#actuator.metrics.export.datadog
+      # datadog:
+      #   api-key: "YOUR_KEY"
+      #   application-key: "YOUR_APPLICATION_KEY"
+
+
+# Chaos Engineering
+---
+spring:
+  config:
+    activate:
+      on-profile: chaos-monkey      
+management.endpoint.chaosmonkey.enabled: true
+chaos:
+  monkey:
+    enabled: true
+    watcher:
+      component: false
+      controller: false
+      repository: false
+      rest-controller: false
+      service: false
