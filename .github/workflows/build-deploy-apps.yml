@@ -54,7 +54,7 @@ env:
   # spring.cloud.azure.keyvault.secret.endpoint
   # SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT / https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#all-configurable-properties
   # -Dspring.cloud.azure.keyvault.secret.property-sources[0].endpoint=https://kv-petcliasa21.vault.azure.net 
-  DEPLOYMENT_JVM_OPTIONS: -Dspring.cloud.azure.keyvault.secret.endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[0].endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[1].endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[2].endpoint=https://kv-petcliasa21.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
+  DEPLOYMENT_JVM_OPTIONS: -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
   
   DEPLOYMENT_VERSION: 2.6.6
   DEPLOYMENT_RUNTIME_VERSION: Java_11
