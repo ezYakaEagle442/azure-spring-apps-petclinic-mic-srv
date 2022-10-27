@@ -1,4 +1,4 @@
-name: Build & Deploy to ASA STAGING Deployments with CLI
+name: Build & Deploy to ASA PRODUCTION Deployments with CLI
 
 ###################################################################################################################
 #
@@ -80,13 +80,13 @@ env:
   # https://github.com/marketplace/actions/azure-spring-apps#arguments
   # Choose either the Blue or Green settings below
   STAGING_DEPLOYMENT_NAME: blue # Deployment name can contain only lowercase letters, numbers and hyphens
-  DEPLOYMENT_STAGING: true
-  DEPLOYMENT_ACTION: deploy
+  # DEPLOYMENT_STAGING: true
+  #  DEPLOYMENT_ACTION: deploy
 
   # Choose either Blue or Green
   PRODUCTION_DEPLOYMENT_NAME: green
-  # DEPLOYMENT_STAGING: false
-  # DEPLOYMENT_ACTION: set-production
+  DEPLOYMENT_STAGING: false
+  DEPLOYMENT_ACTION: set-production
 
   # ==== Secrets ====
   credentials: ${{ secrets.AZURE_CREDENTIALS }}

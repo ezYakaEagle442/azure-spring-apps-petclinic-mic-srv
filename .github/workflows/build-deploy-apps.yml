@@ -66,7 +66,7 @@ env:
   # If set to true and the deployment specified by deployment-name does not exist at execution time, it will be created.
   DEPLOYMENT_CREATE_NEW: true
 
-  # https://github.com/marketplace/actions/azure-spring-cloud#arguments
+  # https://github.com/marketplace/actions/azure-spring-apps#arguments
   # Choose either the Blue or Green settings below
   DEPLOYMENT_NAME: blue # Deployment name can contain only lowercase letters, numbers and hyphens
   DEPLOYMENT_STAGING: true
