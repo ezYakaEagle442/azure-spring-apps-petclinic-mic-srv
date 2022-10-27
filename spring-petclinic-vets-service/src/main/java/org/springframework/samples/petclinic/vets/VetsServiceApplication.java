@@ -42,6 +42,7 @@ public class VetsServiceApplication {
 	
 	public static void main(String[] args) {
 	
+		/*
 		System.out.println("Checking ALL ENV variable  : |" + "|\n");
 		System.getenv().forEach((key, value) -> {
 			System.out.println(key + ":" + value);
@@ -51,7 +52,8 @@ public class VetsServiceApplication {
 		System.getProperties().forEach((key, value) -> {
 			System.out.println(key + ":" + value);
 		});
-
+		 */
+		
 		System.out.println("Checking ENV variable  : |" + "|\n");
 		System.out.println("Checking ENV variable SPRING_PROFILES_ACTIVE : |" +  System.getenv("SPRING_PROFILES_ACTIVE") + "|\n");		
 		System.out.println("Checking ENV variable SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT : |" + System.getenv("SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT") + "|\n");
