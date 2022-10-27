@@ -65,6 +65,7 @@ resource kv 'Microsoft.KeyVault/vaults@2022-07-01' = {
     enableSoftDelete: true
     enableRbacAuthorization: true // /!\ Preview feature: When true, the key vault will use RBAC for authorization of data actions, and the access policies specified in vault properties will be ignored
     // When enabledForDeployment is true, networkAcls.bypass must include \"AzureServices\"
+    // Setting Azure RBAC permission model invalidates all access policies permissions. It can cause outages when equivalent Azure roles aren't assigned.
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
