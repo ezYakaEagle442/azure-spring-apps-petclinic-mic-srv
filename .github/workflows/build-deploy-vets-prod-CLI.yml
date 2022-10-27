@@ -1,4 +1,4 @@
-name: Build & Deploy Vets-Service to ASA PRODUCTION Deployments with CLI
+name: Build & Deploy Vets-Service to ASA STAGING Deployments with CLI
 
 ###################################################################################################################
 #
@@ -31,7 +31,9 @@ env:
   PRJ_PREFIX: asa-spring-petclinic
 
   # ==== Identities ====:
+  CUSTOMERS_SVC_APP_ID_NAME: id-asa-petclinic-customers-service-dev-westeurope-101 # customize this
   VETS_SVC_APP_ID_NAME: id-asa-petclinic-vets-service-dev-westeurope-101 # customize this
+  VISITS_SVC_APP_ID_NAME: id-asa-petclinic-visits-service-dev-westeurope-101 # customize this
 
   # ==== Azure Spring Apps / Apps Deployment params ====:
 
@@ -67,7 +69,7 @@ env:
   # Choose either the Blue or Green settings below
   STAGING_DEPLOYMENT_NAME: blue # Deployment name can contain only lowercase letters, numbers and hyphens
   # DEPLOYMENT_STAGING: true
-  # DEPLOYMENT_ACTION: deploy
+  #  DEPLOYMENT_ACTION: deploy
 
   # Choose either Blue or Green
   PRODUCTION_DEPLOYMENT_NAME: green
@@ -118,6 +120,16 @@ jobs:
         GH_WORKSPACE=${{ github.workspace }} # "/github/workspace"
 
         VETS_SVC_APP_IDENTITY_CLIENT_ID=$(az identity show --name ${{ env.VETS_SVC_APP_ID_NAME }} -g ${{ env.RG_APP }} --query clientId -o tsv)
+        VISITS_SVC_APP_IDENTITY_CLIENT_ID=$(az identity show --name ${{ env.VISITS_SVC_APP_ID_NAME }} -g ${{ env.RG_APP }} --query clientId -o tsv)
+        CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$(az identity show --name ${{ env.CUSTOMERS_SVC_APP_ID_NAME }} -g ${{ env.RG_APP }} --query clientId -o tsv)
+
+        echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_ENV
+        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_ENV
+        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_ENV
+
+        echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_OUTPUT
+        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_OUTPUT
+        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_OUTPUT
 
         echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_ENV
         echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_OUTPUT
@@ -320,7 +332,7 @@ jobs:
         echo "*                                                                                      *"
         echo "*                                                                                      *"
         echo "****************************************************************************************"
-        
+                  
         VETS_SERVICE_STARTUP_PROBE_CFG="spring-petclinic-${{ env.VETS_SERVICE }}/${{ env.DEPLOYMENT_STARTUP_PROBE_CFG }}"
         VETS_SERVICE_LIVENESS_PROBE_CFG="spring-petclinic-${{ env.VETS_SERVICE }}/${{ env.DEPLOYMENT_LIVENESS_PROBE_CFG }}"
         VETS_SERVICE_READINESS_PROBE_CFG="spring-petclinic-${{ env.VETS_SERVICE }}/${{ env.DEPLOYMENT_READINESS_PROBE_CFG }}"
