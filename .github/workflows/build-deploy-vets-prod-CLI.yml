@@ -392,12 +392,12 @@ jobs:
         # Check the value of $?, which contains the result of executing the most recent command/function:
         deployment_not_found=$?
 
-        if [ $deployment_not_found -eq 0 ]; then
-          echo "Found existing deployment $DEPLOYMENT_NAME"
-        else
-          echo "*** THIS SNIPPET SHOULD NEVER BEEN CALLED *** Deployment $DEPLOYMENT_NAME NOT found"
-          # exit 1
-        fi        
+        #if [ $deployment_not_found -eq 0 ]; then
+        #  echo "Found existing deployment $DEPLOYMENT_NAME"
+        #else
+        #  echo "*** THIS SNIPPET SHOULD NEVER BEEN CALLED *** Deployment $DEPLOYMENT_NAME NOT found"
+        #  # exit 1
+        #fi        
       
         # https://github.com/Azure/Azure-Spring-Apps/issues/15
         # --startup-probe-config $VETS_SERVICE_STARTUP_PROBE_CFG \
