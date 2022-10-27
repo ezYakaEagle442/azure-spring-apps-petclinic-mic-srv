@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.samples.YAMLConfig;
+//import org.springframework.samples.YAMLConfig;
 import org.springframework.samples.petclinic.vets.model.Vet;
 import org.springframework.samples.petclinic.vets.model.VetRepository;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,8 +42,8 @@ class VetResource {
 
     private final VetRepository vetRepository;
 
-    @Autowired
-    private YAMLConfig myConfig;
+    //@Autowired
+    //private YAMLConfig myConfig;
 	
 	@Value("${spring.cloud.azure.keyvault.secret.endpoint}")
     private String kvSecretEndpoint;
