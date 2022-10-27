@@ -307,9 +307,16 @@ jobs:
         echo ""
 
         VETS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.build.outputs.VETS_SVC_APP_IDENTITY_CLIENT_ID }}
+        VISITS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.build.outputs.VISITS_SVC_APP_IDENTITY_CLIENT_ID }}
+        CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.build.outputs.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }}
 
         echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID"
+        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"
+        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"
+
         echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
+        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
+        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
 
         # https://learn.microsoft.com/en-us/azure/spring-apps/concept-manage-monitor-app-spring-boot-actuator
         # https://learn.microsoft.com/en-us/azure/spring-apps/how-to-configure-health-probes-graceful-termination
