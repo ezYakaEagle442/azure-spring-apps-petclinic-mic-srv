@@ -285,6 +285,15 @@ jobs:
     - name: Build with Maven
       id: mvn_build
       run: | 
+        echo "****************************************************************************************"
+        echo "*                                                                                      *"
+        echo "*                                                                                      *"
+        echo "* /!\ IMPORTANT WARNING: projects must be built with -Denv=cloud                       *"
+        echo "* EXCEPT for api-gateway                                                               *"
+        echo "*                                                                                      *"
+        echo "*                                                                                      *"
+        echo "****************************************************************************************"
+              
         mvn -B clean package --file pom.xml -DskipTests -Denv=cloud
         
         echo "github.workspace = ${{ github.workspace }}"
