@@ -189,7 +189,7 @@ jobs:
         echo "****************************************************************************************"
         echo "*                                                                                      *"
         echo "*                                                                                      *"
-        echo "* /!\ IMPORTANT WARING: projects must be built with -Denv=cloud                        *"
+        echo "* /!\ IMPORTANT WARNING: projects must be built with -Denv=cloud                        *"
          echo " EXCEPT for api-gateway                                                               *"
         echo "*                                                                                      *"
         echo "*                                                                                      *"
