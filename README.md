@@ -115,7 +115,9 @@ have the CLI extension, you may need to upgrade to the latest
 ### Change directory and build the project with Maven
 
 TODO: add ASA Maven Plugin [https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Spring-Apps:-Deploy](https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Spring-Apps:-Deploy)
- 
+
+<span style="color:red">**/!\ IMPORTANT WARNING: projects must be built with -Denv=cloud  EXCEPT for api-gateway**</span>
+
 ```bash
     cd azure-spring-apps-petclinic-mic-srv
     mvn clean package -DskipTests -Denv=cloud
@@ -601,6 +603,17 @@ eactor.core.Exceptions$ReactiveException: io.netty.handler.ssl.SslHandshakeTimeo
 It means that you may need to upgrade your Spring Boot version to the latest one...
 See
 [https://github.com/netty/netty/issues/12343](https://github.com/netty/netty/issues/12343)
+
+
+If you face this issue :
+```console
+error Caused by: java.net.MalformedURLException: no protocol: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+```
+
+It means that the api-gateway project had been built with mvn -B clean package --file pom.xml -DskipTests **-Denv=cloud**
+This set the env=cloud at in the parent [POM](pom.xml#L246) which then injects the spring-cloud-azure-starter-keyvault-secrets dependency at [POM](pom.xml#L289)
+it looks like event just having such dependency would cause the runtime to look for ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+
 
 ## Next Steps
 
