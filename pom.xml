@@ -187,6 +187,11 @@
             </build>
         </profile>
 
+        <!-- 
+        as This buildDocker Dockerize plugin adds dependencies and is deprecated.
+        Anyway ASA will build the container image so we do not need it.
+        FYI https://www.eclipse.org/jkube/docs/kubernetes-maven-plugin is the next gen plugin.
+        -->
         <profile>
             <id>buildDocker</id>
             <build>
