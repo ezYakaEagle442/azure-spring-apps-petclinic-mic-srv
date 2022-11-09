@@ -125,6 +125,10 @@ TODO: add ASA Maven Plugin [https://github.com/microsoft/azure-maven-plugins/wik
 This will take a few minutes.
 
 
+## Understanding the Spring Petclinic application
+
+![](./docs/microservices-architecture-diagram.jpg)
+
 ## Deploy Azure Spring Apps instance and the petclinic microservices Apps with IaC
 
 See **[Bicep](./iac/bicep/README.md)**
@@ -320,6 +324,14 @@ Resource Group where you created an Azure Spring Apps service instance.
 
 In the Log Analyics page, selects `Logs` blade and run any of the sample queries supplied below 
 for Azure Spring Apps.
+
+
+
+```sh
+LOG_ANALYTICS_WORKSPACE_CLIENT_ID=`az monitor log-analytics workspace show --query customerId -g $RESOURCE_GROUP -n $LOG_ANALYTICS_WORKSPACE --out tsv`
+
+az monitor log-analytics query -w $LOG_ANALYTICS_WORKSPACE_CLIENT_ID  --analytics-query "AppPlatformLogsforSpring | where TimeGenerated > ago(1d) | project TimeGenerated , AppName , Log" -o table > asa.log
+```
 
 Type and run the following Kusto query to see application logs:
 ```sql
