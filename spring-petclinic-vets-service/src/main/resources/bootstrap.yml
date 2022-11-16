@@ -13,6 +13,35 @@ spring:
   #  config:
   #    uri: http://config-server:8888 or http://CloudConfigServerApplication or  https://asa-petcliasa.svc.azuremicroservices.io/eureka/eureka ?
 ---
+# https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#configuration-17
+# https://github.com/Azure/azure-sdk-for-java/issues/28128
+# See Azure KeyVault config doc  https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#basic-usage-3
+# https://github.com/Azure/azure-sdk-for-java/issues/28310
+spring:
+  cloud:
+    azure:    
+      #profile: # spring.cloud.azure.profile
+        # subscription-id:
+        # tenant-id: ${SPRING_CLOUD_AZURE_TENANT_ID}
+      #credential:
+        #managed-identity-enabled: true        
+      keyvault:
+        secret:
+          enabled: true
+          property-source-enabled: true
+          # endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+          property-sources:
+            - name: kv-cfg-vets # KV Config for each App Vets-Service
+              endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+              credential:
+                managed-identity-enabled: true
+                client-id: ${VETS_SVC_APP_IDENTITY_CLIENT_ID}
+              #  client-secret: ${AZURE_CLIENT_SECRET} for SPN not for MI
+              # profile:
+              #  tenant-id: ${SPRING_CLOUD_AZURE_TENANT_ID}
+  profiles:
+    active: mysql    
+---
 management:
   health:
     livenessstate:
