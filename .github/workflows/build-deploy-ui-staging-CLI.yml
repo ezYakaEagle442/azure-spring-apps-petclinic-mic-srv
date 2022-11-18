@@ -10,7 +10,7 @@ name: Build & Deploy UI STAGING Deployments with CLI
 ###################################################################################################################
 
 env:
-  AZ_CLI_VERSION: 2.40.0
+  AZ_CLI_VERSION: 2.42.0
   AZURE_SPRING_APPS_SERVICE: asa-petcliasa # customize this
   KEYVAULT: kv-petcliasa21 # customize this
   RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
@@ -53,7 +53,7 @@ env:
   # -Dspring.cloud.azure.keyvault.secret.property-sources[0].endpoint=https://kv-petcliasa21.vault.azure.net 
   # -Dspring.cloud.azure.keyvault.secret.endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[0].endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[1].endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[2].endpoint=https://kv-petcliasa21.vault.azure.net 
   DEPLOYMENT_JVM_OPTIONS: -Xms512m -Xmx1024m -Dspring.cloud.azure.keyvault.secret.enabled=false -Dspring.cloud.azure.keyvault.secret.property-source-enabled=false
-  DEPLOYMENT_VERSION: 2.6.6
+  DEPLOYMENT_VERSION: 2.6.13
   DEPLOYMENT_RUNTIME_VERSION: Java_11
   DEPLOYMENT_CPU: 500m
   DEPLOYMENT_MEMORY: 1Gi
@@ -234,7 +234,7 @@ jobs:
       run: | 
         # https://learn.microsoft.com/en-us/azure/storage/blobs/blob-cli
 
-        # Runne rwill be blocked by network rules of storage account. Must Allow its IP
+        # Runner will be blocked by network rules of storage account. Must Allow its IP
         # TODO in Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account
 
         echo "About to upload Artifcats to Azure BLOB Storage. /!\ --overwrite' is in preview and under development"
@@ -351,9 +351,9 @@ jobs:
         echo "DEPLOYMENT_NAME="$DEPLOYMENT_NAME
 
         echo "Cheking if any deployment already exist for App ${{ env.API_GATEWAY }} ..."
-        vets_deployment=$(az spring app deployment list --app ${{ env.API_GATEWAY }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }})
+        apigw_deployment=$(az spring app deployment list --app ${{ env.API_GATEWAY }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }})
 
-        if [[ $(echo $vets_deployment | jq -r 'length') -eq 0 ]]
+        if [[ $(echo $apigw_deployment | jq -r 'length') -eq 0 ]]
         then
             echo "There is no existing deployment for ${{ env.API_GATEWAY }}"
         else
