@@ -13,7 +13,7 @@ name: Deploy from BLOB to ASA
 ###################################################################################################################
 
 env:
-  AZ_CLI_VERSION: 2.40.0
+  AZ_CLI_VERSION: 2.42.0
   AZURE_SPRING_APPS_SERVICE: asa-petcliasa # customize this
   KEYVAULT: kv-petcliasa21 # customize this
   RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
@@ -55,7 +55,7 @@ env:
   # SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT / https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#all-configurable-properties
   DEPLOYMENT_JVM_OPTIONS: -Dspring.cloud.azure.keyvault.secret.endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[0].endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[1].endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[2].endpoint=https://kv-petcliasa21.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
   
-  DEPLOYMENT_VERSION: 2.6.6
+  DEPLOYMENT_VERSION: 2.6.13
   DEPLOYMENT_RUNTIME_VERSION: Java_11
   DEPLOYMENT_CPU: 500m
   DEPLOYMENT_MEMORY: 512Mi
