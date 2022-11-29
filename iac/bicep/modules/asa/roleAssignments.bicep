@@ -46,6 +46,9 @@ resource kvSecretsUserRoleAssignmentCustomersService 'Microsoft.Authorization/ro
     principalType: 'ServicePrincipal'
   }
 }
+output customersServiceRoleAssignmentUpdatedOn string = kvSecretsUserRoleAssignmentCustomersService.properties.updatedOn
+output customersServiceRoleAssignmentId string = kvSecretsUserRoleAssignmentCustomersService.id
+output customersServiceRoleAssignmentName string = kvSecretsUserRoleAssignmentCustomersService.name
 
 resource kvSecretsUserRoleAssignmentVetsService 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(kv.id, kvRoleType , asaVetsServicePrincipalId)
@@ -55,6 +58,9 @@ resource kvSecretsUserRoleAssignmentVetsService 'Microsoft.Authorization/roleAss
     principalType: 'ServicePrincipal'
   }
 }
+output vetsServiceRoleAssignmentUpdatedOn string = kvSecretsUserRoleAssignmentVetsService.properties.updatedOn
+output vetsServiceRoleAssignmentId string = kvSecretsUserRoleAssignmentVetsService.id
+output vetsServiceRoleAssignmentName string = kvSecretsUserRoleAssignmentVetsService.name
 
 resource kvSecretsUserRoleAssignmentVisitsService 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(kv.id, kvRoleType , asaVisitsServicePrincipalId)
@@ -64,3 +70,6 @@ resource kvSecretsUserRoleAssignmentVisitsService 'Microsoft.Authorization/roleA
     principalType: 'ServicePrincipal'
   }
 }
+output visitsServiceRoleAssignmentUpdatedOn string = kvSecretsUserRoleAssignmentVisitsService.properties.updatedOn
+output visitsServiceRoleAssignmentId string = kvSecretsUserRoleAssignmentVisitsService.id
+output visitsServiceRoleAssignmentName string = kvSecretsUserRoleAssignmentVisitsService.name

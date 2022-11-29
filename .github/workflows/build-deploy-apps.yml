@@ -274,99 +274,23 @@ jobs:
         cache: maven
 
   # https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
-  # invalid value workflow reference: references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
-  #call-maven-build-workflow:
-  #  name: Trigger Maven
-  #  needs: set-var
-  #  uses: ./.github/workflows/maven-build.yml # .github/workflows/maven-build.yml@main ==> references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
-  #  secrets: inherit # pass all secrets
-  #    # envPAT: ${{ secrets.envPAT }} # pass just this secret
-  
-    - name: Build with Maven
-      id: mvn_build
-      run: | 
-        echo "****************************************************************************************"
-        echo "*                                                                                      *"
-        echo "*                                                                                      *"
-        echo "* /!\ IMPORTANT WARNING: projects must be built with -Denv=cloud                       *"
-        echo "* EXCEPT for api-gateway                                                               *"
-        echo "*                                                                                      *"
-        echo "*                                                                                      *"
-        echo "****************************************************************************************"
-              
-        mvn -B clean package --file pom.xml -DskipTests -Denv=cloud
-        
-        echo "github.workspace = ${{ github.workspace }}"
-        pwd
+  call-maven-build-workflow:
+    name: Trigger Maven for backend services
+    needs: build
+    uses: ./.github/workflows/maven-build.yml # .github/workflows/maven-build.yml@main ==> references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
+    secrets: inherit # pass all secrets
+      # envPAT: ${{ secrets.envPAT }} # pass just this secret
 
-        echo "****************************************************************************************"
-        echo "*                                                                                      *"
-        echo "*                                                                                      *"
-        echo "* Checking Artifacts ...                                                               *"
-        echo "*                                                                                      *"
-        echo "*                                                                                      *"
-        echo "****************************************************************************************"
+  call-maven-build-ui-workflow:
+    name: Trigger Maven for the UI
+    needs: build
+    uses: ./.github/workflows/maven-build-ui.yml
+    secrets: inherit
 
-        ls -al
-        echo ""
-        echo ""
-
-        ls -al spring-petclinic-admin-server/target/*.jar
-        ls -al spring-petclinic-api-gateway/target/*.jar
-        ls -al spring-petclinic-config-server/target/*.jar
-        ls -al spring-petclinic-customers-service/target/*.jar
-        ls -al spring-petclinic-vets-service/target/*.jar
-        ls -al spring-petclinic-visits-service/target/*.jar
-
-    # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts
-    - name: Archive ADMIN-SERVER Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.ADMIN_SERVER }}
-        path: ${{ github.workspace }}/${{ env.ADMIN_SERVER_JAR }}
-        retention-days: 5
-
-    - name: Archive CONFIG-SERVER Jar artifacts
-      uses:  actions/upload-artifact@v3
-      with:
-        name: ${{ env.CONFIG_SERVER }}
-        path: ${{ github.workspace }}/${{ env.CONFIG_SERVER_JAR }}
-        retention-days: 5
-
-    - name: Archive DISCOVERY-SERVER Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.DISCOVERY_SERVER }}
-        path: ${{ github.workspace }}/${{ env.DISCOVERY_SERVER_JAR }}
-        retention-days: 5
-
-    - name: Archive API-GATEWAY Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.API_GATEWAY }}
-        path: ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }}
-        retention-days: 5
-
-    - name: Archive CUSTOMERS-SERVICE Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.CUSTOMERS_SERVICE }}
-        path: ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }}
-        retention-days: 5
-
-    - name: Archive VETS-SERVICE Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.VETS_SERVICE }}
-        path: ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }}
-        retention-days: 5
-
-    - name: Archive VISITS-SERVICE Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.VISITS_SERVICE }}
-        path: ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }}
-        retention-days: 5
+  deploy-apps:
+    needs: [call-maven-build-workflow,call-maven-build-ui-workflow]
+    runs-on: ubuntu-latest # [self-hosted, linux, x64]
+    steps: 
 
     - name: Azure Login
       uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
@@ -381,29 +305,43 @@ jobs:
         sleep 30        
       shell: bash
 
-    - name: Upload Artifacts to Azure BLOB Storage
-      id: blob_upload
+    - name: Download Artifacts from Azure BLOB Storage
+      id: blob_download
       run: | 
         # https://learn.microsoft.com/en-us/azure/storage/blobs/blob-cli
 
-        # Runne rwill be blocked by network rules of storage account. Must Allow its IP
+        # Runner will be blocked by network rules of storage account. Must Allow its IP
         # TODO in Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account
 
-        echo "About to upload Artifcats to Azure BLOB Storage. /!\ --overwrite' is in preview and under development"
-        echo "AZ_BLOB_MAX_CONNECTIONS=${{ env.AZ_BLOB_MAX_CONNECTIONS }}"
-        echo "AZ_BLOB_TIMEOUT=${{ env.AZ_BLOB_TIMEOUT }} "
-        echo "AZ_BLOB_MAX_CONNECTIONS=${{ env.AZ_BLOB_MAX_CONNECTIONS }}"
+        pwd
+        ls -al
 
-        # https://learn.microsoft.com/en-us/rest/api/storageservices/setting-timeouts-for-blob-service-operations
-        az storage blob upload --name ${{ env.ADMIN_SERVER }} --file ${{ github.workspace }}/${{ env.ADMIN_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name ${{ env.CONFIG_SERVER }} --file ${{ github.workspace }}/${{ env.CONFIG_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name ${{ env.DISCOVERY_SERVER }} --file ${{ github.workspace }}/${{ env.DISCOVERY_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name ${{ env.API_GATEWAY }} --file ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name  ${{ env.CUSTOMERS_SERVICE }} --file ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name ${{ env.VETS_SERVICE }} --file ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name  ${{ env.VISITS_SERVICE }} --file ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
+        mkdir ${{ github.workspace }}/${{ env.VETS_SERVICE }}
+        mkdir ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
+        mkdir ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
+        mkdir ${{ github.workspace }}/${{ env.API_GATEWAY }}
 
+        ls -al ${{ github.workspace }}/${{ env.VETS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
 
+        echo "About to download Artifcats from Azure BLOB Storage"
+        # --blob-url  ? https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
+        az storage blob download --name ${{ env.VETS_SERVICE }} --file $VETS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.CUSTOMERS_SERVICE }} --file $CUSTOMERS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.VISITS_SERVICE }} --file $VISITS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.API_GATEWAY }} --file $API_GATEWAY_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+
+        ls -al ${{ github.workspace }}/${{ env.VETS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
+
+        ls -al ${{ env.VETS_SERVICE_PACKAGE_PATH }}
+        ls -al ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}
+        ls -al ${{ env.VISITS_SERVICE_PACKAGE_PATH }}
+        ls -al ${{ env.API_GATEWAY_PACKAGE_PATH }}
 
     - name: Disable local IP access to the Azure BLOB Storage 
       if: ${{ always() }}
@@ -411,20 +349,6 @@ jobs:
         echo "About to REMOVE network-rule ALLOWING $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
         az storage account network-rule remove --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }} -g ${{ env.RG_APP }} --only-show-errors
       shell: bash
-
-  deploy-apps:
-    needs: [build]
-    runs-on: ubuntu-latest # [self-hosted, linux, x64]
-    steps: 
-
-    - name: Azure Login
-      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    # You can  download all artifacts in a workflow run by not specifying a name.
-    - name: Download ALL Jar artifacts
-      uses: actions/download-artifact@v3
 
     - name: Check Artifacts
       run: | 
@@ -453,31 +377,10 @@ jobs:
         echo "*                                                                                      *"
         echo "****************************************************************************************"
 
-        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }}"
-        echo "ADMIN_SERVER_PACKAGE_PATH=${{ needs.build.outputs.ADMIN_SERVER_PACKAGE_PATH }}"
-        echo "CONFIG_SERVER_PACKAGE_PATH=${{ needs.build.outputs.CONFIG_SERVER_PACKAGE_PATH }}"
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
-        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ needs.build.outputs.DISCOVERY_SERVER_PACKAGE_PATH }}"
         echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }}"
         echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }}"
-
-        echo ""
-        ls -al ${{ env.ADMIN_SERVER }}
-        echo ""
-        ls -al ${{ needs.build.outputs.ADMIN_SERVER_PACKAGE_PATH }} # ${{ env.ADMIN_SERVER_PACKAGE_PATH }}
-        echo ""
-
-        echo ""
-        ls -al ${{ env.CONFIG_SERVER }}
-        echo ""
-        ls -al ${{ needs.build.outputs.CONFIG_SERVER_PACKAGE_PATH }} # ${{ env.CONFIG_SERVER_PACKAGE_PATH }}        
-        echo ""
-
-        echo ""
-        ls -al ${{ env.DISCOVERY_SERVER }}
-        echo ""
-        ls -al ${{ needs.build.outputs.DISCOVERY_SERVER_PACKAGE_PATH }} # ${{ env.DISCOVERY_SERVER_PACKAGE_PATH }}          
-        echo ""
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
+        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }}"
 
         echo ""
         ls -al ${{ env.API_GATEWAY }}
@@ -515,7 +418,6 @@ jobs:
         echo "TENANT=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
         echo ""
 
-
         VETS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.build.outputs.VETS_SVC_APP_IDENTITY_CLIENT_ID }}
         VISITS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.build.outputs.VISITS_SVC_APP_IDENTITY_CLIENT_ID }}
         CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.build.outputs.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }}
@@ -537,10 +439,10 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.VETS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }} # ${{ env.VETS_SERVICE_PACKAGE_PATH }}
+        package: ${{ env.VETS_SERVICE_PACKAGE_PATH }}
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
-        environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -VETS_SVC_APP_IDENTITY_CLIENT_ID ${{ env.VETS_SVC_APP_IDENTITY_CLIENT_ID }} ${{ env.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
+        environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -VETS_SVC_APP_IDENTITY_CLIENT_ID ${{ env.VETS_SVC_APP_IDENTITY_CLIENT_ID }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
         deployment-name: ${{ needs.build.outputs.VETS_SERVICE_DEPLOYMENT }} # $VETS_SERVICE_DEPLOYMENT
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
         version: ${{ env.DEPLOYMENT_VERSION }} 
@@ -554,7 +456,7 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.VISITS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }} # ${{ env.VISITS_SERVICE_PACKAGE_PATH }}
+        package: ${{ env.VISITS_SERVICE_PACKAGE_PATH }}
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -VISITS_SVC_APP_IDENTITY_CLIENT_ID ${{ env.VISITS_SVC_APP_IDENTITY_CLIENT_ID }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
@@ -571,7 +473,7 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.CUSTOMERS_SERVICE }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }} # ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}
+        package: ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID ${{ env.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
@@ -588,7 +490,7 @@ jobs:
         service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
         app-name: ${{ env.API_GATEWAY }}
         use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
-        package: ${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }} # ${{ env.API_GATEWAY_PACKAGE_PATH }}
+        package: ${{ env.API_GATEWAY_PACKAGE_PATH }}
         jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
         deployment-name: ${{ needs.build.outputs.API_GATEWAY_DEPLOYMENT }} # $API_GATEWAY_DEPLOYMENT
         create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
