@@ -116,7 +116,7 @@ module roleAssignments './modules/asa/roleAssignments.bicep' = {
     kvRoleType: 'KeyVaultSecretsUser'
     asaCustomersServicePrincipalId: identities.outputs.customersServiceIdentityId
     asaVetsServicePrincipalId: identities.outputs.vetsServiceIdentityId
-    asaVisitsServicePrincipalId: identities.outputs.visitsServiceIdentityIds
+    asaVisitsServicePrincipalId: identities.outputs.visitsServiceIdentityId
   }
   dependsOn: [
     identities
