@@ -306,7 +306,7 @@ jobs:
     # https://github.com/actions/checkout/blob/main/adrs/0153-checkout-v2.md#path
         
     - name: Checkout your repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3.1.0 # https://github.com/actions/checkout
       
     - name: Set up JDK 11
       uses: actions/setup-java@v2

@@ -69,7 +69,7 @@ jobs:
         creds: ${{ env.credentials }} # ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Checkout
-      uses: actions/checkout@v3.0.2 # https://github.com/actions/checkout
+      uses: actions/checkout@v3.1.0 # https://github.com/actions/checkout
 
     - name: Deploy Azure Key Vault      
       # uses: azure/CLI@v1.0.6 # https://github.com/marketplace/actions/azure-cli-action
@@ -148,7 +148,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }} # ${{ env.credentials }}
         
     - name: Checkout
-      uses: actions/checkout@v3.0.2 # https://github.com/actions/checkout
+      uses: actions/checkout@v3.1.0 # https://github.com/actions/checkout
 
     - name: Deploy the pre-req
       run: |
