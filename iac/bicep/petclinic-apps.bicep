@@ -105,6 +105,12 @@ param serviceRegistryName string = 'default' // The resource name 'Azure Spring 
 @description('The Azure Spring Apps Config Server Git URI (The repo must be public).')
 param gitConfigURI string
 
+@description('The MySQL server name')
+param mySQLServerName string = 'petcliasa'
+
+@description('The MySQL administrator Login')
+param mySQLadministratorLogin  string = 'mys_adm'
+
 @description('Allow client workstation to MySQL for local Dev/Test only')
 param clientIPAddress string
 
@@ -191,8 +197,8 @@ module mysqlPub './modules/mysql/mysql.bicep' = {
     clientIPAddress: clientIPAddress
     startIpAddress: startIpAddress
     endIpAddress: endIpAddress
-    serverName: kv.getSecret('MYSQL-SERVER-NAME')
-    administratorLogin: kv.getSecret('SPRING-DATASOURCE-USERNAME')
+    serverName: mySQLServerName
+    administratorLogin: mySQLadministratorLogin
     administratorLoginPassword: kv.getSecret('SPRING-DATASOURCE-PASSWORD') 
     azureSpringAppsOutboundPubIP: ipRules // /!\ has 2 IP separated from a coma, ex: 20.31.114.2,20.238.165.131
   }

@@ -9,6 +9,9 @@ env:
   RG_KV: rg-iac-kv21 # RG where to deploy KV
   RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
   
+  MYSQL_SERVER_NAME: petcliasa
+  MYSQL_ADM_USR: mys_adm
+
   DEPLOY_TO_VNET: false
 
   KV_NAME: kv-petcliasa21 # The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters
@@ -103,6 +106,8 @@ jobs:
             -p clientIPAddress="10.0.0.0" \
             -p startIpAddress="10.0.0.0" \
             -p endIpAddress="10.0.0.255" \
+            -p mySQLServerName=${{ env.MYSQL_SERVER_NAME }} \
+            -p mySQLadministratorLogin=${{ env.MYSQL_ADM_USR }} \
             -p gitConfigURI=${{ env.GIT_CFG_URI }}   
       shell: bash
 

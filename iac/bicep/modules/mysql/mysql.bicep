@@ -6,7 +6,6 @@ param appName string = 'iacdemo${uniqueString(resourceGroup().id)}'
 @description('The location of the MySQL DB.')
 param location string = resourceGroup().location
 
-@secure()
 @description('The MySQL DB Admin Login.')
 param administratorLogin string = 'mys_adm'
 
@@ -14,7 +13,6 @@ param administratorLogin string = 'mys_adm'
 @description('The MySQL DB Admin Password.')
 param administratorLoginPassword string
 
-@secure()
 @description('The MySQL DB Server name.')
 param serverName string
 
