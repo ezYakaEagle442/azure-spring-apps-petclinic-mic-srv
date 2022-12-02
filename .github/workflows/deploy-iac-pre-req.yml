@@ -17,6 +17,7 @@ env:
   SPN_APP_NAME: gha_asa_run # A Service Principal required for GitHub Action Runner
 
   # ==== Secrets ====
+  SPN_APP_ID: ${{ secrets.SPN_APP_ID }} # A Service Principal required for GitHub Action Runner
 
   # https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#consume-secrets-in-your-workflow
   # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-secrets
@@ -152,15 +153,13 @@ jobs:
     - name: Deploy the pre-req
       run: |
           # --debug # --what-if to test like a dry-run
-
-          SPN_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${{ env.SPN_APP_NAME }}'].{id:appId}" --output tsv)
           
           az deployment group create --name asa-petclinic-pre-req -f iac/bicep/pre-req.bicep -g ${{ env.RG_APP }} \
             -p appName=${{ env.APP_NAME }} \
             -p location=${{ env.LOCATION }} \
             -p kvName=${{ env.KV_NAME }} \
             -p kvRGName=${{ env.RG_KV }} \
-            -p ghRunnerSpnPrincipalId= $SPN_ID \
+            -p ghRunnerSpnPrincipalId=${{ env.SPN_APP_ID }} \
             -p deployToVNet=${{ env.DEPLOY_TO_VNET }}
               
       shell: bash

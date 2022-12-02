@@ -151,8 +151,7 @@ SELECT name FROM mysql.time_zone_name;
 ### Understand the Spring Cloud Config
 
 Read [https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-setup-config-server?tabs=Azure-portal&pivots=programming-language-java](https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-setup-config-server?tabs=Azure-portal&pivots=programming-language-java)
-<!-- https://www.canchito-dev.com/public/blog/2019/07/22/spring-cloud-config-server-and-client-side-support-for-externalized-configuration/ >
--->
+
 
 Spring Boot is a framework aimed to help developers to easily create and build stand-alone, production-grade Spring based Applications that you can “just run”.
 
@@ -164,8 +163,17 @@ In other words, the Spring Cloud Config Server is simply a Spring Boot applicati
 
 A Spring Boot application properly configured, can take immediate advantage of the Spring Config Server. It also picks up some additional useful features related to Environment change events. Any Spring Boot application can easily be configured as a Spring Cloud Config Client.
 
+### Understand the Spring Cloud Discovery Server
+see :
+- [https://spring.io/guides/gs/service-registration-and-discovery](https://spring.io/guides/gs/service-registration-and-discovery/)
+- [https://spring.io/projects/spring-cloud-netflix](https://spring.io/projects/spring-cloud-netflix)
 
+Spring Cloud Netflix provides Netflix OSS integrations for Spring Boot apps through autoconfiguration and binding to the Spring Environment and other Spring programming model idioms. With a few simple annotations, you can quickly enable and configure the common patterns inside your application and build large distributed systems with battle-tested Netflix components. The patterns provided include Service Discovery (Eureka).
 
+Features
+Spring Cloud Netflix features:
+- Service Discovery: Eureka instances can be registered and clients can discover the instances using Spring-managed beans
+- Service Discovery: an embedded Eureka server can be created with declarative Java configuration
 
 ### Deploy Spring Boot applications and set environment variables
 
@@ -343,10 +351,10 @@ Type and run the following Kusto query to see application logs:
 
 Type and run the following Kusto query to see `customers-service` application logs:
 ```sql
-    AppPlatformLogsforSpring 
-    | where AppName has "customers"
-    | limit 500
-    | sort by TimeGenerated
+        AppPlatformLogsforSpring 
+        | where AppName has "customers"
+        | limit 500
+        | sort by TimeGenerated
 ```
 
 Type and run the following Kusto query  to see errors and exceptions thrown by each app:
@@ -408,8 +416,7 @@ Read those doc/samples below :
 <!-- https://learn.microsoft.com/en-us/azure/spring-apps/tutorial-managed-identities-key-vault?tabs=system-assigned-managed-identity -->
 To use managed identity for Azure Spring Apps apps, add properties with the following content to src/main/resources/application.properties.
 ```bash
-azure.keyvault.enabled=true
-azure.keyvault.uri=${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT} # https://<your-keyvault-name>.vault.azure.net
+
 ```
 
 
@@ -507,6 +514,7 @@ env:
 
 ```
 
+TODO : Deployment order : SVC then UI
 
 Once you push this change, you will see GitHub Actions triggered to build and deploy all the apps in the repo to your Azure Spring Apps instance.
 ![](./media/automate-deployments-using-github-actions.png)
