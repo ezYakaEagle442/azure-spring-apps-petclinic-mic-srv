@@ -54,6 +54,22 @@ param logAnalyticsWorkspaceName string = 'log-${appName}'
 
 param appInsightsName string = 'appi-${appName}'
 
+
+@description('The Azure Spring Apps instance name')
+param azureSpringAppsInstanceName string = 'asa-${appName}'
+
+@description('The Storage Account name')
+param azureStorageName string = 'stasa${appName}'
+
+@description('The BLOB Storage service name')
+param azureBlobServiceName string = 'default'
+
+@description('The BLOB Storage Container name')
+param blobContainerName string = '${appName}-blob'
+
+@description('the GitHub Runner Service Principal Id')
+param ghRunnerSpnPrincipalId string
+
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.operationalinsights/workspaces?tabs=bicep
 resource logAnalyticsWorkspace  'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: logAnalyticsWorkspaceName
@@ -101,6 +117,20 @@ module roleAssignments './modules/asa/roleAssignments.bicep' = {
     asaCustomersServicePrincipalId: identities.outputs.customersServicePrincipalId
     asaVetsServicePrincipalId: identities.outputs.vetsServicePrincipalId
     asaVisitsServicePrincipalId: identities.outputs.visitsServicePrincipalId
+  }
+  dependsOn: [
+    identities
+  ] 
+}
+
+module storage './modules/asa/storage.bicep' = {
+  name: 'storage'
+  params: {
+    blobContainerName: blobContainerName
+    azureBlobServiceName: azureBlobServiceName
+    azureStorageName: azureStorageName
+    azureSpringAppsInstanceName: azureSpringAppsInstanceName
+    ghRunnerSpnPrincipalId: ghRunnerSpnPrincipalId
   }
   dependsOn: [
     identities
