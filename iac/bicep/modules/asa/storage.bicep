@@ -32,6 +32,7 @@ param blobContainerName string = '${appName}-blob'
 @description('Azure Blob Storage Built-in role to assign')
 param storageBlobRoleType string = 'StorageBlobDataContributor'
 
+@description('the GitHub Runner Service Principal Id')
 param ghRunnerSpnPrincipalId string
 
 @description('The Identity Tags. See https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources?tabs=bicep#apply-an-object')
