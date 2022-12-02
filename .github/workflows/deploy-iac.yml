@@ -52,7 +52,7 @@ on:
 jobs:
  
   call-pre-req-workflow:
-    name: Trigger Maven
+    name: Trigger Pre-Req
     uses: ./.github/workflows/deploy-iac-pre-req.yml
     secrets: inherit
 
