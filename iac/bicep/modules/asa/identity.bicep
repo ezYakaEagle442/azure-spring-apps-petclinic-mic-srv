@@ -67,7 +67,7 @@ resource vetsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2
   tags: tags
 }
 output vetsServiceIdentityId string = vetsServiceIdentity.id
-output vetsServicePrincipalId string = vetsServiceAppIdentity.properties.principalId
+output vetsServicePrincipalId string = vetsServiceIdentity.properties.principalId
 
 resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
   name: visitsServiceAppIdentityName
