@@ -61,12 +61,12 @@ resource customersServicedentity 'Microsoft.ManagedIdentity/userAssignedIdentiti
 output customersServiceIdentityId string = customersServicedentity.id
 output customersServicePrincipalId string = customersServicedentity.properties.principalId
 
-resource vetsServiceAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
+resource vetsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
   name: vetsServiceAppIdentityName
   location: location
   tags: tags
 }
-output vetsServiceAppIdentityId string = vetsServiceAppIdentity.id
+output vetsServiceIdentityId string = vetsServiceIdentity.id
 output vetsServicePrincipalId string = vetsServiceAppIdentity.properties.principalId
 
 resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
