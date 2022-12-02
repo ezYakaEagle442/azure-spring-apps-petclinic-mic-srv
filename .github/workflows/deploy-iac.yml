@@ -119,8 +119,8 @@ jobs:
 
     - name: Configure DB
       run: |
-            az mysql flexible-server parameter set -g ${{ env.RG_APP }} \
-            -s ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com --name time_zone --value ${{ env.MYSQL_TIME_ZONE }}
+            az mysql flexible-server parameter set --name time_zone --value ${{ env.MYSQL_TIME_ZONE }} \
+            -s ${{ env.MYSQL_SERVER_NAME }} -g ${{ env.RG_APP }}
 
             # https://dev.mysql.com/doc/refman/8.0/en/charset-unicode-sets.html
             az mysql flexible-server parameter set --name character_set_server --value ${{ env.MYSQL_CHARACTER_SET }} \
