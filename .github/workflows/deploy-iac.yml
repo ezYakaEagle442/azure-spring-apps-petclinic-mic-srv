@@ -11,6 +11,9 @@ env:
   
   MYSQL_SERVER_NAME: petcliasa
   MYSQL_ADM_USR: mys_adm
+  MYSQL_TIME_ZONE: Europe/Paris
+  MYSQL_CHARACTER_SET: utf8
+  MYSQL_PORT: 3306
 
   DEPLOY_TO_VNET: false
 
@@ -30,8 +33,11 @@ env:
   # the specific secret value. For example, do not use a blob of JSON, XML, or YAML (or similar) to encapsulate a secret value, 
   # as this significantly reduces the probability the secrets will be properly redacted. Instead, create individual secrets for each sensitive value.
 
+  MYSQL_ADM_PWD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+
   SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT: ${{ secrets.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}
   SPRING_CLOUD_AZURE_TENANT_ID: ${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }}
+  
   VM_ADMIN_USER_NAME: ${{ secrets.VM_ADMIN_USER_NAME }}
   VM_ADMIN_PASSWORD: ${{ secrets.VM_ADMIN_PASSWORD }}
 
@@ -72,7 +78,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3.1.0 # https://github.com/actions/checkout
 
-    - name: Deploy Azure Spring Apps
+    - name: Create Azure Spring Apps
       run: |
 
           # If you're deploying Azure Spring Apps Enterprise tier for the first time in the target subscription, 
@@ -109,6 +115,32 @@ jobs:
             -p mySQLServerName=${{ env.MYSQL_SERVER_NAME }} \
             -p mySQLadministratorLogin=${{ env.MYSQL_ADM_USR }} \
             -p gitConfigURI=${{ env.GIT_CFG_URI }}   
+      shell: bash
+
+    - name: Configure DB
+      run: |
+            az mysql flexible-server parameter set -g ${{ env.RG_APP }} \
+            -s ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com --name time_zone --value ${{ env.MYSQL_TIME_ZONE }}
+
+            # https://dev.mysql.com/doc/refman/8.0/en/charset-unicode-sets.html
+            az mysql flexible-server parameter set --name character_set_server --value ${{ env.MYSQL_CHARACTER_SET }} \
+            -g ${{ env.RG_APP }} -s ${{ env.MYSQL_SERVER_NAME }}
+
+            sudo apt install mysql-client-core-8.0
+            # https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-connection-using-parameters.html
+            mysql -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }}
+
+            \. spring-petclinic-vets-service/src/main/resources/db/mysql/schema.sql
+            \. spring-petclinic-vets-service/src/main/resources/db/mysql/data.sql
+
+            \. spring-petclinic-customers-service/src/main/resources/db/mysql/schema.sql
+            \. spring-petclinic-customers-service/src/main/resources/db/mysql/data.sql
+
+            \. spring-petclinic-visits-service/src/main/resources/db/mysql/schema.sql
+            \. spring-petclinic-visits-service/src/main/resources/db/mysql/data.sql
+
+            quit
+
       shell: bash
 
     # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
