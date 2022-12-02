@@ -10,6 +10,12 @@ env:
   RG_KV: rg-iac-kv21 # RG where to deploy KV
   RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ACA, ACA Env., MySQL, etc.
 
+  # ==== Azure storage to store Artifacts , values must be consistent with the ones in storage.bicep ====:
+  AZ_STORAGE_NAME : stasapetcliasa # customize this
+  AZ_BLOB_CONTAINER_NAME: petcliasa-blob # customize this
+  # AZ_BLOB_SVC_NAME: default # MUST NOT BE MODIFIED
+  # https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.13.jar
+
   # ==== APPS ====
   PRJ_PREFIX: asa-spring-petclinic
 
@@ -37,10 +43,6 @@ env:
 
 on:
   workflow_call:
-    outputs:
-      tag_id:
-        description: "The Maven Build job output"
-        value: ${{ jobs.maven-build.outputs.tag_id }}
 
   push:
     branches:
@@ -64,8 +66,6 @@ on:
 jobs:
   maven-build:
     runs-on: ubuntu-latest
-    outputs:
-      tag_id: ${{ steps.mvn_build.outputs.tag_id }}
 
     steps:
     - uses: actions/checkout@v2
@@ -90,7 +90,7 @@ jobs:
         echo "*                                                                                      *"
         echo "****************************************************************************************"
 
-        mvn -B clean package --file pom.xml -DskipTests
+        mvn -B clean package --file pom.xml -DskipTests --projects spring-petclinic-api-gateway -rf :asa-spring-petclinic-api-gateway
         
         echo "github.workspace = ${{ github.workspace }}"
         pwd
@@ -98,24 +98,69 @@ jobs:
         ls -al
         ls -al spring-petclinic-api-gateway/target/*.jar
 
-        tag_id=$GITHUB_SHA
-        echo "GITHUB_RUN_ID="$GITHUB_RUN_ID
-        echo "GITHUB_SHA="$GITHUB_SHA
-        echo "run_id="${{ github.run_id }}
-        echo "github.sha="${{ github.sha }}
-        
-        echo "tag_id="$tag_id
-        SHORT_SHA=`echo $GITHUB_SHA | cut -c1-8`
-        echo "SHORT_SHA="$SHORT_SHA
+    - name: Azure Login
+      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-        tag_id=$SHORT_SHA
-        echo "tag_id="$tag_id
+    - name: Authorize local IP access to the Azure BLOB Storage 
+      if: ${{ always() }}
+      run: |
+        echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
+        az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }}  --only-show-errors
+        sleep 30        
+      shell: bash
 
-        # The `set-output` command is deprecated and will be disabled soon. 
-        # see: https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/
-        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
-        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
-        
-        # echo "::set-output name=tag_id::$tag_id"
-        echo "tag_id=$tag_id" >> $GITHUB_ENV
-        echo "tag_id=$tag_id" >> $GITHUB_OUTPUT
+    - name: Upload Artifacts to Azure BLOB Storage
+      id: blob_upload
+      run: | 
+        # https://learn.microsoft.com/en-us/azure/storage/blobs/blob-cli
+
+        # Runner will be blocked by network rules of storage account. Must Allow its IP
+        # TODO in Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account
+
+         az config set extension.use_dynamic_install=yes_without_prompt
+        echo "About to upload Artifcats to Azure BLOB Storage. /!\ --overwrite' is in preview and under development"
+        echo "AZ_BLOB_MAX_CONNECTIONS=${{ env.AZ_BLOB_MAX_CONNECTIONS }}"
+        echo "AZ_BLOB_TIMEOUT=${{ env.AZ_BLOB_TIMEOUT }} "
+        echo "AZ_BLOB_MAX_CONNECTIONS=${{ env.AZ_BLOB_MAX_CONNECTIONS }}"
+
+        # https://learn.microsoft.com/en-us/rest/api/storageservices/setting-timeouts-for-blob-service-operations
+        az storage blob upload --name ${{ env.API_GATEWAY }} --file ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
+
+    - name: Disable local IP access to the Azure BLOB Storage 
+      if: ${{ always() }}
+      run: |
+        echo "About to REMOVE network-rule ALLOWING $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
+        az storage account network-rule remove --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }} -g ${{ env.RG_APP }} --only-show-errors
+      shell: bash
+
+    # https://docs.github.com/en/packages/learn-github-packages/introduction-to-github-packages
+    # To authenticate to a GitHub Packages registry within a GitHub Actions workflow, you can use
+    # GITHUB_TOKEN to publish packages associated with the workflow repository.
+
+    # https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry
+    # https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-maven#publishing-packages-to-github-packages
+    # Publish the package
+    # https://stackoverflow.com/questions/57711558/deploy-to-github-package-registry-from-github-action
+    # https://github.com/marketplace/actions/generate-settings-xml-for-maven-builds
+    # https://maven.apache.org/plugins/maven-deploy-plugin/deploy-mojo.html#altDeploymentRepository
+    - name:  Publish the package
+      run: |
+        mkdir -p ~/.m2
+        echo "<settings><servers><server><id>github-asc</id><username>$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $1}')</username><password>\${env.GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
+        REPO="github-asa::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}"
+
+        # mvn deploy -DaltReleaseDeploymentRepository="${REPO}" -DaltSnapshotDeploymentRepository="${REPO}" --batch-mode -DskipTests -Dmaven.install.skip=true
+      env:
+        GITHUB_TOKEN: ${{ secrets.PKG_PAT }}
+
+    # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
+    # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners
+    # if the runner is self-hosted which is not github provided it is recommended to manually logout at the end of the workflow as shown below.
+    - name: Azure Logout security hardening
+      run: |
+          az logout
+          az cache purge
+          az account clear
+      shell: bash
