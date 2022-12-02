@@ -27,10 +27,6 @@ env:
   # the specific secret value. For example, do not use a blob of JSON, XML, or YAML (or similar) to encapsulate a secret value, 
   # as this significantly reduces the probability the secrets will be properly redacted. Instead, create individual secrets for each sensitive value.
 
-  #MYSQL_SERVER_FULL_NAME: ${{ secrets.MYSQL_SERVER_FULL_NAME }}
-  #SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
-  #SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
-  #SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
   SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT: ${{ secrets.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}
   SPRING_CLOUD_AZURE_TENANT_ID: ${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }}
   VM_ADMIN_USER_NAME: ${{ secrets.VM_ADMIN_USER_NAME }}
@@ -46,204 +42,25 @@ env:
   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   # ==== Versions ====
-  DEPLOYMENT_VERSION: 2.6.6
-  AZ_CLI_VERSION: 2.40.0
+  DEPLOYMENT_VERSION: 2.6.13
+  AZ_CLI_VERSION: 2.42.0
   JAVA_VERSION: 11
 
 on:
   workflow_dispatch:
-  
-    # inputs: # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_dispatchinputs
-    #  tag_id:
-    #    description: the Image Tag ID
-    #    required: true
-    #    type: string
 
 jobs:
-  deploy-kv:
-    runs-on: ubuntu-latest
-    steps:
-
-    # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
-    # /!\ IMPORTANT: The step that creates or updates the environment variable does not have access to the new value, but all subsequent steps in a job will have access.
-    - name: Set Base environment variables
-      run: |
-        echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV     
-      shell: bash
-
-    - name: Login with GHA Runner SP
-      uses: azure/login@v1.4.6 # fails https://github.com/marketplace/actions/azure-login
-      with:
-        creds: ${{ env.credentials }} # ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Checkout
-      uses: actions/checkout@v3.0.2 # https://github.com/actions/checkout
-
-    - name: Deploy Azure Key Vault      
-      # uses: azure/CLI@v1.0.6 # https://github.com/marketplace/actions/azure-cli-action
-      # with:
-        #azcliversion: ${{ env.AZ_CLI_VERSION }}
-        # inlineScript: |
-      shell: bash
-      run: |
-          pwd
-          ls -al
-          # /home/runner/work/asa-java-petclinic-mic-srv/asa-java-petclinic-mic-srv/.
-          
-          az deployment group create --name asa-petclinic-kv -f iac/bicep/modules/kv/kv.bicep -g ${{ env.RG_KV }} \
-            -p appName=${{ env.APP_NAME }} \
-            -p kvName=${{ env.KV_NAME }} \
-            -p location=${{ env.LOCATION }}
-
-    # Allow GH Runner to access KV
-    # When Public access is disabled on KV, you need to add a network rule in the KV Firewall
-    - name: Authorize local IP to access the Azure Key Vault
-      run: |
-          az keyvault network-rule add --ip-address $LOCAL_IP --name ${{ env.KV_NAME }} --only-show-errors
-          sleep 30
-      shell: bash
-
-    # Now that GH Runner is Allowed to access KV, create the secrets
-    - name: Create MYSQL-SERVER-NAME secret in Azure Key Vault
-      run: |
-          az deployment group create --name asa-petclinic-kv-server-name -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
-            -p appName=${{ env.APP_NAME }} \
-            -p kvName=${{ env.KV_NAME }} \
-            -p secretName="MYSQL-SERVER-NAME" \
-            -p secretValue=${{ secrets.MYSQL_SERVER_NAME }} \
-            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}          
-      shell: bash
-
-    - name: Create MYSQL-SERVER-FULL-NAME secret in Azure Key Vault
-      run: |
-          az deployment group create --name asa-petclinic-kv-server-full-name -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
-            -p appName=${{ env.APP_NAME }} \
-            -p kvName=${{ env.KV_NAME }} \
-            -p secretName="MYSQL-SERVER-FULL-NAME" \
-            -p secretValue=${{ secrets.MYSQL_SERVER_FULL_NAME }} \
-            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
-      shell: bash
-
-    - name: Create SPRING-DATASOURCE-USERNAME secret in Azure Key Vault
-      run: |
-          az deployment group create --name asa-petclinic-kv-db-usr -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
-            -p appName=${{ env.APP_NAME }} \
-            -p kvName=${{ env.KV_NAME }} \
-            -p secretName="SPRING-DATASOURCE-USERNAME" \
-            -p secretValue=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
-            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
-      shell: bash
-
-    - name: Create SPRING-DATASOURCE-PASSWORD secret in Azure Key Vault
-      run: |
-          az deployment group create --name asa-petclinic-kv-db-pwd -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
-            -p appName=${{ env.APP_NAME }} \
-            -p kvName=${{ env.KV_NAME }} \
-            -p secretName="SPRING-DATASOURCE-PASSWORD" \
-            -p secretValue=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
-            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
-      shell: bash
-
-    - name: Create SPRING-DATASOURCE-URL secret in Azure Key Vault
-      run: |
-          az deployment group create --name asa-petclinic-kv-db-url -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
-            -p appName=${{ env.APP_NAME }} \
-            -p kvName=${{ env.KV_NAME }} \
-            -p secretName="SPRING-DATASOURCE-URL" \
-            -p secretValue=${{ secrets.SPRING_DATASOURCE_URL }} \
-            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
-      shell: bash
-
-    - name: Create SPRING-CLOUD-AZURE-KEY-VAULT-ENDPOINT secret in Azure Key Vault
-      run: |
-          az deployment group create --name asa-petclinic-kv-endpoint -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
-            -p appName=${{ env.APP_NAME }} \
-            -p kvName=${{ env.KV_NAME }} \
-            -p secretName="SPRING-CLOUD-AZURE-KEY-VAULT-ENDPOINT" \
-            -p secretValue=${{ secrets.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} \
-            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
-      shell: bash
-
-    - name: Create SPRING-CLOUD-AZURE-TENANT-ID secret in Azure Key Vault
-      run: |
-          az deployment group create --name asa-petclinic-kv-tenant -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
-            -p appName=${{ env.APP_NAME }} \
-            -p kvName=${{ env.KV_NAME }} \
-            -p secretName="SPRING-CLOUD-AZURE-TENANT-ID" \
-            -p secretValue=${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }} \
-            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }} 
-      shell: bash
-
-    - name: Create VM-ADMIN-USER-NAME secret in Azure Key Vault
-      if: ${{ env.DEPLOY_TO_VNET }} 
-      run: |
-          az deployment group create --name asa-petclinic-kv-vm-usr -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
-            -p appName=${{ env.APP_NAME }} \
-            -p kvName=${{ env.KV_NAME }} \
-            -p secretName="VM-ADMIN-USER-NAME" \
-            -p secretValue=${{ secrets.VM_ADMIN_USER_NAME }} \
-            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
-      shell: bash
-
-    - name: Create VM-ADMIN-PASSWORD secret in Azure Key Vault
-      if: ${{ env.DEPLOY_TO_VNET }}
-      run: |
-          az deployment group create --name asa-petclinic-kv-vm-pwd -f iac/bicep/modules/kv/kv_sec_key.bicep -g ${{ env.RG_KV }} \
-            -p appName=${{ env.APP_NAME }} \
-            -p kvName=${{ env.KV_NAME }} \
-            -p secretName="VM-ADMIN-PASSWORD" \
-            -p secretValue=${{ secrets.VM_ADMIN_PASSWORD }} \
-            -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
-      shell: bash
-
-    - name: Disable local IP access to the Key Vault
-      if: ${{ always() }}
-      run: |
-          az keyvault network-rule remove --ip-address $LOCAL_IP --name ${{ env.KV_NAME }} --only-show-errors
-      shell: bash
-
-  deploy-iac:
-    runs-on: ubuntu-latest
-    needs: deploy-kv
-    steps:
-
-    - name: Set Base environment variables
-      run: |
-        echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV     
-      shell: bash
-
-    - name: Login with GHA Runner SP
-      uses: azure/login@v1.4.6 # fails https://github.com/marketplace/actions/azure-login
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }} # ${{ env.credentials }}
-        
-    - name: Checkout
-      uses: actions/checkout@v3.0.2 # https://github.com/actions/checkout
-
-    - name: Deploy the pre-req
-      run: |
-          # --debug # --what-if to test like a dry-run
-          az deployment group create --name asa-petclinic-pre-req -f iac/bicep/pre-req.bicep -g ${{ env.RG_APP }} \
-            -p appName=${{ env.APP_NAME }} \
-            -p location=${{ env.LOCATION }} \
-            -p kvName=${{ env.KV_NAME }} \
-            -p kvRGName=${{ env.RG_KV }} \
-            -p deployToVNet=${{ env.DEPLOY_TO_VNET }}
-              
-      shell: bash
-
-    - name: Azure Logout security hardening
-      run: |
-          az logout
-          az cache purge
-          az account clear             
-      shell: bash
+ 
+  call-pre-req-workflow:
+    name: Trigger Maven
+    uses: ./.github/workflows/deploy-iac-pre-req.yml
+    secrets: inherit
 
   # https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
   # invalid value workflow reference: references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
   call-maven-build-workflow:
     name: Trigger Maven
-    needs: deploy-iac
+    needs: [call-pre-req-workflow]
     uses: ./.github/workflows/maven-build.yml # .github/workflows/maven-build.yml@main ==> references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
     secrets: inherit # pass all secrets
       # envPAT: ${{ secrets.envPAT }} # pass just this secret
@@ -263,12 +80,6 @@ jobs:
 
     - name: Deploy Azure Spring Apps
       run: |
-
-          # https://docs.github.com/en/actions/using-jobs/defining-outputs-for-jobs
-          echo "Checking tag_id output ... " ${{ needs.call-maven-build-workflow.outputs.tag_id }}
-          tag_id=${{ needs.call-maven-build-workflow.outputs.tag_id }}
-          echo "Tag ID:"$tag_id
-          echo "Image Build tag ID from {{ env.tag_id }} "${{ env.tag_id }}
 
           # If you're deploying Azure Spring Apps Enterprise tier for the first time in the target subscription, 
           # use the following commands to register the provider and accept the legal terms and privacy statements for the Enterprise tier
