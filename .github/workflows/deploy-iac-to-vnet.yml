@@ -25,10 +25,6 @@ env:
   # the specific secret value. For example, do not use a blob of JSON, XML, or YAML (or similar) to encapsulate a secret value, 
   # as this significantly reduces the probability the secrets will be properly redacted. Instead, create individual secrets for each sensitive value.
 
-  #MYSQL_SERVER_FULL_NAME: ${{ secrets.MYSQL_SERVER_FULL_NAME }}
-  #SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
-  #SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
-  #SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
   SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT: ${{ secrets.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}
   SPRING_CLOUD_AZURE_TENANT_ID: ${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }}
   VM_ADMIN_USER_NAME: ${{ secrets.VM_ADMIN_USER_NAME }}
@@ -44,8 +40,8 @@ env:
   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   # ==== Versions ====
-  DEPLOYMENT_VERSION: 2.6.6
-  AZ_CLI_VERSION: 2.40.0
+  DEPLOYMENT_VERSION: 2.6.13
+  AZ_CLI_VERSION: 2.42.0
   JAVA_VERSION: 11
 
 on:
@@ -209,12 +205,6 @@ jobs:
     steps:
     - name: Deploy Azure Spring Apps
       run: |
-
-          # https://docs.github.com/en/actions/using-jobs/defining-outputs-for-jobs
-          echo "Checking tag_id output ... " ${{ needs.call-maven-build-workflow.outputs.tag_id }}
-          tag_id=${{ needs.call-maven-build-workflow.outputs.tag_id }}
-          echo "Tag ID:"$tag_id
-
           # If you're deploying Azure Spring Apps Enterprise tier for the first time in the target subscription, 
           # use the following commands to register the provider and accept the legal terms and privacy statements for the Enterprise tier
           echo "see Azure Spring Apps Enterprise tier pre-req at https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-standard#prerequisites"
