@@ -56,17 +56,8 @@ jobs:
     uses: ./.github/workflows/deploy-iac-pre-req.yml
     secrets: inherit
 
-  # https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
-  # invalid value workflow reference: references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
-  call-maven-build-workflow:
-    name: Trigger Maven
-    needs: [call-pre-req-workflow]
-    uses: ./.github/workflows/maven-build.yml # .github/workflows/maven-build.yml@main ==> references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
-    secrets: inherit # pass all secrets
-      # envPAT: ${{ secrets.envPAT }} # pass just this secret
-
-  deploy-apps:
-    needs: call-maven-build-workflow
+  create-apps:
+    needs: call-pre-req-workflow
     runs-on: ubuntu-latest
             
     steps:
