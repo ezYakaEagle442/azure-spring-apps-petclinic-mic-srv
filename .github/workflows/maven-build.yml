@@ -103,7 +103,7 @@ jobs:
         ls -al
         #ls -al spring-petclinic-admin-server/target/*.jar
         #ls -al spring-petclinic-api-gateway/target/*.jar
-        #ls -al spring-petclinic-config-server/target/*.jar
+        ls -al spring-petclinic-config-server/target/*.jar
         ls -al spring-petclinic-customers-service/target/*.jar
         ls -al spring-petclinic-vets-service/target/*.jar
         ls -al spring-petclinic-visits-service/target/*.jar
