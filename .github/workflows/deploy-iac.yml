@@ -117,38 +117,6 @@ jobs:
             -p gitConfigURI=${{ env.GIT_CFG_URI }}   
       shell: bash
 
-    - name: Configure DB
-      run: |
-            az mysql flexible-server parameter set --name time_zone --value ${{ env.MYSQL_TIME_ZONE }} \
-            -s ${{ env.MYSQL_SERVER_NAME }} -g ${{ env.RG_APP }}
-
-            # https://dev.mysql.com/doc/refman/8.0/en/charset-unicode-sets.html
-            az mysql flexible-server parameter set --name character_set_server --value ${{ env.MYSQL_CHARACTER_SET }} \
-            -g ${{ env.RG_APP }} -s ${{ env.MYSQL_SERVER_NAME }}
-
-            LOCAL_IP=$(curl whatismyip.akamai.com)
-            az mysql flexible-server firewall-rule create -g ${{ env.RG_APP }} -n ${{ env.MYSQL_SERVER_NAME }} --rule-name gha \
-            --start-ip-address $LOCAL_IP --end-ip-address $LOCAL_IP
-
-            # https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md
-            #sudo apt install mysql-client-core-8.0
-
-            # https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-connection-using-parameters.html
-            #mysql -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }}
-
-            #\. spring-petclinic-vets-service/src/main/resources/db/mysql/schema.sql
-            #\. spring-petclinic-vets-service/src/main/resources/db/mysql/data.sql
-
-            #\. spring-petclinic-customers-service/src/main/resources/db/mysql/schema.sql
-            #\. spring-petclinic-customers-service/src/main/resources/db/mysql/data.sql
-
-            #\. spring-petclinic-visits-service/src/main/resources/db/mysql/schema.sql
-            #\. spring-petclinic-visits-service/src/main/resources/db/mysql/data.sql
-
-            #quit
-            az mysql flexible-server firewall-rule delete -g ${{ env.RG_APP }} -n ${{ env.MYSQL_SERVER_NAME }} --rule-name gha
-      shell: bash
-
     # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
     # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners
     # if the runner is self-hosted which is not github provided it is recommended to manually logout at the end of the workflow as shown below.
@@ -158,3 +126,8 @@ jobs:
           az cache purge
           az account clear
       shell: bash
+      
+  call-db-init-workflow:
+    name: Load Data to DB
+    uses: ./.github/workflows/sql-load.yml
+    secrets: inherit
