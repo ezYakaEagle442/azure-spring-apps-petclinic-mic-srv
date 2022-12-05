@@ -95,7 +95,7 @@ jobs:
         echo "*                                                                                      *"
         echo "****************************************************************************************"
 
-        mvn -B clean package --file pom.xml -DskipTests -Denv=cloud --projects spring-petclinic-config-server,spring-petclinic-customers-service,spring-petclinic-vets-service,spring-petclinic-visits-service 
+        mvn -B clean package --file pom.xml -DskipTests -Denv=cloud --projects spring-petclinic-customers-service,spring-petclinic-vets-service,spring-petclinic-visits-service 
         
         echo "github.workspace = ${{ github.workspace }}"
         pwd
@@ -103,7 +103,7 @@ jobs:
         ls -al
         #ls -al spring-petclinic-admin-server/target/*.jar
         #ls -al spring-petclinic-api-gateway/target/*.jar
-        ls -al spring-petclinic-config-server/target/*.jar
+        #ls -al spring-petclinic-config-server/target/*.jar
         ls -al spring-petclinic-customers-service/target/*.jar
         ls -al spring-petclinic-vets-service/target/*.jar
         ls -al spring-petclinic-visits-service/target/*.jar
@@ -127,6 +127,11 @@ jobs:
         az config set extension.use_dynamic_install=yes_without_prompt
         az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }} --only-show-errors
         sleep 30        
+
+        echo "CUSTOMERS_SERVICE_JAR=spring-petclinic-${{ env.CUSTOMERS_SERVICE }}/target/$CUSTOMERS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "VETS_SERVICE_JAR=spring-petclinic-${{ env.VETS_SERVICE }}/target/$VETS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "VISITS_SERVICE_JAR=spring-petclinic-${{ env.VISITS_SERVICE }}/target/$VISITS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
+
       shell: bash
 
     - name: Upload Artifacts to Azure BLOB Storage
@@ -143,9 +148,9 @@ jobs:
         echo "AZ_BLOB_TIMEOUT=${{ env.AZ_BLOB_TIMEOUT }} "
         echo "AZ_BLOB_MAX_CONNECTIONS=${{ env.AZ_BLOB_MAX_CONNECTIONS }}"
 
-        echo "CUSTOMERS_SERVICE_JAR=spring-petclinic-${{ env.CUSTOMERS_SERVICE }}/target/$CUSTOMERS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
-        echo "VETS_SERVICE_JAR=spring-petclinic-${{ env.VETS_SERVICE }}/target/$VETS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
-        echo "VISITS_SERVICE_JAR=spring-petclinic-${{ env.VISITS_SERVICE }}/target/$VISITS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
+        ls -al ${{ env.CUSTOMERS_SERVICE_JAR }}
+        ls -al ${{ env.VETS_SERVICE_JAR }}
+        ls -al ${{ env.VISITS_SERVICE_JAR }}
 
         # https://learn.microsoft.com/en-us/rest/api/storageservices/setting-timeouts-for-blob-service-operations
         az storage blob upload --name  ${{ env.CUSTOMERS_SERVICE }} --file ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
