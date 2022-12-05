@@ -9,6 +9,7 @@ env:
   RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
   
   MYSQL_SERVER_NAME: petcliasa
+  MYSQL_DB_NAME: petclinic
   MYSQL_ADM_USR: mys_adm
   MYSQL_TIME_ZONE: Europe/Paris
   MYSQL_CHARACTER_SET: utf8
@@ -56,21 +57,24 @@ jobs:
             #sudo apt install mysql-client-core-8.0
 
             # https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-connection-using-parameters.html
-            mysql -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-vets-service/src/main/resources/db/mysql/schema.sql
-            mysql -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-vets-service/src/main/resources/db/mysql/data.sql
+            echo Init Vets
+            mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-vets-service/src/main/resources/db/mysql/schema.sql
+            mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-vets-service/src/main/resources/db/mysql/data.sql
 
-            mysql -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-customers-service/src/main/resources/db/mysql/schema.sql
-            mysql -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-customers-service/src/main/resources/db/mysql/data.sql
+            echo Init Cistomers
+            mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-customers-service/src/main/resources/db/mysql/schema.sql
+            mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-customers-service/src/main/resources/db/mysql/data.sql
 
-            mysql -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-visits-service/src/main/resources/db/mysql/schema.sql
-            mysql -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-visits-service/src/main/resources/db/mysql/data.sql
+            echo Init visits
+            mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-visits-service/src/main/resources/db/mysql/schema.sql
+            mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-visits-service/src/main/resources/db/mysql/data.sql
 
       shell: bash
 
     - name: Disable local IP access to the DB
       if: ${{ always() }}
       run: |
-            az mysql flexible-server firewall-rule delete -g ${{ env.RG_APP }} -n ${{ env.MYSQL_SERVER_NAME }} --rule-name gha
+            az mysql flexible-server firewall-rule delete -g ${{ env.RG_APP }} -n ${{ env.MYSQL_SERVER_NAME }} --rule-name gha --yes
       shell: bash
 
     # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
