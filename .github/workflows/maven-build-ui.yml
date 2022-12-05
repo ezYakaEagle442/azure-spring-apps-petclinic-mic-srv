@@ -16,6 +16,11 @@ env:
   # AZ_BLOB_SVC_NAME: default # MUST NOT BE MODIFIED
   # https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.13.jar
 
+  # https://learn.microsoft.com/en-us/rest/api/storageservices/setting-timeouts-for-blob-service-operations
+  AZ_BLOB_MAX_CONNECTIONS: 5
+  AZ_BLOB_MAXSIZE_CONDITION: 104857600
+  AZ_BLOB_TIMEOUT: 600
+
   # ==== APPS ====
   PRJ_PREFIX: asa-spring-petclinic
 
@@ -98,6 +103,8 @@ jobs:
         ls -al
         ls -al spring-petclinic-api-gateway/target/*.jar
 
+        echo "API_GATEWAY_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.API_GATEWAY }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
+
     - name: Azure Login
       uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
       with:
@@ -108,7 +115,7 @@ jobs:
       run: |
         LOCAL_IP=$(curl whatismyip.akamai.com)
         echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
-        
+
         echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
         az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }}  --only-show-errors
         sleep 30        
