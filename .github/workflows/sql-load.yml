@@ -1,6 +1,4 @@
-# This workflow will deploy all the Azure services, including ASA, KV & secrets, MYSQL (eventually with a Firewall rule to allow your workstation IP)
-# eventually if DEPLOY_TO_VNET is set to true : also VNet, ASA deployed to VNet, private DNS-Zone, client VM deployed to the VNet
-
+# This workflow will Load SQL scripts to DB
 name: Load SQL scripts to DB
 
 env:
@@ -61,7 +59,7 @@ jobs:
             mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-vets-service/src/main/resources/db/mysql/schema.sql
             mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-vets-service/src/main/resources/db/mysql/data.sql
 
-            echo Init Cistomers
+            echo Init Customers
             mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-customers-service/src/main/resources/db/mysql/schema.sql
             mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-customers-service/src/main/resources/db/mysql/data.sql
 
