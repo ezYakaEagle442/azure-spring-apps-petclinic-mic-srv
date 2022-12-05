@@ -130,7 +130,9 @@ jobs:
             az mysql flexible-server firewall-rule create -g ${{ env.RG_APP }} -n ${{ env.MYSQL_SERVER_NAME }} --rule-name gha \
             --start-ip-address $LOCAL_IP --end-ip-address $LOCAL_IP
 
+            # https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md
             sudo apt install mysql-client-core-8.0
+
             # https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-connection-using-parameters.html
             mysql -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }}
 
