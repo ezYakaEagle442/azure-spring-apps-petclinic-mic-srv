@@ -258,6 +258,14 @@ jobs:
         echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"
         echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"
 
+        echo "ADMIN_SERVER_PACKAGE_PATH=$ADMIN_SERVER_PACKAGE_PATH"
+        echo "DISCOVERY_SERVER_PACKAGE_PATH=$DISCOVERY_SERVER_PACKAGE_PATH"
+        echo "CONFIG_SERVER_PACKAGE_PATH=$CONFIG_SERVER_PACKAGE_PATH"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=$CUSTOMERS_SERVICE_PACKAGE_PATH"
+        echo "VETS_SERVICE_PACKAGE_PATH=$VETS_SERVICE_PACKAGE_PATH"
+        echo "VISITS_SERVICE_PACKAGE_PATH=$VISITS_SERVICE_PACKAGE_PATH"
+        echo "API_GATEWAY_PACKAGE_PATH=$API_GATEWAY_PACKAGE_PATH"
+
       shell: bash
 
     # Something to note, actions/checkout@v2 no longer sets the github workspace to the path input, which means you may need to manually set the working directory for your runs step
@@ -328,12 +336,22 @@ jobs:
         ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
         ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
 
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
+        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }}" >> $GITHUB_ENV
+
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }}"
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }}"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
+        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }}"
+
         echo "About to download Artifcats from Azure BLOB Storage"
         # --blob-url  ? https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
-        az storage blob download --name ${{ env.VETS_SERVICE }} --file $VETS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
-        az storage blob download --name ${{ env.CUSTOMERS_SERVICE }} --file $CUSTOMERS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
-        az storage blob download --name ${{ env.VISITS_SERVICE }} --file $VISITS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
-        az storage blob download --name ${{ env.API_GATEWAY }} --file $API_GATEWAY_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.VETS_SERVICE }} --file ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.CUSTOMERS_SERVICE }} --file ${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.VISITS_SERVICE }} --file ${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.API_GATEWAY }} --file ${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
 
         ls -al ${{ github.workspace }}/${{ env.VETS_SERVICE }}
         ls -al ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
