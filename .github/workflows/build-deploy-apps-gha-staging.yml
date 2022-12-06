@@ -1,0 +1,547 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: GHA to ASA Staging Build & Deploy
+
+###################################################################################################################
+#
+# https://learn.microsoft.com/en-us/azure/spring-apps/how-to-github-actions?pivots=programming-language-java
+# https://github.com/marketplace/actions/azure-spring-apps
+# https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect
+# https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure
+#
+###################################################################################################################
+
+env:
+  AZ_CLI_VERSION: 2.42.0
+  AZURE_SPRING_APPS_SERVICE: asa-petcliasa # customize this
+  KEYVAULT: kv-petcliasa21 # customize this
+  RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
+
+  # ==== Azure storage to store Artifacts , values must be consistent with he ones in storage.bicep ====:
+  AZ_STORAGE_NAME : stasapetcliasa # customize this
+  AZ_BLOB_CONTAINER_NAME: petcliasa-blob # customize this
+  # AZ_BLOB_SVC_NAME: default # MUST NOT BE MODIFIED
+  # https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
+
+  # https://learn.microsoft.com/en-us/rest/api/storageservices/setting-timeouts-for-blob-service-operations
+  AZ_BLOB_MAX_CONNECTIONS: 5
+  AZ_BLOB_MAXSIZE_CONDITION: 104857600
+  AZ_BLOB_TIMEOUT: 600
+
+  # ==== APPS ====:
+  API_GATEWAY: api-gateway
+  ADMIN_SERVER: admin-server
+  CONFIG_SERVER: config-server
+  CUSTOMERS_SERVICE: customers-service
+  DISCOVERY_SERVER: discovery-server
+  VETS_SERVICE: vets-service
+  VISITS_SERVICE: visits-service
+
+  PRJ_PREFIX: asa-spring-petclinic
+
+  # ==== Identities ====:
+  CUSTOMERS_SVC_APP_ID_NAME: id-asa-petclinic-customers-service-dev-westeurope-101 # customize this
+  VETS_SVC_APP_ID_NAME: id-asa-petclinic-vets-service-dev-westeurope-101 # customize this
+  VISITS_SVC_APP_ID_NAME: id-asa-petclinic-visits-service-dev-westeurope-101 # customize this
+
+  # ==== Azure Spring Apps / Apps Deployment params ====:
+
+  # customize this
+  # DEPLOYMENT_RG: rg-iac-asa-petclinic-mic-srv 
+  # https://microsoft.github.io/spring-cloud-azure/current/reference/html/appendix.html#azure_key_vault_secrets_proeprties
+  # spring.cloud.azure.keyvault.secret.enabled MUST bBE true
+  # spring.cloud.azure.keyvault.secret.endpoint
+  # SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT / https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#all-configurable-properties
+  # -Dspring.cloud.azure.keyvault.secret.property-sources[0].endpoint=https://kv-petcliasa21.vault.azure.net 
+  DEPLOYMENT_JVM_OPTIONS: -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
+  
+  DEPLOYMENT_VERSION: 2.6.13
+  DEPLOYMENT_RUNTIME_VERSION: Java_11
+  DEPLOYMENT_CPU: 500m
+  DEPLOYMENT_MEMORY: 512Mi
+  DEPLOYMENT_INSTANCE_COUNT: 3
+  DEPLOYMENT_DISABLE_PROBE: false
+
+  # If set to true and the deployment specified by deployment-name does not exist at execution time, it will be created.
+  DEPLOYMENT_CREATE_NEW: true
+
+  # https://github.com/marketplace/actions/azure-spring-apps#arguments
+  # Choose either the Blue or Green settings below
+  DEPLOYMENT_NAME: blue # Deployment name can contain only lowercase letters, numbers and hyphens
+  DEPLOYMENT_STAGING: true
+  DEPLOYMENT_ACTION: deploy
+
+  # Choose either Blue or Green
+  # DEPLOYMENT_NAME: green
+  # DEPLOYMENT_STAGING: false
+  # DEPLOYMENT_ACTION: set-production
+
+
+  # ==== Secrets ====
+  credentials: ${{ secrets.AZURE_CREDENTIALS }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT: ${{ secrets.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}
+  SPRING_CLOUD_AZURE_TENANT_ID: ${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }}
+
+
+on: # [push]
+  workflow_dispatch:
+    
+jobs:
+  init:
+    outputs:
+      API_GATEWAY_JAR_ARTIFACT: ${{ steps.set-var.outputs.API_GATEWAY_JAR_ARTIFACT }}
+      ADMIN_SERVER_JAR_ARTIFACT: ${{ steps.set-var.outputs.ADMIN_SERVER_JAR_ARTIFACT }}
+      CONFIG_SERVER_JAR_ARTIFACT: ${{ steps.set-var.outputs.CONFIG_SERVER_JAR_ARTIFACT }}
+      CUSTOMERS_SERVICE_JAR_ARTIFACT: ${{ steps.set-var.outputs.CUSTOMERS_SERVICE_JAR_ARTIFACT }}
+      VETS_SERVICE_JAR_ARTIFACT: ${{ steps.set-var.outputs.VETS_SERVICE_JAR_ARTIFACT }}
+      VISITS_SERVICE_JAR_ARTIFACT: ${{ steps.set-var.outputs.VISITS_SERVICE_JAR_ARTIFACT }}
+      DISCOVERY_SERVER_JAR_ARTIFACT: ${{ steps.set-var.outputs.DISCOVERY_SERVER_JAR_ARTIFACT }}
+
+      API_GATEWAY_PACKAGE_PATH: ${{ steps.set-var2.outputs.API_GATEWAY_PACKAGE_PATH }}
+      ADMIN_SERVER_PACKAGE_PATH: ${{ steps.set-var2.outputs.ADMIN_SERVER_PACKAGE_PATH }}
+      CONFIG_SERVER_PACKAGE_PATH: ${{ steps.set-var2.outputs.CONFIG_SERVER_PACKAGE_PATH }}
+      CUSTOMERS_SERVICE_PACKAGE_PATH: ${{ steps.set-var2.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}
+      VETS_SERVICE_PACKAGE_PATH: ${{ steps.set-var2.outputs.VETS_SERVICE_PACKAGE_PATH }}
+      VISITS_SERVICE_PACKAGE_PATH: ${{ steps.set-var2.outputs.VISITS_SERVICE_PACKAGE_PATH }}
+      DISCOVERY_SERVER_PACKAGE_PATH: ${{ steps.set-var2.outputs.DISCOVERY_SERVER_PACKAGE_PATH }}
+
+      API_GATEWAY_DEPLOYMENT: ${{ steps.set-var.outputs.API_GATEWAY_DEPLOYMENT }}
+      ADMIN_SERVER_DEPLOYMENT: ${{ steps.set-var.outputs.ADMIN_SERVER_DEPLOYMENT }}
+      CONFIG_SERVER_DEPLOYMENT: ${{ steps.set-var.outputs.CONFIG_SERVER_DEPLOYMENT }}
+      CUSTOMERS_SERVICE_DEPLOYMENT: ${{ steps.set-var.outputs.CUSTOMERS_SERVICE_DEPLOYMENT }}
+      DISCOVERY_SERVER_DEPLOYMENT: ${{ steps.set-var.outputs.DISCOVERY_SERVER_DEPLOYMENT }}
+      VETS_SERVICE_DEPLOYMENT: ${{ steps.set-var.outputs.VETS_SERVICE_DEPLOYMENT }}
+      VISITS_SERVICE_DEPLOYMENT: ${{ steps.set-var.outputs.VISITS_SERVICE_DEPLOYMENT }}
+
+      VETS_SVC_APP_IDENTITY_CLIENT_ID: ${{ steps.set-var.outputs.VETS_SVC_APP_IDENTITY_CLIENT_ID }}
+      VISITS_SVC_APP_IDENTITY_CLIENT_ID: ${{ steps.set-var.outputs.VISITS_SVC_APP_IDENTITY_CLIENT_ID }}
+      CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID: ${{ steps.set-var.outputs.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }}
+
+    runs-on: ubuntu-latest
+    # environment: production // https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
+    # https://github.com/marketplace/actions/azure-login
+    steps:
+
+    - name: Azure Login
+      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
+    # /!\ IMPORTANT:  The step that creates or updates the environment variable does not have access to the new value, but all subsequent steps in a job will have access.
+    - name: Set Base environment variables
+      id: set-var
+      run: |
+        echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
+
+        GH_WORKSPACE=${{ github.workspace }} # "/github/workspace"
+
+        VETS_SVC_APP_IDENTITY_CLIENT_ID=$(az identity show --name ${{ env.VETS_SVC_APP_ID_NAME }} -g ${{ env.RG_APP }} --query clientId -o tsv)
+        VISITS_SVC_APP_IDENTITY_CLIENT_ID=$(az identity show --name ${{ env.VISITS_SVC_APP_ID_NAME }} -g ${{ env.RG_APP }} --query clientId -o tsv)
+        CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$(az identity show --name ${{ env.CUSTOMERS_SVC_APP_ID_NAME }} -g ${{ env.RG_APP }} --query clientId -o tsv)
+
+        echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_ENV
+        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_ENV
+        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_ENV
+
+        echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_OUTPUT
+        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_OUTPUT
+        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID" >> $GITHUB_OUTPUT
+        
+        echo "API_GATEWAY_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.API_GATEWAY }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
+        echo "ADMIN_SERVER_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.ADMIN_SERVER }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
+        echo "CONFIG_SERVER_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.CONFIG_SERVER }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
+        echo "DISCOVERY_SERVER_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.DISCOVERY_SERVER }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
+        echo "CUSTOMERS_SERVICE_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.CUSTOMERS_SERVICE }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
+        echo "VETS_SERVICE_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.VETS_SERVICE }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
+        echo "VISITS_SERVICE_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.VISITS_SERVICE }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
+
+        echo "API_GATEWAY_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.API_GATEWAY }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_OUTPUT
+        echo "ADMIN_SERVER_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.ADMIN_SERVER }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_OUTPUT
+        echo "CONFIG_SERVER_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.CONFIG_SERVER }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_OUTPUT
+        echo "DISCOVERY_SERVER_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.DISCOVERY_SERVER }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_OUTPUT
+        echo "CUSTOMERS_SERVICE_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.CUSTOMERS_SERVICE }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_OUTPUT
+        echo "VETS_SERVICE_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.VETS_SERVICE }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_OUTPUT
+        echo "VISITS_SERVICE_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.VISITS_SERVICE }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_OUTPUT
+
+        echo "API_GATEWAY_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.API_GATEWAY }}" >> $GITHUB_ENV
+        echo "ADMIN_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.ADMIN_SERVER }}" >> $GITHUB_ENV
+        echo "CONFIG_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.CONFIG_SERVER }}" >> $GITHUB_ENV
+        echo "CUSTOMERS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.CUSTOMERS_SERVICE }}" >> $GITHUB_ENV
+        echo "DISCOVERY_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.DISCOVERY_SERVER }}" >> $GITHUB_ENV
+        echo "VETS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.VETS_SERVICE }}" >> $GITHUB_ENV
+        echo "VISITS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.VISITS_SERVICE }}" >> $GITHUB_ENV
+
+        echo "API_GATEWAY_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.API_GATEWAY }}" >> $GITHUB_OUTPUT
+        echo "ADMIN_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.ADMIN_SERVER }}" >> $GITHUB_OUTPUT
+        echo "CONFIG_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.CONFIG_SERVER }}" >> $GITHUB_OUTPUT
+        echo "CUSTOMERS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.CUSTOMERS_SERVICE }}" >> $GITHUB_OUTPUT
+        echo "DISCOVERY_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.DISCOVERY_SERVER }}" >> $GITHUB_OUTPUT
+        echo "VETS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.VETS_SERVICE }}" >> $GITHUB_OUTPUT
+        echo "VISITS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.VISITS_SERVICE }}" >> $GITHUB_OUTPUT
+
+      shell: bash
+
+    # Variables in the env map cannot be defined in terms of other variables in the map
+    - name: Set dependent environment variables
+      id: set-var2
+      run: |
+
+        # ==== JARS ====: PWD already in /home/runner/work/azure-spring-cloud-petclinic-mic-srv >> $GITHUB_ENV
+        echo "API_GATEWAY_JAR=spring-petclinic-${{ env.API_GATEWAY }}/target/$API_GATEWAY_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "ADMIN_SERVER_JAR=spring-petclinic-${{ env.ADMIN_SERVER }}/target/$ADMIN_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "CONFIG_SERVER_JAR=spring-petclinic-${{ env.CONFIG_SERVER }}/target/$CONFIG_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "DISCOVERY_SERVER_JAR=spring-petclinic-${{ env.DISCOVERY_SERVER }}/target/$DISCOVERY_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "CUSTOMERS_SERVICE_JAR=spring-petclinic-${{ env.CUSTOMERS_SERVICE }}/target/$CUSTOMERS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "VETS_SERVICE_JAR=spring-petclinic-${{ env.VETS_SERVICE }}/target/$VETS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "VISITS_SERVICE_JAR=spring-petclinic-${{ env.VISITS_SERVICE }}/target/$VISITS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
+
+        echo ""
+        echo "GH_WORKSPACE Check ..."
+        ls -al ${{ env.GH_WORKSPACE }}
+        echo ""
+
+        echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ env.API_GATEWAY_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ env.ADMIN_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "CONFIG_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.CONFIG_SERVER }}/${{ env.CONFIG_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}/${{ env.CUSTOMERS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ env.DISCOVERY_SERVER_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_ENV
+
+        echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ env.API_GATEWAY_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ env.ADMIN_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "CONFIG_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.CONFIG_SERVER }}/${{ env.CONFIG_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}/${{ env.CUSTOMERS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ env.DISCOVERY_SERVER_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ env.VETS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ env.VISITS_SERVICE_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+
+
+      shell: bash
+
+    - name: Display environment variables
+      run: |
+        echo "Checking GITHUB_ENV"
+
+        echo "LOCAL_IP=$LOCAL_IP"
+
+        echo "API_GATEWAY_JAR_ARTIFACT=$API_GATEWAY_JAR_ARTIFACT"
+        echo "ADMIN_SERVER_JAR_ARTIFACT=$ADMIN_SERVER_JAR_ARTIFACT"
+        echo "CONFIG_SERVER_JAR_ARTIFACT=$CONFIG_SERVER_JAR_ARTIFACT"
+        echo "DISCOVERY_SERVER_JAR_ARTIFACT=$DISCOVERY_SERVER_JAR_ARTIFACT"
+        echo "CUSTOMERS_SERVICE_JAR_ARTIFACT=$CUSTOMERS_SERVICE_JAR_ARTIFACT"
+        echo "VETS_SERVICE_JAR_ARTIFACT=$VETS_SERVICE_JAR_ARTIFACT"
+        echo "VISITS_SERVICE_JAR_ARTIFACT=$VISITS_SERVICE_JAR_ARTIFACT"
+
+        echo "API_GATEWAY_JAR=$API_GATEWAY_JAR"
+        echo "ADMIN_SERVER_JAR=$ADMIN_SERVER_JAR"
+        echo "CONFIG_SERVER_JAR=$CONFIG_SERVER_JAR"
+        echo "CUSTOMERS_SERVICE_JAR=$CUSTOMERS_SERVICE_JAR"
+        echo "DISCOVERY_SERVER_JAR=$DISCOVERY_SERVER_JAR"
+        echo "VETS_SERVICE_JAR=$VETS_SERVICE_JAR"
+        echo "VISITS_SERVICE_JAR=$VISITS_SERVICE_JAR"
+
+        echo "API_GATEWAY_DEPLOYMENT=$API_GATEWAY_DEPLOYMENT"
+        echo "ADMIN_SERVER_DEPLOYMENT=$ADMIN_SERVER_DEPLOYMENT"
+        echo "CONFIG_SERVER_DEPLOYMENT=$CONFIG_SERVER_DEPLOYMENT"
+        echo "CUSTOMERS_SERVICE_DEPLOYMENT=$CUSTOMERS_SERVICE_DEPLOYMENT"
+        echo "DISCOVERY_SERVER_DEPLOYMENT=$DISCOVERY_SERVER_DEPLOYMENT"
+        echo "VETS_SERVICE_DEPLOYMENT=$VETS_SERVICE_DEPLOYMENT"
+        echo "VISITS_SERVICE_DEPLOYMENT=$VISITS_SERVICE_DEPLOYMENT"
+
+        echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID"
+        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"
+        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"
+
+        echo "ADMIN_SERVER_PACKAGE_PATH=$ADMIN_SERVER_PACKAGE_PATH"
+        echo "DISCOVERY_SERVER_PACKAGE_PATH=$DISCOVERY_SERVER_PACKAGE_PATH"
+        echo "CONFIG_SERVER_PACKAGE_PATH=$CONFIG_SERVER_PACKAGE_PATH"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=$CUSTOMERS_SERVICE_PACKAGE_PATH"
+        echo "VETS_SERVICE_PACKAGE_PATH=$VETS_SERVICE_PACKAGE_PATH"
+        echo "VISITS_SERVICE_PACKAGE_PATH=$VISITS_SERVICE_PACKAGE_PATH"
+        echo "API_GATEWAY_PACKAGE_PATH=$API_GATEWAY_PACKAGE_PATH"
+
+      shell: bash
+
+    # Something to note, actions/checkout@v2 no longer sets the github workspace to the path input, which means you may need to manually set the working directory for your runs step
+    # https://github.com/actions/checkout/blob/main/adrs/0153-checkout-v2.md#path
+        
+    - name: Checkout your repo
+      uses: actions/checkout@v3.1.0 # https://github.com/actions/checkout
+      
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'microsoft'
+        cache: maven
+
+  # https://docs.github.com/en/actions/using-workflows/reusing-workflows#calling-a-reusable-workflow
+  call-maven-build-workflow:
+    name: Trigger Maven for backend services
+    needs: init
+    uses: ./.github/workflows/maven-build.yml # .github/workflows/maven-build.yml@main ==> references to workflows must be prefixed with format 'owner/repository/' or './' for local workflows
+    secrets: inherit # pass all secrets
+      # envPAT: ${{ secrets.envPAT }} # pass just this secret
+
+  call-maven-build-ui-workflow:
+    name: Trigger Maven for the UI
+    needs: init
+    uses: ./.github/workflows/maven-build-ui.yml
+    secrets: inherit
+
+  deploy-apps:
+
+    needs: [init,call-maven-build-workflow,call-maven-build-ui-workflow]
+    runs-on: ubuntu-latest # [self-hosted, linux, x64]
+    steps: 
+
+    - name: Azure Login
+      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Authorize local IP access to the Azure BLOB Storage 
+      if: ${{ always() }}
+      run: |
+        LOCAL_IP=$(curl whatismyip.akamai.com)
+        echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
+        echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
+        az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }}  --only-show-errors
+        sleep 30        
+      shell: bash
+
+    - name: Set environment variables
+      id: set-var
+      run: |
+
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VETS_SERVICE_PACKAGE_PATH }}"
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VISITS_SERVICE_PACKAGE_PATH }}"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
+        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.init.outputs.API_GATEWAY_PACKAGE_PATH }}"
+
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VETS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VISITS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
+        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.init.outputs.API_GATEWAY_PACKAGE_PATH }}" >> $GITHUB_ENV
+
+        #echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ needs.init.outputs.DISCOVERY_SERVER_JAR_ARTIFACT }}"
+        #echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ needs.init.outputs.ADMIN_SERVER_JAR_ARTIFACT }}"
+        #echo "CONFIG_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.CONFIG_SERVER }}/${{ needs.init.outputs.CONFIG_SERVER_JAR_ARTIFACT }}"
+        
+        #echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}/${{ needs.init.outputs.CUSTOMERS_SERVICE_JAR_ARTIFACT }}"
+        #echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ needs.init.outputs.VETS_SERVICE_JAR_ARTIFACT }}"
+        #echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ needs.init.outputs.VISITS_SERVICE_JAR_ARTIFACT }}"
+        #echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ needs.init.outputs.API_GATEWAY_JAR_ARTIFACT }}"
+
+      shell: bash
+
+    - name: Download Artifacts from Azure BLOB Storage
+      id: blob_download
+      run: | 
+        # https://learn.microsoft.com/en-us/azure/storage/blobs/blob-cli
+
+        # Runner will be blocked by network rules of storage account. Must Allow its IP
+        # TODO in Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account
+
+        pwd
+        ls -al
+
+        mkdir ${{ github.workspace }}/${{ env.VETS_SERVICE }}
+        mkdir ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
+        mkdir ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
+        mkdir ${{ github.workspace }}/${{ env.API_GATEWAY }}
+
+        ls -al ${{ github.workspace }}/${{ env.VETS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
+
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ env.VETS_SERVICE_PACKAGE_PATH }}"
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ env.VISITS_SERVICE_PACKAGE_PATH }}"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
+        echo "API_GATEWAY_PACKAGE_PATH=${{ env.API_GATEWAY_PACKAGE_PATH }}"
+
+        echo "About to download Artifcats from Azure BLOB Storage"
+        # --blob-url  ? https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
+        az storage blob download --name ${{ env.VETS_SERVICE }} --file $VETS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.CUSTOMERS_SERVICE }} --file $CUSTOMERS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.VISITS_SERVICE }} --file $VISITS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.API_GATEWAY }} --file $API_GATEWAY_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+
+        ls -al ${{ github.workspace }}/${{ env.VETS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
+
+      shell: bash
+
+    - name: Disable local IP access to the Azure BLOB Storage 
+      if: ${{ always() }}
+      run: |
+        echo "About to REMOVE network-rule ALLOWING $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
+        az storage account network-rule remove --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }} -g ${{ env.RG_APP }} --only-show-errors
+      shell: bash
+
+    - name: Check Artifacts
+      run: | 
+        echo "github.workspace = ${{ github.workspace }}"
+        pwd
+        ls -al
+
+        echo ""
+        echo "GH_WORKSPACE Check ..."
+        ls -al ${{ env.GH_WORKSPACE }}
+        echo ""
+
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ env.VETS_SERVICE_PACKAGE_PATH }}"
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ env.VISITS_SERVICE_PACKAGE_PATH }}"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
+        echo "API_GATEWAY_PACKAGE_PATH=${{ env.API_GATEWAY_PACKAGE_PATH }}"
+
+        #echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ needs.init.outputs.DISCOVERY_SERVER_JAR_ARTIFACT }}"
+        #echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ needs.init.outputs.ADMIN_SERVER_JAR_ARTIFACT }}"
+        #echo "CONFIG_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.CONFIG_SERVER }}/${{ needs.init.outputs.CONFIG_SERVER_JAR_ARTIFACT }}"
+        
+        #echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}/${{ needs.init.outputs.CUSTOMERS_SERVICE_JAR_ARTIFACT }}"
+        #echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ needs.init.outputs.VETS_SERVICE_JAR_ARTIFACT }}"
+        #echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ needs.init.outputs.VISITS_SERVICE_JAR_ARTIFACT }}"
+        #echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ needs.init.outputs.API_GATEWAY_JAR_ARTIFACT }}"
+
+        echo "****************************************************************************************"
+        echo "*                                                                                      *"
+        echo "*                                                                                      *"
+        echo "* Checking Artifacts ...                                                               *"
+        echo "*                                                                                      *"
+        echo "*                                                                                      *"
+        echo "****************************************************************************************"
+
+        echo ""
+        ls -al ${{ env.API_GATEWAY }}
+        echo ""
+        ls -al ${{ needs.init.outputs.API_GATEWAY_PACKAGE_PATH }} # ${{ env.API_GATEWAY_PACKAGE_PATH }}
+        echo ""
+
+        echo ""
+        ls -al ${{ env.CUSTOMERS_SERVICE }}
+        echo ""
+        ls -al ${{ needs.init.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }} # ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}
+        echo ""
+
+        echo ""
+        ls -al  ${{ env.VETS_SERVICE }}
+        echo ""
+        ls -al ${{ needs.init.outputs.VETS_SERVICE_PACKAGE_PATH }} # ${{ env.VETS_SERVICE_PACKAGE_PATH }}
+        echo ""
+
+        echo ""
+        ls -al  ${{ env.VISITS_SERVICE }}
+        echo ""
+        ls -al ${{ needs.init.outputs.VISITS_SERVICE_PACKAGE_PATH }} # ${{ env.VISITS_SERVICE_PACKAGE_PATH }}
+        echo ""    
+
+        echo ""
+        echo "VETS_SERVICE_DEPLOYMENT=${{ needs.init.outputs.VETS_SERVICE_DEPLOYMENT }}"
+        echo "VISITS_SERVICE_DEPLOYMENT=${{ needs.init.outputs.VISITS_SERVICE_DEPLOYMENT }}"
+        echo "CUSTOMERS_SERVICE_DEPLOYMENT=${{ needs.init.outputs.CUSTOMERS_SERVICE_DEPLOYMENT }}"
+        echo "API_GATEWAY_DEPLOYMENT=${{ needs.init.outputs.API_GATEWAY_DEPLOYMENT }}"
+        echo ""
+
+        echo ""
+        echo "KV URI=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}"
+        echo "TENANT=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
+        echo ""
+
+        VETS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.init.outputs.VETS_SVC_APP_IDENTITY_CLIENT_ID }}
+        VISITS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.init.outputs.VISITS_SVC_APP_IDENTITY_CLIENT_ID }}
+        CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.init.outputs.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }}
+
+        echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID"
+        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"
+        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"
+
+        echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
+        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
+        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
+
+    # https://github.com/marketplace/actions/azure-spring-apps
+    - name: Deploy vets-service
+      uses: Azure/spring-apps-deploy@v1
+      with:
+        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+        action: ${{ env.DEPLOYMENT_ACTION }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
+        app-name: ${{ env.VETS_SERVICE }}
+        use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
+        package: ${{ env.VETS_SERVICE_PACKAGE_PATH }}
+        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
+        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
+        environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -VETS_SVC_APP_IDENTITY_CLIENT_ID ${{ env.VETS_SVC_APP_IDENTITY_CLIENT_ID }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
+        deployment-name: ${{ needs.init.outputs.VETS_SERVICE_DEPLOYMENT }}
+        create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
+        version: ${{ env.DEPLOYMENT_VERSION }} 
+        runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
+
+    - name: Deploy visits-service
+      uses: Azure/spring-apps-deploy@v1
+      with:
+        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+        action: ${{ env.DEPLOYMENT_ACTION }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
+        app-name: ${{ env.VISITS_SERVICE }}
+        use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
+        package: ${{ env.VISITS_SERVICE_PACKAGE_PATH }}
+        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
+        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
+        environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -VISITS_SVC_APP_IDENTITY_CLIENT_ID ${{ env.VISITS_SVC_APP_IDENTITY_CLIENT_ID }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
+        deployment-name: ${{ needs.init.outputs.VISITS_SERVICE_DEPLOYMENT }}
+        create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
+        version: ${{ env.DEPLOYMENT_VERSION }} 
+        runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
+
+    - name: Deploy customers-service
+      uses: Azure/spring-apps-deploy@v1
+      with:
+        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+        action: ${{ env.DEPLOYMENT_ACTION }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
+        app-name: ${{ env.CUSTOMERS_SERVICE }}
+        use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
+        package: ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}
+        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
+        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
+        environment-variables: "-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT ${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} -CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID ${{ env.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }} -SPRING_CLOUD_AZURE_TENANT_ID ${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
+        deployment-name: ${{ needs.init.outputs.CUSTOMERS_SERVICE_DEPLOYMENT }}
+        create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
+        version: ${{ env.DEPLOYMENT_VERSION }} 
+        runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }}
+
+    - name: Deploy api-gateway
+      uses: Azure/spring-apps-deploy@v1
+      with:
+        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+        action: ${{ env.DEPLOYMENT_ACTION }}
+        service-name: ${{ env.AZURE_SPRING_APPS_SERVICE }}
+        app-name: ${{ env.API_GATEWAY }}
+        use-staging-deployment: ${{ env.DEPLOYMENT_STAGING }}
+        package: ${{ env.API_GATEWAY_PACKAGE_PATH }}
+        jvm-options: ${{ env.DEPLOYMENT_JVM_OPTIONS }}
+        deployment-name: ${{ needs.init.outputs.API_GATEWAY_DEPLOYMENT }}
+        create-new-deployment: ${{ env.DEPLOYMENT_CREATE_NEW }}
+        version: ${{ env.DEPLOYMENT_VERSION }} 
+        runtime-version: ${{ env.DEPLOYMENT_RUNTIME_VERSION }} 
+        
+    # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
+    # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners
+    # if the runner is self-hosted which is not github provided it is recommended to manually logout at the end of the workflow as shown below.
+    - name: Azure Logout security hardening
+      run: |
+          az logout
+          az cache purge
+          az account clear
+      shell: bash
