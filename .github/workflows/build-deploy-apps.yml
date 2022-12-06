@@ -296,6 +296,7 @@ jobs:
     secrets: inherit
 
   deploy-apps:
+
     needs: [init,call-maven-build-workflow,call-maven-build-ui-workflow]
     runs-on: ubuntu-latest # [self-hosted, linux, x64]
     steps: 
@@ -313,6 +314,31 @@ jobs:
         echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
         az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }}  --only-show-errors
         sleep 30        
+      shell: bash
+
+    - name: Set environment variables
+      id: set-var
+      run: |
+
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VETS_SERVICE_PACKAGE_PATH }}"
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VISITS_SERVICE_PACKAGE_PATH }}"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
+        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.init.outputs.API_GATEWAY_PACKAGE_PATH }}"
+
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VETS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VISITS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
+        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.init.outputs.API_GATEWAY_PACKAGE_PATH }}" >> $GITHUB_ENV
+
+        #echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ needs.init.outputs.DISCOVERY_SERVER_JAR_ARTIFACT }}"
+        #echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ needs.init.outputs.ADMIN_SERVER_JAR_ARTIFACT }}"
+        #echo "CONFIG_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.CONFIG_SERVER }}/${{ needs.init.outputs.CONFIG_SERVER_JAR_ARTIFACT }}"
+        
+        #echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}/${{ needs.init.outputs.CUSTOMERS_SERVICE_JAR_ARTIFACT }}"
+        #echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ needs.init.outputs.VETS_SERVICE_JAR_ARTIFACT }}"
+        #echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ needs.init.outputs.VISITS_SERVICE_JAR_ARTIFACT }}"
+        #echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ needs.init.outputs.API_GATEWAY_JAR_ARTIFACT }}"
+
       shell: bash
 
     - name: Download Artifacts from Azure BLOB Storage
@@ -336,24 +362,10 @@ jobs:
         ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
         ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
 
-        echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VETS_SERVICE_PACKAGE_PATH }}"
-        echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VISITS_SERVICE_PACKAGE_PATH }}"
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
-        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.init.outputs.API_GATEWAY_PACKAGE_PATH }}"
-
-        echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VETS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
-        echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VISITS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}" >> $GITHUB_ENV
-        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.init.outputs.API_GATEWAY_PACKAGE_PATH }}" >> $GITHUB_ENV
-
-        #echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ needs.init.outputs.DISCOVERY_SERVER_JAR_ARTIFACT }}"
-        #echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ needs.init.outputs.ADMIN_SERVER_JAR_ARTIFACT }}"
-        #echo "CONFIG_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.CONFIG_SERVER }}/${{ needs.init.outputs.CONFIG_SERVER_JAR_ARTIFACT }}"
-        
-        #echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}/${{ needs.init.outputs.CUSTOMERS_SERVICE_JAR_ARTIFACT }}"
-        #echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ needs.init.outputs.VETS_SERVICE_JAR_ARTIFACT }}"
-        #echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ needs.init.outputs.VISITS_SERVICE_JAR_ARTIFACT }}"
-        #echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ needs.init.outputs.API_GATEWAY_JAR_ARTIFACT }}"
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ env.VETS_SERVICE_PACKAGE_PATH }}"
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ env.VISITS_SERVICE_PACKAGE_PATH }}"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
+        echo "API_GATEWAY_PACKAGE_PATH=${{ env.API_GATEWAY_PACKAGE_PATH }}"
 
         echo "About to download Artifcats from Azure BLOB Storage"
         # --blob-url  ? https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
@@ -385,16 +397,10 @@ jobs:
         ls -al ${{ env.GH_WORKSPACE }}
         echo ""
 
-        echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VETS_SERVICE_PACKAGE_PATH }}"
-        echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.VISITS_SERVICE_PACKAGE_PATH }}"
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.init.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
-        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.init.outputs.API_GATEWAY_PACKAGE_PATH }}"
-
         echo "VETS_SERVICE_PACKAGE_PATH=${{ env.VETS_SERVICE_PACKAGE_PATH }}"
         echo "VISITS_SERVICE_PACKAGE_PATH=${{ env.VISITS_SERVICE_PACKAGE_PATH }}"
         echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
         echo "API_GATEWAY_PACKAGE_PATH=${{ env.API_GATEWAY_PACKAGE_PATH }}"
-
 
         #echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ needs.init.outputs.DISCOVERY_SERVER_JAR_ARTIFACT }}"
         #echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ needs.init.outputs.ADMIN_SERVER_JAR_ARTIFACT }}"
