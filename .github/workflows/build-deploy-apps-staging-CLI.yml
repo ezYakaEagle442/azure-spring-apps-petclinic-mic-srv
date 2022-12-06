@@ -1,4 +1,4 @@
-name: Build & Deploy to ASA STAGING Deployments with CLI
+name: Deploy to ASA STAGING Deployments with CLI
 
 ###################################################################################################################
 #
@@ -101,7 +101,8 @@ on: # [push]
   workflow_dispatch:
     
 jobs:
-  build:
+
+  deploy-apps:
     outputs:
       API_GATEWAY_JAR_ARTIFACT: ${{ steps.set-var.outputs.API_GATEWAY_JAR_ARTIFACT }}
       ADMIN_SERVER_JAR_ARTIFACT: ${{ steps.set-var.outputs.ADMIN_SERVER_JAR_ARTIFACT }}
@@ -119,21 +120,13 @@ jobs:
       VISITS_SERVICE_PACKAGE_PATH: ${{ steps.set-var2.outputs.VISITS_SERVICE_PACKAGE_PATH }}
       DISCOVERY_SERVER_PACKAGE_PATH: ${{ steps.set-var2.outputs.DISCOVERY_SERVER_PACKAGE_PATH }}
 
-      API_GATEWAY_STAGING_DEPLOYMENT: ${{ steps.set-var.outputs.API_GATEWAY_STAGING_DEPLOYMENT }}
-      ADMIN_SERVER_STAGING_DEPLOYMENT: ${{ steps.set-var.outputs.ADMIN_SERVER_STAGING_DEPLOYMENT }}
-      CONFIG_SERVER_STAGING_DEPLOYMENT: ${{ steps.set-var.outputs.CONFIG_SERVER_STAGING_DEPLOYMENT }}
-      CUSTOMERS_SERVICE_STAGING_DEPLOYMENT: ${{ steps.set-var.outputs.CUSTOMERS_SERVICE_STAGING_DEPLOYMENT }}
-      DISCOVERY_SERVER_STAGING_DEPLOYMENT: ${{ steps.set-var.outputs.DISCOVERY_SERVER_STAGING_DEPLOYMENT }}
-      VETS_SERVICE_STAGING_DEPLOYMENT: ${{ steps.set-var.outputs.VETS_SERVICE_STAGING_DEPLOYMENT }}
-      VISITS_SERVICE_STAGING_DEPLOYMENT: ${{ steps.set-var.outputs.VISITS_SERVICE_STAGING_DEPLOYMENT }}
-
-      API_GATEWAY_PRODUCTION_DEPLOYMENT: ${{ steps.set-var.outputs.API_GATEWAY_PRODUCTION_DEPLOYMENT }}
-      ADMIN_SERVER_PRODUCTION_DEPLOYMENT: ${{ steps.set-var.outputs.ADMIN_SERVER_PRODUCTION_DEPLOYMENT }}
-      CONFIG_SERVER_PRODUCTION_DEPLOYMENT: ${{ steps.set-var.outputs.CONFIG_SERVER_PRODUCTION_DEPLOYMENT }}
-      CUSTOMERS_SERVICE_PRODUCTION_DEPLOYMENT: ${{ steps.set-var.outputs.CUSTOMERS_SERVICE_PRODUCTION_DEPLOYMENT }}
-      DISCOVERY_SERVER_PRODUCTION_DEPLOYMENT: ${{ steps.set-var.outputs.DISCOVERY_SERVER_PRODUCTION_DEPLOYMENT }}
-      VETS_SERVICE_PRODUCTION_DEPLOYMENT: ${{ steps.set-var.outputs.VETS_SERVICE_PRODUCTION_DEPLOYMENT }}
-      VISITS_SERVICE_PRODUCTION_DEPLOYMENT: ${{ steps.set-var.outputs.VISITS_SERVICE_PRODUCTION_DEPLOYMENT }}
+      API_GATEWAY_DEPLOYMENT: ${{ steps.set-var.outputs.API_GATEWAY_DEPLOYMENT }}
+      ADMIN_SERVER_DEPLOYMENT: ${{ steps.set-var.outputs.ADMIN_SERVER_DEPLOYMENT }}
+      CONFIG_SERVER_DEPLOYMENT: ${{ steps.set-var.outputs.CONFIG_SERVER_DEPLOYMENT }}
+      CUSTOMERS_SERVICE_DEPLOYMENT: ${{ steps.set-var.outputs.CUSTOMERS_SERVICE_DEPLOYMENT }}
+      DISCOVERY_SERVER_DEPLOYMENT: ${{ steps.set-var.outputs.DISCOVERY_SERVER_DEPLOYMENT }}
+      VETS_SERVICE_DEPLOYMENT: ${{ steps.set-var.outputs.VETS_SERVICE_DEPLOYMENT }}
+      VISITS_SERVICE_DEPLOYMENT: ${{ steps.set-var.outputs.VISITS_SERVICE_DEPLOYMENT }}
 
       VETS_SVC_APP_IDENTITY_CLIENT_ID: ${{ steps.set-var.outputs.VETS_SVC_APP_IDENTITY_CLIENT_ID }}
       VISITS_SVC_APP_IDENTITY_CLIENT_ID: ${{ steps.set-var.outputs.VISITS_SVC_APP_IDENTITY_CLIENT_ID }}
@@ -186,37 +179,21 @@ jobs:
         echo "VETS_SERVICE_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.VETS_SERVICE }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_OUTPUT
         echo "VISITS_SERVICE_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.VISITS_SERVICE }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_OUTPUT
 
-        echo "API_GATEWAY_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.API_GATEWAY }}" >> $GITHUB_ENV
-        echo "ADMIN_SERVER_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.ADMIN_SERVER }}" >> $GITHUB_ENV
-        echo "CONFIG_SERVER_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.CONFIG_SERVER }}" >> $GITHUB_ENV
-        echo "CUSTOMERS_SERVICE_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.CUSTOMERS_SERVICE }}" >> $GITHUB_ENV
-        echo "DISCOVERY_SERVER_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.DISCOVERY_SERVER }}" >> $GITHUB_ENV
-        echo "VETS_SERVICE_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.VETS_SERVICE }}" >> $GITHUB_ENV
-        echo "VISITS_SERVICE_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.VISITS_SERVICE }}" >> $GITHUB_ENV
+        echo "API_GATEWAY_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.API_GATEWAY }}" >> $GITHUB_ENV
+        echo "ADMIN_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.ADMIN_SERVER }}" >> $GITHUB_ENV
+        echo "CONFIG_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.CONFIG_SERVER }}" >> $GITHUB_ENV
+        echo "CUSTOMERS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.CUSTOMERS_SERVICE }}" >> $GITHUB_ENV
+        echo "DISCOVERY_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.DISCOVERY_SERVER }}" >> $GITHUB_ENV
+        echo "VETS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.VETS_SERVICE }}" >> $GITHUB_ENV
+        echo "VISITS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.VISITS_SERVICE }}" >> $GITHUB_ENV
 
-        echo "API_GATEWAY_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.API_GATEWAY }}" >> $GITHUB_OUTPUT
-        echo "ADMIN_SERVER_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.ADMIN_SERVER }}" >> $GITHUB_OUTPUT
-        echo "CONFIG_SERVER_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.CONFIG_SERVER }}" >> $GITHUB_OUTPUT
-        echo "CUSTOMERS_SERVICE_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.CUSTOMERS_SERVICE }}" >> $GITHUB_OUTPUT
-        echo "DISCOVERY_SERVER_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.DISCOVERY_SERVER }}" >> $GITHUB_OUTPUT
-        echo "VETS_SERVICE_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.VETS_SERVICE }}" >> $GITHUB_OUTPUT
-        echo "VISITS_SERVICE_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-${{ env.VISITS_SERVICE }}" >> $GITHUB_OUTPUT
-
-        echo "API_GATEWAY_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.API_GATEWAY }}" >> $GITHUB_ENV
-        echo "ADMIN_SERVER_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.ADMIN_SERVER }}" >> $GITHUB_ENV
-        echo "CONFIG_SERVER_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.CONFIG_SERVER }}" >> $GITHUB_ENV
-        echo "CUSTOMERS_SERVICE_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.CUSTOMERS_SERVICE }}" >> $GITHUB_ENV
-        echo "DISCOVERY_SERVER_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.DISCOVERY_SERVER }}" >> $GITHUB_ENV
-        echo "VETS_SERVICE_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.VETS_SERVICE }}" >> $GITHUB_ENV
-        echo "VISITS_SERVICE_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.VISITS_SERVICE }}" >> $GITHUB_ENV
-
-        echo "API_GATEWAY_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.API_GATEWAY }}" >> $GITHUB_OUTPUT
-        echo "ADMIN_SERVER_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.ADMIN_SERVER }}" >> $GITHUB_OUTPUT
-        echo "CONFIG_SERVER_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.CONFIG_SERVER }}" >> $GITHUB_OUTPUT
-        echo "CUSTOMERS_SERVICE_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.CUSTOMERS_SERVICE }}" >> $GITHUB_OUTPUT
-        echo "DISCOVERY_SERVER_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.DISCOVERY_SERVER }}" >> $GITHUB_OUTPUT
-        echo "VETS_SERVICE_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.VETS_SERVICE }}" >> $GITHUB_OUTPUT
-        echo "VISITS_SERVICE_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-${{ env.VISITS_SERVICE }}" >> $GITHUB_OUTPUT
+        echo "API_GATEWAY_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.API_GATEWAY }}" >> $GITHUB_OUTPUT
+        echo "ADMIN_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.ADMIN_SERVER }}" >> $GITHUB_OUTPUT
+        echo "CONFIG_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.CONFIG_SERVER }}" >> $GITHUB_OUTPUT
+        echo "CUSTOMERS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.CUSTOMERS_SERVICE }}" >> $GITHUB_OUTPUT
+        echo "DISCOVERY_SERVER_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.DISCOVERY_SERVER }}" >> $GITHUB_OUTPUT
+        echo "VETS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.VETS_SERVICE }}" >> $GITHUB_OUTPUT
+        echo "VISITS_SERVICE_DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}-${{ env.VISITS_SERVICE }}" >> $GITHUB_OUTPUT
 
       shell: bash
 
@@ -229,8 +206,8 @@ jobs:
         echo "API_GATEWAY_JAR=spring-petclinic-${{ env.API_GATEWAY }}/target/$API_GATEWAY_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "ADMIN_SERVER_JAR=spring-petclinic-${{ env.ADMIN_SERVER }}/target/$ADMIN_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "CONFIG_SERVER_JAR=spring-petclinic-${{ env.CONFIG_SERVER }}/target/$CONFIG_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
-        echo "CUSTOMERS_SERVICE_JAR=spring-petclinic-${{ env.CUSTOMERS_SERVICE }}/target/$CUSTOMERS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "DISCOVERY_SERVER_JAR=spring-petclinic-${{ env.DISCOVERY_SERVER }}/target/$DISCOVERY_SERVER_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "CUSTOMERS_SERVICE_JAR=spring-petclinic-${{ env.CUSTOMERS_SERVICE }}/target/$CUSTOMERS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "VETS_SERVICE_JAR=spring-petclinic-${{ env.VETS_SERVICE }}/target/$VETS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "VISITS_SERVICE_JAR=spring-petclinic-${{ env.VISITS_SERVICE }}/target/$VISITS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
 
@@ -280,156 +257,77 @@ jobs:
         echo "VETS_SERVICE_JAR=$VETS_SERVICE_JAR"
         echo "VISITS_SERVICE_JAR=$VISITS_SERVICE_JAR"
 
-        echo "API_GATEWAY_STAGING_DEPLOYMENT=$API_GATEWAY_STAGING_DEPLOYMENT"
-        echo "ADMIN_SERVER_STAGING_DEPLOYMENT=$ADMIN_SERVER_STAGING_DEPLOYMENT"
-        echo "CONFIG_SERVER_STAGING_DEPLOYMENT=$CONFIG_SERVER_STAGING_DEPLOYMENT"
-        echo "CUSTOMERS_SERVICE_STAGING_DEPLOYMENT=$CUSTOMERS_SERVICE_STAGING_DEPLOYMENT"
-        echo "DISCOVERY_SERVER_STAGING_DEPLOYMENT=$DISCOVERY_SERVER_STAGING_DEPLOYMENT"
-        echo "VETS_SERVICE_STAGING_DEPLOYMENT=$VETS_SERVICE_STAGING_DEPLOYMENT"
-        echo "VISITS_SERVICE_STAGING_DEPLOYMENT=$VISITS_SERVICE_STAGING_DEPLOYMENT"
-
-        echo "API_GATEWAY_PRODUCTION_DEPLOYMENT=$API_GATEWAY_PRODUCTION_DEPLOYMENT"
-        echo "ADMIN_SERVER_PRODUCTION_DEPLOYMENT=$ADMIN_SERVER_PRODUCTION_DEPLOYMENT"
-        echo "CONFIG_SERVER_PRODUCTION_DEPLOYMENT=$CONFIG_SERVER_PRODUCTION_DEPLOYMENT"
-        echo "CUSTOMERS_SERVICE_PRODUCTION_DEPLOYMENT=$CUSTOMERS_SERVICE_PRODUCTION_DEPLOYMENT"
-        echo "DISCOVERY_SERVER_PRODUCTION_DEPLOYMENT=$DISCOVERY_SERVER_PRODUCTION_DEPLOYMENT"
-        echo "VETS_SERVICE_PRODUCTION_DEPLOYMENT=$VETS_SERVICE_PRODUCTION_DEPLOYMENT"
-        echo "VISITS_SERVICE_PRODUCTION_DEPLOYMENT=$VISITS_SERVICE_PRODUCTION_DEPLOYMENT"
+        echo "API_GATEWAY_DEPLOYMENT=$API_GATEWAY_DEPLOYMENT"
+        echo "ADMIN_SERVER_DEPLOYMENT=$ADMIN_SERVER_DEPLOYMENT"
+        echo "CONFIG_SERVER_DEPLOYMENT=$CONFIG_SERVER_DEPLOYMENT"
+        echo "CUSTOMERS_SERVICE_DEPLOYMENT=$CUSTOMERS_SERVICE_DEPLOYMENT"
+        echo "DISCOVERY_SERVER_DEPLOYMENT=$DISCOVERY_SERVER_DEPLOYMENT"
+        echo "VETS_SERVICE_DEPLOYMENT=$VETS_SERVICE_DEPLOYMENT"
+        echo "VISITS_SERVICE_DEPLOYMENT=$VISITS_SERVICE_DEPLOYMENT"
 
         echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID"
         echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"
         echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"
 
+        echo "ADMIN_SERVER_PACKAGE_PATH=$ADMIN_SERVER_PACKAGE_PATH"
+        echo "DISCOVERY_SERVER_PACKAGE_PATH=$DISCOVERY_SERVER_PACKAGE_PATH"
+        echo "CONFIG_SERVER_PACKAGE_PATH=$CONFIG_SERVER_PACKAGE_PATH"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=$CUSTOMERS_SERVICE_PACKAGE_PATH"
+        echo "VETS_SERVICE_PACKAGE_PATH=$VETS_SERVICE_PACKAGE_PATH"
+        echo "VISITS_SERVICE_PACKAGE_PATH=$VISITS_SERVICE_PACKAGE_PATH"
+        echo "API_GATEWAY_PACKAGE_PATH=$API_GATEWAY_PACKAGE_PATH"
+
       shell: bash
-
-    # Something to note, actions/checkout@v2 no longer sets the github workspace to the path input, which means you may need to manually set the working directory for your runs step
-    # https://github.com/actions/checkout/blob/main/adrs/0153-checkout-v2.md#path
-        
-    - name: Checkout your repo
-      uses: actions/checkout@v3.1.0 # https://github.com/actions/checkout
-      
-    - name: Set up JDK 11
-      uses: actions/setup-java@v2
-      with:
-        java-version: '11'
-        distribution: 'microsoft'
-        cache: maven
-  
-    - name: Build with Maven
-      id: mvn_build
-      run: | 
-        echo "****************************************************************************************"
-        echo "*                                                                                      *"
-        echo "*                                                                                      *"
-        echo "* /!\ IMPORTANT WARNING: projects must be built with -Denv=cloud                       *"
-        echo "* EXCEPT for api-gateway                                                               *"
-        echo "*                                                                                      *"
-        echo "*                                                                                      *"
-        echo "****************************************************************************************"
-
-        mvn -B clean package --file pom.xml -DskipTests -Denv=cloud
-        
-        echo "github.workspace = ${{ github.workspace }}"
-        pwd
-
-        echo "****************************************************************************************"
-        echo "*                                                                                      *"
-        echo "*                                                                                      *"
-        echo "*Checking Artifacts ...                                                                *"
-        echo "*                                                                                      *"
-        echo "*                                                                                      *"
-        echo "****************************************************************************************"
-
-        ls -al
-        echo ""
-        echo ""
-
-        ls -al spring-petclinic-admin-server/target/*.jar
-        ls -al spring-petclinic-api-gateway/target/*.jar
-        ls -al spring-petclinic-config-server/target/*.jar
-        ls -al spring-petclinic-customers-service/target/*.jar
-        ls -al spring-petclinic-vets-service/target/*.jar
-        ls -al spring-petclinic-visits-service/target/*.jar
-
-    # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts
-    - name: Archive ADMIN-SERVER Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.ADMIN_SERVER }}
-        path: ${{ github.workspace }}/${{ env.ADMIN_SERVER_JAR }}
-        retention-days: 5
-
-    - name: Archive CONFIG-SERVER Jar artifacts
-      uses:  actions/upload-artifact@v3
-      with:
-        name: ${{ env.CONFIG_SERVER }}
-        path: ${{ github.workspace }}/${{ env.CONFIG_SERVER_JAR }}
-        retention-days: 5
-
-    - name: Archive DISCOVERY-SERVER Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.DISCOVERY_SERVER }}
-        path: ${{ github.workspace }}/${{ env.DISCOVERY_SERVER_JAR }}
-        retention-days: 5
-
-    - name: Archive API-GATEWAY Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.API_GATEWAY }}
-        path: ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }}
-        retention-days: 5
-
-    - name: Archive CUSTOMERS-SERVICE Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.CUSTOMERS_SERVICE }}
-        path: ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }}
-        retention-days: 5
-
-    - name: Archive VETS-SERVICE Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.VETS_SERVICE }}
-        path: ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }}
-        retention-days: 5
-
-    - name: Archive VISITS-SERVICE Jar artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.VISITS_SERVICE }}
-        path: ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }}
-        retention-days: 5
 
     - name: Authorize local IP access to the Azure BLOB Storage 
       if: ${{ always() }}
       run: |
+        LOCAL_IP=$(curl whatismyip.akamai.com)
+        echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
         echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
         az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }}  --only-show-errors
         sleep 30        
       shell: bash
 
-    - name: Upload Artifacts to Azure BLOB Storage
-      id: blob_upload
+    - name: Download Artifacts from Azure BLOB Storage
+      id: blob_download
       run: | 
         # https://learn.microsoft.com/en-us/azure/storage/blobs/blob-cli
 
-        # Runne rwill be blocked by network rules of storage account. Must Allow its IP
+        # Runner will be blocked by network rules of storage account. Must Allow its IP
         # TODO in Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account
 
-        echo "About to upload Artifcats to Azure BLOB Storage. /!\ --overwrite' is in preview and under development"
-        echo "AZ_BLOB_MAX_CONNECTIONS=${{ env.AZ_BLOB_MAX_CONNECTIONS }}"
-        echo "AZ_BLOB_TIMEOUT=${{ env.AZ_BLOB_TIMEOUT }} "
-        echo "AZ_BLOB_MAX_CONNECTIONS=${{ env.AZ_BLOB_MAX_CONNECTIONS }}"
+        pwd
+        ls -al
 
-        # https://learn.microsoft.com/en-us/rest/api/storageservices/setting-timeouts-for-blob-service-operations
-        az storage blob upload --name ${{ env.ADMIN_SERVER }} --file ${{ github.workspace }}/${{ env.ADMIN_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name ${{ env.CONFIG_SERVER }} --file ${{ github.workspace }}/${{ env.CONFIG_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name ${{ env.DISCOVERY_SERVER }} --file ${{ github.workspace }}/${{ env.DISCOVERY_SERVER_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name ${{ env.API_GATEWAY }} --file ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name  ${{ env.CUSTOMERS_SERVICE }} --file ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name ${{ env.VETS_SERVICE }} --file ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
-        az storage blob upload --name  ${{ env.VISITS_SERVICE }} --file ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
+        mkdir ${{ github.workspace }}/${{ env.VETS_SERVICE }}
+        mkdir ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
+        mkdir ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
+        mkdir ${{ github.workspace }}/${{ env.API_GATEWAY }}
+
+        ls -al ${{ github.workspace }}/${{ env.VETS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
+
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ env.VETS_SERVICE_PACKAGE_PATH }}"
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ env.VISITS_SERVICE_PACKAGE_PATH }}"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
+        echo "API_GATEWAY_PACKAGE_PATH=${{ env.API_GATEWAY_PACKAGE_PATH }}"
+
+        echo "About to download Artifcats from Azure BLOB Storage"
+        # --blob-url  ? https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
+        az storage blob download --name ${{ env.VETS_SERVICE }} --file $VETS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.CUSTOMERS_SERVICE }} --file $CUSTOMERS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.VISITS_SERVICE }} --file $VISITS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.API_GATEWAY }} --file $API_GATEWAY_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+
+        ls -al ${{ github.workspace }}/${{ env.VETS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
+        ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
+
+      shell: bash
 
     - name: Disable local IP access to the Azure BLOB Storage 
       if: ${{ always() }}
@@ -437,23 +335,6 @@ jobs:
         echo "About to REMOVE network-rule ALLOWING $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
         az storage account network-rule remove --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }} -g ${{ env.RG_APP }} --only-show-errors
       shell: bash
-
-  deploy-apps:
-    needs: [build]
-    runs-on: ubuntu-latest # [self-hosted, linux, x64]
-    steps: 
-
-    - name: Azure Login
-      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Checkout your repo
-      uses: actions/checkout@v3.1.0 # https://github.com/actions/checkout
-
-    # You can  download all artifacts in a workflow run by not specifying a name.
-    - name: Download ALL Jar artifacts
-      uses: actions/download-artifact@v3
 
     - name: Check Artifacts
       run: | 
@@ -466,84 +347,48 @@ jobs:
         ls -al ${{ env.GH_WORKSPACE }}
         echo ""
 
-        echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ needs.build.outputs.API_GATEWAY_JAR_ARTIFACT }}"
-        echo "ADMIN_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.ADMIN_SERVER }}/${{ needs.build.outputs.ADMIN_SERVER_JAR_ARTIFACT }}"
-        echo "CONFIG_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.CONFIG_SERVER }}/${{ needs.build.outputs.CONFIG_SERVER_JAR_ARTIFACT }}"
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}/${{ needs.build.outputs.CUSTOMERS_SERVICE_JAR_ARTIFACT }}"
-        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ github.workspace }}/${{ env.DISCOVERY_SERVER }}/${{ needs.build.outputs.DISCOVERY_SERVER_JAR_ARTIFACT }}"
-        echo "VETS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VETS_SERVICE }}/${{ needs.build.outputs.VETS_SERVICE_JAR_ARTIFACT }}"
-        echo "VISITS_SERVICE_PACKAGE_PATH=${{ github.workspace }}/${{ env.VISITS_SERVICE }}/${{ needs.build.outputs.VISITS_SERVICE_JAR_ARTIFACT }}"
+        echo "VETS_SERVICE_PACKAGE_PATH=${{ env.VETS_SERVICE_PACKAGE_PATH }}"
+        echo "VISITS_SERVICE_PACKAGE_PATH=${{ env.VISITS_SERVICE_PACKAGE_PATH }}"
+        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
+        echo "API_GATEWAY_PACKAGE_PATH=${{ env.API_GATEWAY_PACKAGE_PATH }}"
 
         echo "****************************************************************************************"
         echo "*                                                                                      *"
         echo "*                                                                                      *"
-        echo "*Checking Artifacts ...                                                                *"
+        echo "* Checking Artifacts ...                                                               *"
         echo "*                                                                                      *"
         echo "*                                                                                      *"
         echo "****************************************************************************************"
-
-        echo "API_GATEWAY_PACKAGE_PATH=${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }}"
-        echo "ADMIN_SERVER_PACKAGE_PATH=${{ needs.build.outputs.ADMIN_SERVER_PACKAGE_PATH }}"
-        echo "CONFIG_SERVER_PACKAGE_PATH=${{ needs.build.outputs.CONFIG_SERVER_PACKAGE_PATH }}"
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
-        echo "DISCOVERY_SERVER_PACKAGE_PATH=${{ needs.build.outputs.DISCOVERY_SERVER_PACKAGE_PATH }}"
-        echo "VETS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }}"
-        echo "VISITS_SERVICE_PACKAGE_PATH=${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }}"
-
-        echo ""
-        ls -al ${{ env.ADMIN_SERVER }}
-        echo ""
-        ls -al ${{ needs.build.outputs.ADMIN_SERVER_PACKAGE_PATH }} # ${{ env.ADMIN_SERVER_PACKAGE_PATH }}
-        echo ""
-
-        echo ""
-        ls -al ${{ env.CONFIG_SERVER }}
-        echo ""
-        ls -al ${{ needs.build.outputs.CONFIG_SERVER_PACKAGE_PATH }} # ${{ env.CONFIG_SERVER_PACKAGE_PATH }}        
-        echo ""
-
-        echo ""
-        ls -al ${{ env.DISCOVERY_SERVER }}
-        echo ""
-        ls -al ${{ needs.build.outputs.DISCOVERY_SERVER_PACKAGE_PATH }} # ${{ env.DISCOVERY_SERVER_PACKAGE_PATH }}          
-        echo ""
 
         echo ""
         ls -al ${{ env.API_GATEWAY }}
         echo ""
-        ls -al ${{ needs.build.outputs.API_GATEWAY_PACKAGE_PATH }} # ${{ env.API_GATEWAY_PACKAGE_PATH }}           
+        ls -al ${{ env.API_GATEWAY_PACKAGE_PATH }}
         echo ""
 
         echo ""
         ls -al ${{ env.CUSTOMERS_SERVICE }}
         echo ""
-        ls -al ${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }} # ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}        
+        ls -al ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}
         echo ""
 
         echo ""
         ls -al  ${{ env.VETS_SERVICE }}
         echo ""
-        ls -al ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }} # ${{ env.VETS_SERVICE_PACKAGE_PATH }}          
+        ls -al ${{ env.VETS_SERVICE_PACKAGE_PATH }}
         echo ""
 
         echo ""
         ls -al  ${{ env.VISITS_SERVICE }}
         echo ""
-        ls -al ${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }} # ${{ env.VISITS_SERVICE_PACKAGE_PATH }}   
+        ls -al ${{ env.VISITS_SERVICE_PACKAGE_PATH }}
         echo ""    
 
         echo ""
-        echo "VETS_SERVICE_STAGING_DEPLOYMENT=${{ needs.build.outputs.VETS_SERVICE_STAGING_DEPLOYMENT }}"
-        echo "VISITS_SERVICE_STAGING_DEPLOYMENT=${{ needs.build.outputs.VISITS_SERVICE_STAGING_DEPLOYMENT }}"
-        echo "CUSTOMERS_SERVICE_STAGING_DEPLOYMENT=${{ needs.build.outputs.CUSTOMERS_SERVICE_STAGING_DEPLOYMENT }}"
-        echo "API_GATEWAY_STAGING_DEPLOYMENT=${{ needs.build.outputs.API_GATEWAY_STAGING_DEPLOYMENT }}"
-        echo ""
-
-        echo ""
-        echo "VETS_SERVICE_PRODUCTION_DEPLOYMENT=${{ needs.build.outputs.VETS_SERVICE_PRODUCTION_DEPLOYMENT }}"
-        echo "VISITS_SERVICE_PRODUCTION_DEPLOYMENT=${{ needs.build.outputs.VISITS_SERVICE_PRODUCTION_DEPLOYMENT }}"
-        echo "CUSTOMERS_SERVICE_PRODUCTION_DEPLOYMENT=${{ needs.build.outputs.CUSTOMERS_SERVICE_PRODUCTION_DEPLOYMENT }}"
-        echo "API_GATEWAY_PRODUCTION_DEPLOYMENT=${{ needs.build.outputs.API_GATEWAY_PRODUCTION_DEPLOYMENT }}"
+        echo "VETS_SERVICE_DEPLOYMENT=${{ env.VETS_SERVICE_DEPLOYMENT }}"
+        echo "VISITS_SERVICE_DEPLOYMENT=${{ env.VISITS_SERVICE_DEPLOYMENT }}"
+        echo "CUSTOMERS_SERVICE_DEPLOYMENT=${{ env.CUSTOMERS_SERVICE_DEPLOYMENT }}"
+        echo "API_GATEWAY_DEPLOYMENT=${{ env.API_GATEWAY_DEPLOYMENT }}"
         echo ""
 
         echo ""
@@ -551,21 +396,9 @@ jobs:
         echo "TENANT=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }}"
         echo ""
 
-        VETS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.build.outputs.VETS_SVC_APP_IDENTITY_CLIENT_ID }}
-        VISITS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.build.outputs.VISITS_SVC_APP_IDENTITY_CLIENT_ID }}
-        CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=${{ needs.build.outputs.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }}
-
-        echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID"
-        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"
-        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"
-
-        echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
-        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
-        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"  >> $GITHUB_ENV
-        
-        az config set extension.use_dynamic_install=yes_without_prompt
-        az extension add --name spring
-        az extension update --name spring
+        VETS_SVC_APP_IDENTITY_CLIENT_ID=${{ env.VETS_SVC_APP_IDENTITY_CLIENT_ID }}
+        VISITS_SVC_APP_IDENTITY_CLIENT_ID=${{ env.VISITS_SVC_APP_IDENTITY_CLIENT_ID }}
+        CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=${{ env.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }}
 
     - name: Deploy Vets-Service
       run: | 
@@ -589,12 +422,12 @@ jobs:
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
           echo "Set deployment name to STAGING"
-          DEPLOYMENT_NAME=${{ needs.build.outputs.VETS_SERVICE_STAGING_DEPLOYMENT }}
+          DEPLOYMENT_NAME=${{ env.VETS_SERVICE_STAGING_DEPLOYMENT }}
         else
           if [ !$DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "set-production" ]
           then
               echo "Set deployment name to PRODUCTION"
-              DEPLOYMENT_NAME=${{ needs.build.outputs.VETS_SERVICE_PRODUCTION_DEPLOYMENT }}
+              DEPLOYMENT_NAME=${{ env.VETS_SERVICE_PRODUCTION_DEPLOYMENT }}
           else
               echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
               exit 1
@@ -650,10 +483,10 @@ jobs:
         az spring app deploy \
         --name ${{ env.VETS_SERVICE }} \
         --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
-        --artifact-path ${{ needs.build.outputs.VETS_SERVICE_PACKAGE_PATH }} \
+        --artifact-path ${{ env.VETS_SERVICE_PACKAGE_PATH }} \
         --deployment $DEPLOYMENT_NAME \
         --disable-probe true \
-        --env SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID SPRING_CLOUD_AZURE_TENANT_ID=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }} \
+        --env SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} VETS_SVC_APP_IDENTITY_CLIENT_ID=${{ env.VETS_SVC_APP_IDENTITY_CLIENT_ID }} SPRING_CLOUD_AZURE_TENANT_ID=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }} \
         --jvm-options="${{ env.DEPLOYMENT_JVM_OPTIONS }}" \
         --version ${{ env.DEPLOYMENT_VERSION }} \
         --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }}         
@@ -697,12 +530,12 @@ jobs:
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
           echo "Set deployment name to STAGING"
-          DEPLOYMENT_NAME=${{ needs.build.outputs.VISITS_SERVICE_STAGING_DEPLOYMENT }}
+          DEPLOYMENT_NAME=${{ env.VISITS_SERVICE_STAGING_DEPLOYMENT }}
         else
           if [ !$DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "set-production" ]
           then
               echo "Set deployment name to PRODUCTION"
-              DEPLOYMENT_NAME=${{ needs.build.outputs.VISITS_SERVICE_PRODUCTION_DEPLOYMENT }}
+              DEPLOYMENT_NAME=${{ env.VISITS_SERVICE_PRODUCTION_DEPLOYMENT }}
           else
               echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
               exit 1
@@ -758,10 +591,10 @@ jobs:
         az spring app deploy \
         --name ${{ env.VISITS_SERVICE }} \
         --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
-        --artifact-path ${{ needs.build.outputs.VISITS_SERVICE_PACKAGE_PATH }} \
+        --artifact-path ${{ env.VISITS_SERVICE_PACKAGE_PATH }} \
         --deployment $DEPLOYMENT_NAME \
         --disable-probe true \
-        --env SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID SPRING_CLOUD_AZURE_TENANT_ID=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }} \
+        --env SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} VISITS_SVC_APP_IDENTITY_CLIENT_ID=${{ env.VISITS_SVC_APP_IDENTITY_CLIENT_ID }} SPRING_CLOUD_AZURE_TENANT_ID=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }} \
         --jvm-options="${{ env.DEPLOYMENT_JVM_OPTIONS }}" \
         --version ${{ env.DEPLOYMENT_VERSION }} \
         --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }}         
@@ -804,12 +637,12 @@ jobs:
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
           echo "Set deployment name to STAGING"
-          DEPLOYMENT_NAME=${{ needs.build.outputs.CUSTOMERS_SERVICE_STAGING_DEPLOYMENT }}
+          DEPLOYMENT_NAME=${{ env.CUSTOMERS_SERVICE_STAGING_DEPLOYMENT }}
         else
           if [ !$DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "set-production" ]
           then
               echo "Set deployment name to PRODUCTION"
-              DEPLOYMENT_NAME=${{ needs.build.outputs.CUSTOMERS_SERVICE_PRODUCTION_DEPLOYMENT }}
+              DEPLOYMENT_NAME=${{ env.CUSTOMERS_SERVICE_PRODUCTION_DEPLOYMENT }}
           else
               echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
               exit 1
@@ -865,10 +698,10 @@ jobs:
         az spring app deploy \
         --name ${{ env.CUSTOMERS_SERVICE }} \
         --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
-        --artifact-path ${{ needs.build.outputs.CUSTOMERS_SERVICE_PACKAGE_PATH }} \
+        --artifact-path ${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }} \
         --deployment $DEPLOYMENT_NAME \
         --disable-probe true \
-        --env SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID SPRING_CLOUD_AZURE_TENANT_ID=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }} \
+        --env SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=${{ env.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }} SPRING_CLOUD_AZURE_TENANT_ID=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }} \
         --jvm-options="${{ env.DEPLOYMENT_JVM_OPTIONS }}" \
         --version ${{ env.DEPLOYMENT_VERSION }} \
         --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }}         
