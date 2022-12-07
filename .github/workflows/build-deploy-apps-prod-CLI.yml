@@ -527,8 +527,8 @@ jobs:
               echo "About to Set $DEPLOYMENT_NAME as Production deployment ..."
               # https://github.com/Azure/Azure-Spring-Apps/issues/17
               # [].properties.active = true mean it is a Production Deployment
-              prod_deployment_active=$(az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.[].properties.active')
-              echo "Checking if $DEPLOYMENT_NAME is alreasdy set to Active/Production:" $prod_deployment_active
+              prod_deployment_active=$(az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.properties.active')
+              echo "Checking if $DEPLOYMENT_NAME is already set to Active/Production:" $prod_deployment_active
               if [ $prod_deployment_active ]
               then
                 echo "$DEPLOYMENT_NAME is already set to Production"
@@ -662,8 +662,8 @@ jobs:
               echo "About to Set $DEPLOYMENT_NAME as Production deployment ..."
               # https://github.com/Azure/Azure-Spring-Apps/issues/17
               # [].properties.active = true mean it is a Production Deployment
-              prod_deployment_active=$(az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VISITS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.[].properties.active')
-              echo "Checking if $DEPLOYMENT_NAME is alreasdy set to Active/Production:" $prod_deployment_active
+              prod_deployment_active=$(az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VISITS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.properties.active')
+              echo "Checking if $DEPLOYMENT_NAME is already set to Active/Production:" $prod_deployment_active
               if [ $prod_deployment_active ]
               then
                 echo "$DEPLOYMENT_NAME is already set to Production"
@@ -797,8 +797,8 @@ jobs:
               echo "About to Set $DEPLOYMENT_NAME as Production deployment ..."
               # https://github.com/Azure/Azure-Spring-Apps/issues/17
               # [].properties.active = true mean it is a Production Deployment
-              prod_deployment_active=$(az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.CUSTOMERS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.[].properties.active')
-              echo "Checking if $DEPLOYMENT_NAME is alreasdy set to Active/Production:" $prod_deployment_active
+              prod_deployment_active=$(az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.CUSTOMERS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.properties.active')
+              echo "Checking if $DEPLOYMENT_NAME is already set to Active/Production:" $prod_deployment_active
               if [ $prod_deployment_active ]
               then
                 echo "$DEPLOYMENT_NAME is already set to Production"
