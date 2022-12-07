@@ -370,7 +370,7 @@ jobs:
               # [].properties.active = true mean it is a Production Deployment
               prod_deployment_active=$(az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.API_GATEWAY }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.[].properties.active')
               echo "Checking if $DEPLOYMENT_NAME is alreasdy set to Active/Production:" $prod_deployment_active
-              if [ $prod_deployment_active ]
+              [[ $prod_deployment_active == false ]]
               then
                 echo "$DEPLOYMENT_NAME is already set to Production"
               else
