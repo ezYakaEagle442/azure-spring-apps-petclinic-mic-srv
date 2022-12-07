@@ -181,31 +181,15 @@ jobs:
         pwd
         ls -al
 
-        mkdir ${{ github.workspace }}/${{ env.VETS_SERVICE }}
-        mkdir ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
-        mkdir ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
         mkdir ${{ github.workspace }}/${{ env.API_GATEWAY }}
-
-        ls -al ${{ github.workspace }}/${{ env.VETS_SERVICE }}
-        ls -al ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
-        ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
         ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
 
-        echo "VETS_SERVICE_PACKAGE_PATH=${{ env.VETS_SERVICE_PACKAGE_PATH }}"
-        echo "VISITS_SERVICE_PACKAGE_PATH=${{ env.VISITS_SERVICE_PACKAGE_PATH }}"
-        echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
         echo "API_GATEWAY_PACKAGE_PATH=${{ env.API_GATEWAY_PACKAGE_PATH }}"
 
         echo "About to download Artifcats from Azure BLOB Storage"
         # --blob-url  ? https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
-        az storage blob download --name ${{ env.VETS_SERVICE }} --file $VETS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
-        az storage blob download --name ${{ env.CUSTOMERS_SERVICE }} --file $CUSTOMERS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
-        az storage blob download --name ${{ env.VISITS_SERVICE }} --file $VISITS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
         az storage blob download --name ${{ env.API_GATEWAY }} --file $API_GATEWAY_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
 
-        ls -al ${{ github.workspace }}/${{ env.VETS_SERVICE }}
-        ls -al ${{ github.workspace }}/${{ env.VISITS_SERVICE }}
-        ls -al ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE }}
         ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
 
       shell: bash
