@@ -535,6 +535,7 @@ jobs:
               else
                 echo "About to set $DEPLOYMENT_NAME to Production"
                 az spring app set-deployment -d $DEPLOYMENT_NAME -n ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+              fi
           else
               echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
               exit 1
@@ -669,6 +670,7 @@ jobs:
               else
                 echo "About to set $DEPLOYMENT_NAME to Production"
                 az spring app set-deployment -d $DEPLOYMENT_NAME -n ${{ env.VISITS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+              fi
           else
               echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
               exit 1
@@ -803,6 +805,7 @@ jobs:
               else
                 echo "About to set $DEPLOYMENT_NAME to Production"
                 az spring app set-deployment -d $DEPLOYMENT_NAME -n ${{ env.CUSTOMERS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+              fi
           else
               echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
               exit 1
