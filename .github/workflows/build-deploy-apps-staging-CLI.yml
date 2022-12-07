@@ -525,7 +525,16 @@ jobs:
           if [ !$DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "set-production" ]
           then
               echo "About to Set $DEPLOYMENT_NAME as Production deployment ..."
-              az spring app set-deployment -d $DEPLOYMENT_NAME -n ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+              # https://github.com/Azure/Azure-Spring-Apps/issues/17
+              # [].properties.active = true mean it is a Production Deployment
+              prod_deployment_active=$(az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.[].properties.active')
+              echo "Checking if $DEPLOYMENT_NAME is alreasdy set to Active/Production:" $prod_deployment_active
+              if [ $prod_deployment_active ]
+              then
+                echo "$DEPLOYMENT_NAME is already set to Production"
+              else
+                echo "About to set $DEPLOYMENT_NAME to Production"
+                az spring app set-deployment -d $DEPLOYMENT_NAME -n ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
           else
               echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
               exit 1
@@ -650,7 +659,16 @@ jobs:
           if [ !$DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "set-production" ]
           then
               echo "About to Set $DEPLOYMENT_NAME as Production deployment ..."
-              az spring app set-deployment -d $DEPLOYMENT_NAME -n ${{ env.VISITS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+              # https://github.com/Azure/Azure-Spring-Apps/issues/17
+              # [].properties.active = true mean it is a Production Deployment
+              prod_deployment_active=$(az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.VISITS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.[].properties.active')
+              echo "Checking if $DEPLOYMENT_NAME is alreasdy set to Active/Production:" $prod_deployment_active
+              if [ $prod_deployment_active ]
+              then
+                echo "$DEPLOYMENT_NAME is already set to Production"
+              else
+                echo "About to set $DEPLOYMENT_NAME to Production"
+                az spring app set-deployment -d $DEPLOYMENT_NAME -n ${{ env.VISITS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
           else
               echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
               exit 1
@@ -775,7 +793,16 @@ jobs:
           if [ !$DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "set-production" ]
           then
               echo "About to Set $DEPLOYMENT_NAME as Production deployment ..."
-              az spring app set-deployment -d $DEPLOYMENT_NAME -n ${{ env.CUSTOMERS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+              # https://github.com/Azure/Azure-Spring-Apps/issues/17
+              # [].properties.active = true mean it is a Production Deployment
+              prod_deployment_active=$(az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.CUSTOMERS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.[].properties.active')
+              echo "Checking if $DEPLOYMENT_NAME is alreasdy set to Active/Production:" $prod_deployment_active
+              if [ $prod_deployment_active ]
+              then
+                echo "$DEPLOYMENT_NAME is already set to Production"
+              else
+                echo "About to set $DEPLOYMENT_NAME to Production"
+                az spring app set-deployment -d $DEPLOYMENT_NAME -n ${{ env.CUSTOMERS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
           else
               echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
               exit 1
