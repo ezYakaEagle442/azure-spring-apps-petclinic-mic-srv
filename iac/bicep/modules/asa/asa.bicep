@@ -237,7 +237,7 @@ resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers
   }
 }
 
-resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' = {
+resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
   name: 'customers-service'
   location: location
   parent: azureSpringApps
@@ -266,7 +266,7 @@ resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-previ
 }
 output customersServiceIdentity string = customersserviceapp.identity.userAssignedIdentities['${customersServicedentity.id}'].principalId
 
-resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' = {
+resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
   name: 'vets-service'
   location: location
   parent: azureSpringApps
@@ -295,7 +295,7 @@ resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' =
 }
 output vetsServiceIdentity string = vetsserviceapp.identity.userAssignedIdentities['${vetsServiceAppIdentity.id}'].principalId
 
-resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' = {
+resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
   name: 'visits-service'
   location: location
   parent: azureSpringApps
@@ -325,7 +325,7 @@ resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview
 output visitsServiceIdentity string = visitsservicerapp.identity.userAssignedIdentities['${visitsServiceIdentity.id}'].principalId
 
 
-resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' = {
+resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
   name: 'api-gateway'
   location: location
   parent: azureSpringApps

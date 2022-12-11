@@ -99,7 +99,7 @@ resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 }
 // pre-req: https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-azure-cli#prerequisites
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-09-01-preview' existing = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-11-01-preview' existing = {
   name: azureSpringAppsInstanceName
 }
 
@@ -140,23 +140,23 @@ resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities
   name: visitsServiceAppIdentityName
 }
 
-resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2022-09-01-preview' existing = {
+resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2022-11-01-preview' existing = {
   name: configServerName
 }
 
-resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' existing = {
+resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
   name: 'customers-service'
   parent: azureSpringApps
 }
 
-resource adminserverapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' existing = {
+resource adminserverapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
   name: 'adm-test'
   parent: azureSpringApps
 }
 
 
-// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep
-resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-09-01-preview' = {
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/apps/deployments?pivots=deployment-language-bicep
+resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-11-01-preview' = {
   name: 'default'
   parent: adminserverapp
   sku: {
@@ -227,7 +227,7 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
     
     source: {
       version: deploymentVersion
-      type: 'Jar' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
+      type: 'Jar' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
       jvmOptions: '-Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud'
       relativePath: 'https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar' // 'spring-petclinic-admin-server/target/petclinic-customers-service-2.6.6.jar' // should be a link to a BLOB storage
       runtimeVersion: 'Java_11'
@@ -235,26 +235,26 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
   }
 }
 
-resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' existing = {
+resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
   name: 'vets-service'
   parent: azureSpringApps
 
 }
 
-resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' existing = {
+resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
   name: 'visits-service'
   parent: azureSpringApps
 }
 
-resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-09-01-preview' existing = {
+resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
   name: 'api-gateway'
   parent: azureSpringApps
 }
 
 
 /*
-// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep
-resource customersserviceappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-09-01-preview' = {
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/apps/deployments?pivots=deployment-language-bicep
+resource customersserviceappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-11-01-preview' = {
   name: 'aca-${appName}-customers-service-init-v.0.1.0'
   parent: customersserviceapp
   sku: {
@@ -308,7 +308,7 @@ resource customersserviceappdeployment 'Microsoft.AppPlatform/Spring/apps/deploy
       version: '1.0.0'
       
       
-      type: 'Jar' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
+      type: 'Jar' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
       jvmOptions: '-Dazure.keyvault.uri=${kvURL} -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud'
       relativePath: 'spring-petclinic-customers-service' // './target/petclinic-customers-service-2.6.6.jar'
       runtimeVersion: 'Java_11'
@@ -327,7 +327,7 @@ resource customersserviceappdeployment 'Microsoft.AppPlatform/Spring/apps/deploy
         args: '' // Arguments to the entrypoint. The docker image's CMD is used if this is not provided.
       }
       
-      type: 'Source' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
+      type: 'Source' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
       relativePath: 'spring-petclinic-customers-service'
       runtimeVersion: 'Java_11'
       artifactSelector: 'spring-petclinic-customers-service' // Selector for the artifact to be used for the deployment for multi-module projects. This should be the relative path to the target module/project.
