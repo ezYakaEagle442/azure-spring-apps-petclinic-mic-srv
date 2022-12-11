@@ -10,10 +10,28 @@ urlFragment: "spring-petclinic-microservices"
 
 # Deploy Spring Boot apps using Azure Spring Apps and MySQL 
 
+[![IaC Deployment Status](https://github.com/ezYakaEagle442//azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac-pre-req.yml/badge.svg)](https://github.com/ezYakaEagle442//azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac-pre-req.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 [![IaC Deployment Status](https://github.com/ezYakaEagle442//azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac.yml/badge.svg)](https://github.com/ezYakaEagle442//azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 [![Build Status](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/maven-build.yml/badge.svg)](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/maven-build.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+[![Build Status](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/maven-build-ui.yml/badge.svg)](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/maven-build-ui.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+[![Build Status](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/build-deploy-apps-staging-CLI.yml/badge.svg)](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/build-deploy-apps-staging-CLI.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+[![Build Status](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/build-deploy-apps-prod-CLI.yml/badge.svg)](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/build-deploy-apps-prod-CLI.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+[![Build Status](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/build-deploy-ui-staging-CLI.yml/badge.svg)](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/build-deploy-ui-staging-CLI.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+[![Build Status](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/build-deploy-ui-prod-CLI.yml/badge.svg)](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/build-deploy-ui-prod-CLI.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Azure Spring Apps enables you to easily run a Spring Boot applications on Azure.
@@ -22,19 +40,32 @@ This quickstart shows you how to deploy an existing Java Spring Apps application
 When you're finished, you can continue to manage the application via the Azure CLI or switch to using the 
 Azure Portal.
 
+This microservices sample was initially derived from [AngularJS version](https://github.com/spring-petclinic/spring-petclinic-angular1) to demonstrate how to split sample Spring application into [microservices](http://www.martinfowler.com/articles/microservices.html).
+To achieve that goal we use IaC with Azure Bicep, MS build of OpenJDK 11, GitHub Actions, Azure Springs Apps, Azure Key Vault, Azure Database for MySQL (Flexible server) and Azure BLOB storage to store the *.jar Artifacts
+
+
 * [Deploy Spring Boot apps using Azure Spring Apps and MySQL](#deploy-spring-boot-apps-using-azure-spring-apps-and-mysql)
   * [What will you experience](#what-will-you-experience)
   * [What you will need](#what-you-will-need)
   * [Install the Azure CLI extension](#install-the-azure-cli-extension)
   * [Clone and build the repo](#clone-and-build-the-repo)
-  * [Unit 1 - AUTOMATE Infra deployments using GitHub Actions](#deploy-azure-spring-apps-instance-and-the-petclinic-microservices-apis-with-iac)
-  * [Unit 2 - AUTOMATE Apps deployments using GitHub Actions](#deploy-azure-spring-apps-instance-and-the-petclinic-microservices-apis-with-iac)
+  * [Understanding the Spring Petclinic application](#understanding-the-Spring-Petclinic-application)
+  * [Unit 1 - AUTOMATE Infra deployments using GitHub Actions](#deploy-azure-spring-apps-instance-with-iac)
+  * [Unit 2 - AUTOMATE Apps deployments using GitHub Actions](#deploy-the-petclinic-microservices-apps-with-iac)
   * [Unit 3 - Deploy and monitor Spring Boot apps](#monitor-spring-boot-applications)
   * [Unit 4 - Delete Passwords](#delete-passwords)
- https://aka.ms/Delete-Passwords
- https://techcommunity.microsoft.com/t5/apps-on-azure-blog/delete-passwords-passwordless-connections-for-java-apps-to-azure/ba-p/3638714
- https://learn.microsoft.com/en-us/azure/developer/java/spring-framework/migrate-mysql-to-passwordless-connection?toc=%2Fazure%2Fdeveloper%2Fintro%2Ftoc.json&bc=%2Fazure%2Fdeveloper%2Fintro%2Fbreadcrumb%2Ftoc.json&tabs=sign-in-azure-cli%2Cjava%2Capp-service%2Ccontainer-apps-identity
- 
+
+
+ Read:
+
+ - [https://aka.ms/Delete-Passwords](https://aka.ms/Delete-Passwords) 
+ - [https://techcommunity.microsoft.com/t5/apps-on-azure-blog/delete-passwords-passwordless-connections-for-java-apps-to-azure/ba-p/3638714](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/delete-passwords-passwordless-connections-for-java-apps-to-azure/ba-p/3638714) 
+ - [Delete password migration docs](https://learn.microsoft.com/en-us/azure/developer/java/spring-framework/migrate-mysql-to-passwordless-connection?toc=%2Fazure%2Fdeveloper%2Fintro%2Ftoc.json&bc=%2Fazure%2Fdeveloper%2Fintro%2Fbreadcrumb%2Ftoc.json&tabs=sign-in-azure-cli%2Cjava%2Capp-service%2Ccontainer-apps-identity) 
+ - [http://aka.ms/do-more](http://aka.ms/do-more) 
+- [App deployment](https://learn.microsoft.com/en-us/azure/spring-apps/how-to-prepare-app-deployment?tabs=basic-standard-tier&pivots=programming-language-java)
+- [the Reference Architecture](https://learn.microsoft.com/en-us/azure/spring-apps/reference-architecture?tabs=azure-spring-standard) 
+- [FAQ](https://learn.microsoft.com/en-us/azure/spring-apps/faq?pivots=programming-language-java)
+
 
 ## What will you experience
 You will:
@@ -71,6 +102,11 @@ Note -  The [`jq` utility](https://stedolan.github.io/jq/download/). On Windows,
 Note - The Bash shell. While Azure CLI should behave identically on all environments, shell  semantics vary. Therefore, only bash can be used with the commands in this repo. 
 To complete these repo steps on Windows, use Git Bash that accompanies the Windows distribution of 
 Git. Use only Git Bash to complete this training on Windows. Do not use WSL.
+
+To install Azure Bicep locally, read [https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install)
+
+See the [pre-requisites](https://learn.microsoft.com/en-us/azure/spring-apps/quickstart?tabs=Azure-CLI#prerequisites), [Bicep pre-req](https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-standard#prerequisites) in the ASA docs
+
 
 ### OR Use Azure Cloud Shell
 
@@ -116,7 +152,7 @@ have the CLI extension, you may need to upgrade to the latest
 
 TODO: add ASA Maven Plugin [https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Spring-Apps:-Deploy](https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Spring-Apps:-Deploy)
 
-<span style="color:red">**/!\ IMPORTANT WARNING: projects must be built with -Denv=cloud  EXCEPT for api-gateway**</span>
+<span style="color:red">**/!\ IMPORTANT WARNING: projects must be built with -Denv=cloud EXCEPT for api-gateway**</span>
 
 ```bash
     cd azure-spring-apps-petclinic-mic-srv
@@ -129,29 +165,25 @@ This will take a few minutes.
 
 ![](./docs/microservices-architecture-diagram.jpg)
 
-## Deploy Azure Spring Apps instance and the petclinic microservices Apps with IaC
+The UI code is located at spring-petclinic-api-gateway\src\main\resources\static\scripts.
 
-See **[Bicep](./iac/bicep/README.md)**
+The Spring Zuul(Netflix Intelligent Routing) config at https://github.com/ezYakaEagle442/spring-petclinic-microservices-config/blob/main/api-gateway.yml has been deprecated and replaced by the Spring Cloud Gateway.
 
-<span style="color:red">**Be aware that the MySQL DB is NOT deployed in a VNet but network FireWall Rules are Set. So ensure to allow ASA Outbound IP addresses or check the option "Allow public access from any Azure service within Azure to this server" in the Azure Portal / your MySQL DB / Networking / Firewall rules**</span>
+The Spring Cloud Gateway routing is configured at [spring-petclinic-api-gateway/src/main/resources/application.yml](spring-petclinic-api-gateway/src/main/resources/application.yml)
 
-Now, the Bicep IaC should have configured the Azure Private DNS Zone, as explained in the [docs](https://learn.microsoft.com/en-us/azure/spring-apps/access-app-virtual-network?tabs=azure-portal)
+The API Gateway Controller is located at [spring-petclinic-api-gateway/src/main/java/org/springframework/samples/petclinic/api/boundary/web/ApiGatewayController.java](spring-petclinic-api-gateway/src/main/java/org/springframework/samples/petclinic/api/boundary/web/ApiGatewayController.java)
 
-### Configure MySQL DatabaseDB Time Zone
-
-```sh
-SELECT name FROM mysql.time_zone_name;
-
-    az mysql server configuration set --name time_zone \
-     --resource-group ${RESOURCE_GROUP} \
-     --server ${MYSQL_SERVER_NAME} --value "Europe/Paris"
-```
+Note: The Spring Cloud Discovery Server is NOT deployed as it is a managed service in ASA.
+see :
+- [https://spring.io/guides/gs/service-registration-and-discovery](https://spring.io/guides/gs/service-registration-and-discovery/)
+- [https://spring.io/projects/spring-cloud-netflix](https://spring.io/projects/spring-cloud-netflix)
+- [https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolutionhttps://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/
+- [https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/)
 
 
 ### Understand the Spring Cloud Config
 
 Read [https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-setup-config-server?tabs=Azure-portal&pivots=programming-language-java](https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-setup-config-server?tabs=Azure-portal&pivots=programming-language-java)
-
 
 Spring Boot is a framework aimed to help developers to easily create and build stand-alone, production-grade Spring based Applications that you can “just run”.
 
@@ -175,38 +207,312 @@ Spring Cloud Netflix features:
 - Service Discovery: Eureka instances can be registered and clients can discover the instances using Spring-managed beans
 - Service Discovery: an embedded Eureka server can be created with declarative Java configuration
 
-### Deploy Spring Boot applications and set environment variables
 
-Deploy Spring Boot applications to Azure 
-<span style="color:red">**You do NOT need to deploy a self-hosted GitHub Action runner in the VM created previously**</span>
+## Deploy Azure Spring Apps instance with IaC
+
+See **[Bicep](./iac/bicep/README.md)**
+
+<span style="color:red">**Be aware that the MySQL DB is NOT deployed in a VNet but network FireWall Rules are Set. So ensure to allow ASA Outbound IP addresses or check the option "Allow public access from any Azure service within Azure to this server" in the Azure Portal / your MySQL DB / Networking / Firewall rules**</span>
+
+Read :
+- [https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts)
+- [https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven](https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven)
+
+You have to specify all [KV secrets](./iac/bicep/modules/kv/kv_sec_key.bicep#L25) that will be then created in the GitHub Action [Azure Infra pre-req workflow](./.github/workflows/deploy-iac.yml#L63) :
+- SPRING-DATASOURCE-PASSWORD
+- SPRING-CLOUD-AZURE-KEY-VAULT-ENDPOINT
+- SPRING-CLOUD-AZURE-TENANT-ID
+- VM-ADMIN-USER-NAME
+- VM-ADMIN-PASSWORD
+
+dash '-' are not supported in GH secrets, so the secrets must be named in GH with underscore '_'.
+Also the '&' character in the SPRING_DATASOURCE_URL must be escaped with '\&'
+
+Add the App secrets used by the Spring Config to your GH repo settings / Actions / secrets / Actions secrets / New Repository secrets / Add , ex: [https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/settings/secrets/actions](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/settings/secrets/actions):
+
+Secret Name	| Secret Value example
+-------------:|:-------:
+SPRING_DATASOURCE_URL | jdbc:mysql://petcliasa777.mysql.database.azure.com:3306/petclinic?useSSL=true\&requireSSL=true\&enabledTLSProtocols=TLSv1.2\&verifyServerCertificate=true
+SPRING_DATASOURCE_PASSWORD | PUT YOUR PASSWORD HERE
+SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT | https://kv-petclinic777.vault.azure.net/
+SPRING_CLOUD_AZURE_TENANT_ID | PUT YOUR AZURE TENANT ID HERE
+VM_ADMIN_USER_NAME | PUT YOUR AZURE Windows client VM JumpOff Admin User Name HERE
+VM_ADMIN_PASSWORD | PUT YOUR PASSWORD HERE
 
 ```bash
-# https://github.com/MicrosoftDocs/azure-docs/issues/90220 : production deployment must be created first
+LOCATION="westeurope"
+RG_KV="rg-iac-kv777"
+RG_APP="rg-iac-asa-petclinic-mic-srv"
 
-az spring app deployment create --name production --app admin-server -s asa-aspetcliasa --artifact-path  spring-petclinic-admin-server/target/spring-petclinic-admin-server-2.6.3.jar -g rg-iac-asa-petclinic-mic-srv --version 2.6.3 --runtime-version Java_11 --cpu 500m --memory 512Mi --instance-count 3 --disable-probe false 
+az group create --name $RG_KV --location $LOCATION
+az group create --name $RG_APP --location $LOCATION
+```
 
-# This query is wrong but should returns as many instance-count as decleared at app deployment creation : 3
-appInstances="$(az spring app show --name admin-server -g rg-iac-asa-petclinic-mic-srv --service asa-aspetcliasa --query "[?properties.activeDeployment.name=='production'].properties.activeDeployment.properties.instances.name" -o tsv | head -1)"
+A Service Principal is required for GitHub Action Runner, read [https://aka.ms/azadsp-cli](https://aka.ms/azadsp-cli)
+```bash  
+SPN_APP_NAME="gha_asa_run"
 
-az spring app logs --name discovery-server \
-                         --resource-group rg-iac-asa-petclinic-mic-srv \
-                         --service asa-aspetcliasa \
-                         --deployment default \
-                         --instance discovery-server-default-16-58fbbf89bf-47kvr \
-                         --limit 2048 \
-                         --lines 100 \
-                         --since 60m
+# /!\ In CloudShell, the default subscription is not always the one you thought ...
+subName="set here the name of your subscription"
+subName=$(az account list --query "[?name=='${subName}'].{name:name}" --output tsv)
+echo "subscription Name :" $subName
+
+SUBSCRIPTION_ID=$(az account list --query "[?name=='${subName}'].{id:id}" --output tsv)
+SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+TENANT_ID=$(az account show --query tenantId -o tsv)
+```
+
+Add your AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID to your GH repo secrets / Actions secrets / Repository secrets
+
+Read [https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-cli%2Cwindows#create-a-service-principal-and-add-it-as-a-github-secret)
 
 
-az spring app deploy --name admin-server --artifact-path spring-petclinic-admin-server/target/spring-petclinic-admin-server-2.6.3.jar --jvm-options="-Xms512m -Xmx512m -Dspring.profiles.active=mysql" -g rg-iac-asa-petclinic-mic-srv --service asa-aspetcliasa --verbose
+In the GitHub Action Runner, to allow the Service Principal used to access the Key Vault, execute the command below:
+```sh
+# SPN_PWD=$(az ad sp create-for-rbac --name $SPN_APP_NAME --skip-assignment --query password --output tsv)
+az ad sp create-for-rbac --name $SPN_APP_NAME
+```
 
-az spring app show --name api-gateway -g rg-iac-asa-petclinic-mic-srv --service asa-aspetcliasa
+```console
+{
+  "clientId": "<GUID>",
+  "clientSecret": "<GUID>",
+  "subscriptionId": "<GUID>",
+  "tenantId": "<GUID>",
+  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+  "resourceManagerEndpointUrl": "https://management.azure.com/",
+  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+  "galleryEndpointUrl": "https://gallery.azure.com/",
+  "managementEndpointUrl": "https://management.core.windows.net/"
+}
+```
 
-az spring app logs --name admin-server --resource-group rg-iac-asa-petclinic-mic-srv --service asa-aspetcliasa --deployment production --instance admin-server-production-12-7c4c79b658-8bvfb --limit 2048 --lines 100 --since 60m
+Troubleshoot:
+If you hit _["Error: : No subscriptions found for ***."](https://learn.microsoft.com/en-us/answers/questions/738782/no-subscription-found-for-function-during-azure-cl.html)_ , this is related to an IAM privilege in the subscription.
 
-az spring app show-deploy-log --deployment production --name admin-server -g rg-iac-asa-petclinic-mic-srv --service asa-aspetcliasa
+```sh
+#APP_ID=$(az ad sp list --all --query "[?appDisplayName=='${SPN_APP_NAME}'].{appId:appId}" --output tsv)
+APP_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${SPN_APP_NAME}'].{id:appId}" --output tsv)
+TENANT_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${SPN_APP_NAME}'].{t:appOwnerOrganizationId}" --output tsv)
+
+# /!\ In Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account"
+# /!\ The SPN Id is NOT the App Registration Object ID, but the Enterprise Registration Object ID"
+SPN_ID=$(az ad sp show --id $APP_ID --query id -o tsv)
+
+# the assignee is an appId
+az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_KV} --role contributor
+
+# "Key Vault Secrets User"
+az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_KV} --role 4633458b-17de-408a-b874-0445c86b69e6
+
+
+# https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal#prerequisites
+# /!\ To assign Azure roles, you must have: requires to have Microsoft.Authorization/roleAssignments/write and Microsoft.Authorization/roleAssignments/delete permissions, 
+# such as User Access Administrator or Owner.
+az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_KV} --role Owner
+az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_APP} --role Owner
+
+az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_APP} --role contributor
+```
+
+<span style="color:red">**RBAC Permission model is set on KV, the [pre-req](https://learn.microsoft.com/en-us/azure/key-vault/general/rbac-guide?tabs=azure-cli#prerequisites) requires to have Microsoft.Authorization/roleAssignments/write and Microsoft.Authorization/roleAssignments/delete permissions, such as User Access Administrator or Owner.
+
+[https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal#prerequisites](https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal#prerequisites)
+To assign Azure roles, you must have: requires to have Microsoft.Authorization/roleAssignments/write and Microsoft.Authorization/roleAssignments/delete permissions, such as User Access Administrator or Owner.
+**</span>
+
+<span style="color:red">**"Key Vault Secrets User" [built-in role](https://learn.microsoft.com/en-us/azure/key-vault/general/rbac-guide?tabs=azure-cli#azure-built-in-roles-for-key-vault-data-plane-operations) read secret contents including secret portion of a certificate with private key. Only works for key vaults that use the 'Azure role-based access control' permission model.**
+</span>
+
+Read :
+- [Use GitHub Actions to connect to Azure documentation](https://docs.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Cwindows).
+- [https://github.com/Azure/login#configure-a-service-principal-with-a-secret](https://github.com/Azure/login#configure-a-service-principal-with-a-secret)
+
+Paste in your JSON object for your service principal with the name **AZURE_CREDENTIALS** as secrets to your GH repo secrets / Actions secrets / Repository secrets.
+
+You can test your connection with CLI :
+```sh
+az login --service-principal -u $APP_ID -p $SPN_PWD --tenant $TENANT_ID
+```
+
+Add SUBSCRIPTION_ID, TENANT_ID, APP_ID, SPN_ID, and SPN_PWD as secrets to your GH repo secrets / Actions secrets / Repository secrets
+
+<span style="color:red">**Be aware that at this stage KV is not created yet, it must exist first to set-policy**
+[enableRbasauthorization is true in KV](./iac/bicep/modules/kv/kv.bicep#L61), the key vault will use RBAC for authorization of data actions, and the [access policies specified in vault properties](https://docs.microsoft.com/en-us/azure/templates/microsoft.keyvault/vaults/accesspolicies?tabs=bicep) will be ignored</span>
+
+If enableRbasauthorization was set to false, you would have to follow the here under step to add access policy for the Service Principal.
+```sh
+KV_NAME="kv-petcliasa42"
+az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn $APP_ID
+```
+
+See GitHub Actions :
+- [Deploy the Azure Infra pre-req services workflow](./.github/workflows/deploy-iac-pre-req.yml)
+- [Deploy the Azure Infra services workflow](./.github/workflows/deploy-iac.yml)
+- [Maven Backends Build workflow](./.github/workflows/maven-build.yml)
+- [Maven UI Build workflow](./.github/workflows/maven-build-ui.yml)
+- [Java Apps Backends to Staging Deployment workflow](./.github/workflows/build-deploy-apps-staging-CLI.yml)
+- [Java Apps Backends to Production Deployment workflow](./.github/workflows/build-deploy-apps-prod-CLI.yml)
+- [Java Apps UI to Staging Deployment workflow](./.github/workflows/build-deploy-ui-staging-CLI.yml)
+- [Java Apps UI to Staging Production workflow](./.github/workflows/build-deploy-ui-prod-CLI.yml)
+- [Delete ALL the Azure Infra services workflow, except KeyVault](./.github/workflows/delete-rg.yml)
+
+
+<span style="color:red">****</span>
+
+Workflow Design
+
+The Workflow run the steps in this in this order :
 
 ```
+├── Deploy the Azure Infra services workflow ./.github/workflows/deploy-iac.yml
+│   ├── Authorize local IP to access the Azure Key Vault ./.github/workflows/deploy-iac.yml#L143
+│   ├── Create the secrets ./.github/workflows/deploy-iac.yml#L150
+│   ├── Disable local IP access to the Key Vault ./.github/workflows/deploy-iac.yml#L262
+│   ├── Deploy the pre-req ./.github/workflows/deploy-iac.yml#L295
+│   ├── Whitelist asa Env. OutboundIP to KV and MySQL ./.github/workflows/deploy-iac.yml#L322
+│   ├── Call Maven Build ./.github/workflows/deploy-iac.yml#L369
+│       ├── Maven Build ./.github/workflows/maven-build.yml#L128
+│       ├── Publish the Maven package ./.github/workflows/maven-build.yml#L166
+│       ├── Check all Jar artifacts ./.github/workflows/maven-build.yml#L177
+│       ├── Build image and push it to ACR ./.github/workflows/maven-build.yml#L200
+│   ├── Call Maven Build-UI ./.github/workflows/deploy-iac.yml#L376
+│   ├── Deploy Backend Services ./.github/workflows/deploy-iac.yml#L382
+│       ├── Deploy Backend services calling iac/bicep/petclinic-apps.bicep
+│       ├── Deploy the UI calling iac/bicep/modules/asa/apps/asa-ui.bicep
+│   ├── Configure Diagnostic-Settings ./.github/workflows/deploy-iac.yml#L453
+│   ├── Configure GitHub-Action-Settings ./.github/workflows/deploy-iac.yml#460
+```
+
+You need to set your own param values in each Workflow.
+
+Note: 
+- In the GH workflow / Job ,  runs-on: ubuntu-latest ==> ubuntu-latest is currently transitioning to ubuntu-22.04. During this time, you may experience some jobs running on either an ubuntu-20.04 or ubuntu-22.04 runner. You can specify runs-on: ubuntu-20.04 in your workflow if you need the previous version. Details can be found in this [announcement](https://github.com/actions/runner-images/issues/6399).
+- the GH Hosted Runner / [Ubuntu latest image has already Azure CLI installed](https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#cli-tools)
+
+
+
+## Deploy the petclinic microservices Apps with IaC
+
+
+## Database configuration
+
+In its default configuration, Petclinic uses an in-memory database (HSQLDB) which gets populated at startup with data.
+A similar setup is provided for MySql in case a persistent database configuration is needed.
+Dependency for Connector/J, the MySQL JDBC driver is already included in the `pom.xml` files.
+
+
+### Set MySql connection String
+
+You need to reconfigure the MySQL connection string with your own settings (you can get it from the Azure portal / petcliaks-mysql-server / Connection strings / JDBC):
+In the [spring-petclinic-microservices-config/blob/main/application.yml](https://github.com/ezYakaEagle442/spring-petclinic-microservices-config/blob/main/application.yml) :
+```
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    schema: classpath*:db/mysql/schema.sql
+    data: classpath*:db/mysql/data.sql
+    url: jdbc:mysql://petcliasa.mysql.database.azure.com:3306/petclinic?useSSL=true&requireSSL=true&enabledTLSProtocols=TLSv1.2&verifyServerCertificate=true
+
+    # url: jdbc:mysql://localhost:3306/petclinic?useSSL=false
+    # https://learn.spring.io/spring-boot/docs/2.7.3/reference/html/application-properties.html#appendix.application-properties.data
+    
+    # spring.datasource.password will be automatically injected from KV secrets SPRING-DATASOURCE-PASSWORD
+    # username: ${SPRING-DATASOURCE-USERNAME}
+    # password: ${SPRING-DATASOURCE-PASSWORD}  
+    initialization-mode: NEVER # ALWAYS
+    # https://javabydeveloper.com/spring-boot-loading-initial-data/
+    platform: mysql
+    #driver-class-name: com.mysql.jdbc.Driver
+```
+
+In fact the spring.datasource.password will be automatically injected from KV secrets SPRING-DATASOURCE-PASSWORD using the config below in each micro-service :
+example for Customers-Service [spring-petclinic-customers-service/src/main/resources/bootstrap.yml](spring-petclinic-customers-service/src/main/resources/bootstrap.yml)
+
+```
+spring:
+  cloud:
+    azure:
+      profile: # spring.cloud.azure.profile
+        # subscription-id:
+        tenant-id: ${AZURE_TENANT_ID}
+      credential:
+        managed-identity-enabled: true        
+      keyvault:
+        secret:
+          enabled: true
+          property-sources:
+            - name: kv-cfg-XXX # KV Config for each App XXX
+              endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+              credential:
+                managed-identity-enabled: true
+                client-id: ${XXXX_SVC_APP_IDENTITY_CLIENT_ID}
+---
+```
+
+You can check the DB connection with this [sample project](https://github.com/Azure-Samples/java-on-azure-examples/tree/main/databases/mysql/get-country).
+
+
+### Use the Spring 'mysql' profile
+
+To use a MySQL database, you have to start 3 microservices (`visits-service`, `customers-service` and `vets-services`)
+with the `mysql` Spring profile. Add the `--spring.profiles.active=mysql` as programm argument.
+
+In the `application.yml` of the [Configuration repository], set the `initialization-mode` to `never`  ( or `ALWAYS`).
+
+If you are running the microservices with Docker, you have to add the `mysql` profile into the (Dockerfile)[docker/Dockerfile]:
+```
+ENV SPRING_PROFILES_ACTIVE docker,mysql
+```
+
+All MySQL flexible-server parameters are set in the [sql-load workflow](./.github/workflows/sql-load.yml) called by the [IaC deployment workflow](./.github/workflows/deploy-iac.yml#L130)
+
+
+## Security
+### secret Management
+Azure Key Vault integration is implemented through Spring Cloud for Azure
+
+Read : 
+- [https://learn.microsoft.com/en-us/azure/spring-apps/tutorial-managed-identities-key-vault?tabs=system-assigned-managed-identity](https://learn.microsoft.com/en-us/azure/spring-apps/tutorial-managed-identities-key-vault?tabs=system-assigned-managed-identity)
+- [https://learn.microsoft.com/en-us/azure/spring-apps/how-to-manage-user-assigned-managed-identities?tabs=azure-portal&pivots=sc-standard-tier](https://learn.microsoft.com/en-us/azure/spring-apps/how-to-manage-user-assigned-managed-identities?tabs=azure-portal&pivots=sc-standard-tier)
+- [https://learn.microsoft.com/en-us/azure/azure-app-configuration/use-key-vault-references-spring-boot?source=recommendations](https://learn.microsoft.com/en-us/azure/azure-app-configuration/use-key-vault-references-spring-boot?source=recommendations)
+- [https://learn.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-boot-starter-java-app-with-azure-key-vault](https://learn.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-boot-starter-java-app-with-azure-key-vault)
+- [https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#advanced-usage]https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#advanced-usage)
+- [https://github.com/Azure/azure-sdk-for-java/issues/28310](https://github.com/Azure/azure-sdk-for-java/issues/28310)
+- [Maven Project parent pom.xml](pom.xml#L304)
+
+The Config-server does **NOT** use the config declared on the repo at [spring-petclinic-microservices-config/blob/main/application.yml](https://github.com/ezYakaEagle442/spring-petclinic-microservices-config/blob/main/application.yml) 
+but is configured in [asa.bicep](iac/bicep/modules/asa/asa.bicep#L229) which is configured from the [deployment Workflow](./.github/workflows/deploy-iac.yml#L23) .
+
+and uses a [User-Assigned Managed Identity](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview#managed-identity-types) to be able to read secrets from KeyVault.
+
+If you face any issue, see the [troubleshoot section](#key-vault-troubleshoot-with-USER-Assigned-MI)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Deploy Spring Boot applications and set environment variables
+
 
 ```bash
     az spring app show --name ${API_GATEWAY} | grep url
@@ -274,6 +580,29 @@ open https://${AZURE_SPRING_APPS_SERVICE}-${API_GATEWAY}.azuremicroservices.io/a
 ```
 
 #### Start monitoring Spring Boot apps and dependencies - in Application Insights
+
+You can read the Application Insights docs, but you you do not have to because ASA will configured evrything for you : 
+
+- [https://learn.microsoft.com/en-us/azure/azure-monitor/app/java-in-process-agent](https://learn.microsoft.com/en-us/azure/azure-monitor/app/java-in-process-agent)
+- [https://learn.microsoft.com/en-us/azure/azure-monitor/app/java-spring-boot#spring-boot-via-docker-entry-point](https://learn.microsoft.com/en-us/azure/azure-monitor/app/java-spring-boot#spring-boot-via-docker-entry-point)
+- [https://learn.microsoft.com/en-us/azure/azure-monitor/app/java-in-process-agent#set-the-application-insights-connection-string](https://learn.microsoft.com/en-us/azure/azure-monitor/app/java-in-process-agent#set-the-application-insights-connection-string)
+- [https://techcommunity.microsoft.com/t5/apps-on-azure-blog/bg-p/AppsonAzureBlog](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/bg-p/AppsonAzureBlog)
+- [https://github.com/microsoft/ApplicationInsights-Java](https://github.com/microsoft/ApplicationInsights-Java)
+- [https://github.com/microsoft/AzureMonitorCommunity](https://github.com/microsoft/AzureMonitorCommunity)
+
+Without ASA, The config files are located in each micro-service at src/main/resources/applicationinsights.json
+
+<span style="color:red">**[By default, Application Insights Java 3.x expects the configuration file to be named applicationinsights.json and to be located in the same directory as applicationinsights-agent-3.x.x.jar.](https://learn.microsoft.com/en-us/azure/azure-monitor/app/java-standalone-config#configuration-file-path)**</span>
+
+You can specify your own configuration file path by using one of these two options:
+- APPLICATIONINSIGHTS_CONFIGURATION_FILE environment variable
+- applicationinsights.configuration.file Java system property
+
+In our configuration, in the containers the applicationinsights.json is located at BOOT-INF/classes/applicationinsights.json
+so we must set APPLICATIONINSIGHTS_CONFIGURATION_FILE=BOOT-INF/classes/applicationinsights.json
+
+The Application Insights is provisonned during [the pre-req deployment](./iac/bicep/pre-req.bicep#L98) then its [Connection String](./iac/bicep/modules/asa/asa.bicep#L198) is used to configure Azure Spring Apps Monitoring Settings.
+
 
 Open the Application Insights created by Azure Spring Apps and start monitoring 
 Spring Boot applications. You can find the Application Insights in the same Resource Group where
@@ -403,110 +732,10 @@ AppPlatformLogsforSpring
 | order by TimeGenerated desc
 ```
 
-## Unit-2 - Automate deployments using GitHub Actions
-### Prerequisites 
-To get started with deploying this sample app from GitHub Actions, please:
-1. Complete the sections above with your MySQL, Azure Spring Apps instances and apps created.
-2. Fork this repository and turn on GitHub Actions in your fork
-
-Read :
-- [https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners)
-- [https://github.com/actions/virtual-environments](https://github.com/actions/virtual-environments)
-- [https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners](https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners)
-- [https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts)
-- [https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven](https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven)
-- []()
-
-### Prepare secrets in your Key Vault
-
-Read those doc/samples below :
-- [https://github.com/Azure-Samples/azure-spring-boot-samples/tree/spring-cloud-azure_4.0.0/keyvault/spring-cloud-azure-starter-keyvault-secrets](https://github.com/Azure-Samples/azure-spring-boot-samples/tree/spring-cloud-azure_4.0.0/keyvault/spring-cloud-azure-starter-keyvault-secrets)
-- [https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#secret-management](https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#secret-management)
-- [https://learn.microsoft.com/en-us/azure/spring-apps/tutorial-managed-identities-key-vault?tabs=system-assigned-managed-identity](https://learn.microsoft.com/en-us/azure/spring-apps/tutorial-managed-identities-key-vault?tabs=system-assigned-managed-identity)
-
-<!-- https://learn.microsoft.com/en-us/azure/spring-apps/tutorial-managed-identities-key-vault?tabs=system-assigned-managed-identity -->
-To use managed identity for Azure Spring Apps apps, add properties with the following content to src/main/resources/application.properties.
-```bash
-
-```
-
-
-The Config-server uses the config declared on the repo at [https://github.com/ezYakaEagle442/spring-petclinic-microservices-config/blob/main/application.yml](https://github.com/ezYakaEagle442/spring-petclinic-microservices-config/blob/main/application.yml) and need a Service Principal to be able to read secrets from KeyVault.
-  'Key Vault Administrator'
-  'Key Vault Reader'
-  'Key Vault Secrets User' 
-
-```bash
-az ad sp create-for-rbac --role "Key Vault Reader" --scopes /subscriptions/${SUBSCRIPTION}/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.KeyVault/vaults/<KEY_VAULT>  > git-cnf-spn.txt
-```
-
-Then the KV access policies must be set to allow the above SPN to access your KV. This should be set already in Azure Bicep.
 
 
 
-If you do not have a Key Vault yet, run the following commands to provision a Key Vault:
-```bash
-    az keyvault create --name ${KEY_VAULT} -g ${RESOURCE_GROUP}
-```
 
-Add the MySQL secrets to your Key Vault:
-```bash
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL_SERVER_NAME" --value ${MYSQL_SERVER_NAME}
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-FULL-NAME" --value ${MYSQL_SERVER_FULL_NAME}
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-ADMIN-NAME" --value ${MYSQL_SERVER_ADMIN_NAME}
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-ADMIN-LOGIN-NAME" --value ${MYSQL_SERVER_ADMIN_LOGIN_NAME}
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-SERVER-ADMIN-PASSWORD" --value ${MYSQL_SERVER_ADMIN_PASSWORD}
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "MYSQL-DATABASE-NAME" --value ${MYSQL_DATABASE_NAME}
-```
-
-Create a service principle with enough scope/role to manage your Azure Spring Apps instance:
-```bash
-    az ad sp create-for-rbac --role contributor --scopes /subscriptions/${SUBSCRIPTION} --sdk-auth > spn.txt
-```
-With results:
-```json
-    {
-        "clientId": "<GUID>",
-        "clientSecret": "<GUID>",
-        "subscriptionId": "<GUID>",
-        "tenantId": "<GUID>",
-        "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
-        "resourceManagerEndpointUrl": "https://management.azure.com/",
-        "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
-        "galleryEndpointUrl": "https://gallery.azure.com/",
-        "managementEndpointUrl": "https://management.core.windows.net/"
-    }
-```
-```bash
-    #  For GitHub Action Runner: https://aka.ms/azadsp-cli
-    appName="gha_run"
-    # other way to create the SPN :
-    SP_PWD=$(az ad sp create-for-rbac --name $appName --role contributor --scopes /subscriptions/${SUBSCRIPTION} --query password --output tsv)
-    #SP_ID=$(az ad sp show --id http://$appName --query objectId -o tsv)
-    #SP_ID=$(az ad sp list --all --query "[?appDisplayName=='${appName}'].{appId:appId}" --output tsv)
-    SP_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${appName}'].{id:appId}" --output tsv)
-    TENANT_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${appName}'].{t:appOwnerTenantId}" --output tsv)
-```
-
-Add them as secrets to your Key Vault:
-```bash
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "AZURE-CREDENTIALS-FOR-SPRING" --file spn.txt # --value "<results above>"
-
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "GHA-RUN-SPN-APP" --value $SP_ID
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "GHA-RUN-SPN-PWD" --value $SP_PWD
-    az keyvault secret set --vault-name ${KEY_VAULT} --name "GHA-RUN-SPN-TNT" --value $TENANT_ID
-```
-
-### Grant access to Key Vault with Service Principal
-To generate a key to access the Key Vault, execute command below:
-```bash
-    az ad sp create-for-rbac --role contributor --scopes /subscriptions/${SUBSCRIPTION}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.KeyVault/vaults/${KEY_VAULT} --sdk-auth
-```
-Then, follow [the steps here](https://docs.microsoft.com/azure/spring-cloud/spring-cloud-github-actions-key-vault#add-access-policies-for-the-credential) to add access policy for the Service Principal.
-
-```sh
-az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn <clientId from the Azure SPN JSON>
-```
 
 In the end, add this service principal as secret named "AZURE_CREDENTIALS" in your forked GitHub repo following [the steps here](https://docs.microsoft.com/azure/spring-cloud/how-to-github-actions?pivots=programming-language-java#set-up-github-repository-and-authenticate-1).
 
@@ -523,91 +752,6 @@ env:
   KEYVAULT: your-keyvault-name # customize this
   DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://<your-keyvault-name>.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
 
-```
-
-TODO : Deployment order : SVC then UI
-
-Once you push this change, you will see GitHub Actions triggered to build and deploy all the apps in the repo to your Azure Spring Apps instance.
-![](./media/automate-deployments-using-github-actions.png)
-
-## Unit-3 - Manage application secrets using Azure KeyVault
-
-Use Azure Key Vault to store and load secrets to connect to MySQL database.
-
-### Create Azure Key Vault and store secrets
-
-If you skipped the [Automation step](#automate-deployments-using-github-actions), create an Azure Key Vault and store database connection secrets.
-
-```bash
-    az keyvault create --name ${KEY_VAULT} -g ${RESOURCE_GROUP}
-    export KEY_VAULT_URI=$(az keyvault show --name ${KEY_VAULT} | jq -r '.properties.vaultUri')
-```
-
-Store database connection secrets in Key Vault.
-
-```bash
-    az keyvault secret set --vault-name ${KEY_VAULT} \
-        --name "MYSQL-SERVER-FULL-NAME" --value ${MYSQL_SERVER_FULL_NAME}
-        
-    az keyvault secret set --vault-name ${KEY_VAULT} \
-        --name "MYSQL-DATABASE-NAME" --value ${MYSQL_DATABASE_NAME}
-        
-    az keyvault secret set --vault-name ${KEY_VAULT} \
-        --name "MYSQL-SERVER-ADMIN-LOGIN-NAME" --value ${MYSQL_SERVER_ADMIN_LOGIN_NAME}
-        
-    az keyvault secret set --vault-name ${KEY_VAULT} \
-        --name "MYSQL-SERVER-ADMIN-PASSWORD" --value ${MYSQL_SERVER_ADMIN_PASSWORD}
-```                      
-
-### Enable Managed Identities for applications in Azure Spring Apps
-
-Enable System Assigned Identities for applications and export identities to environment.
-
-```bash
-    az spring app identity assign --name ${CUSTOMERS_SERVICE}
-    export CUSTOMERS_SERVICE_IDENTITY=$(az spring app show --name ${CUSTOMERS_SERVICE} | jq -r '.identity.principalId')
-    
-    az spring app identity assign --name ${VETS_SERVICE}
-    export VETS_SERVICE_IDENTITY=$(az spring app show --name ${VETS_SERVICE} | jq -r '.identity.principalId')
-    
-    az spring app identity assign --name ${VISITS_SERVICE}
-    export VISITS_SERVICE_IDENTITY=$(az spring app show --name ${VISITS_SERVICE} | jq -r '.identity.principalId')
-```
-
-### Grant Managed Identities with access to Azure Key Vault
-
-Add an access policy to Azure Key Vault to allow Managed Identities to read secrets.
-
-```bash
-    az keyvault set-policy --name ${KEY_VAULT} \
-        --object-id ${CUSTOMERS_SERVICE_IDENTITY} --secret-permissions get list
-        
-    az keyvault set-policy --name ${KEY_VAULT} \
-        --object-id ${VETS_SERVICE_IDENTITY} --secret-permissions get list
-        
-    az keyvault set-policy --name ${KEY_VAULT} \
-        --object-id ${VISITS_SERVICE_IDENTITY} --secret-permissions get list
-```
-
-### Activate applications to load secrets from Azure Key Vault
-
-Activate applications to load secrets from Azure Key Vault.
-
-```bash
-    # DO NOT FORGET to replace the value for "azure.keyvault.uri" JVM startup parameter with your Key Vault URI
-    az spring app update --name ${CUSTOMERS_SERVICE} \
-        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault -Dazure.keyvault.uri=https://petclinic-keyvault.vault.azure.net/' \
-        --env
-    
-    # DO NOT FORGET to replace the value for "azure.keyvault.uri" JVM startup parameter with your Key Vault URI    
-    az spring app update --name ${VETS_SERVICE} \
-        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault -Dazure.keyvault.uri=https://petclinic-keyvault.vault.azure.net/' \
-        --env
-    
-    # DO NOT FORGET to replace the value for "azure.keyvault.uri" JVM startup parameter with your Key Vault URI       
-    az spring app update --name ${VISITS_SERVICE} \
-        --jvm-options='-Xms2048m -Xmx2048m -Dspring.profiles.active=mysql,key-vault -Dazure.keyvault.uri=https://petclinic-keyvault.vault.azure.net/' \
-        --env
 ```
 
 ## Troubleshoot
@@ -644,6 +788,77 @@ error Caused by: java.net.MalformedURLException: no protocol: ${SPRING_CLOUD_AZU
 It means that the api-gateway project had been built with mvn -B clean package --file pom.xml -DskipTests **-Denv=cloud**
 This set the env=cloud at in the parent [POM](pom.xml#L246) which then injects the spring-cloud-azure-starter-keyvault-secrets dependency at [POM](pom.xml#L289)
 it looks like event just having such dependency would cause the runtime to look for ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+
+
+### Key Vault troubleshoot with USER-Assigned MI
+
+https://learn.microsoft.com/en-us/azure/spring-apps/tutorial-managed-identities-key-vault?tabs=user-assigned-managed-identity
+[Fast-Track for Azure OpenLab aka Java OpenHack](https://github.com/MicrosoftLearning/Deploying-and-Running-Java-Applications-in-Azure-Spring-Apps/blob/master/Instructions/Labs/LAB_04_secure_secrets_asc.md) uses SYSTEM-Assigned MI 
+
+The Azure SDK API change is summarized at [Issue #28310](https://github.com/Azure/azure-sdk-for-java/issues/28310)
+
+KeyVault integration runs easily when :
+- You use SYSTEM-Assigned MI, because then in the Config use by the Config-server you do NOT need to specify the client-id
+- When you use 1 & only 1 USER-Assigned MI for ALL your Apps/Micro-services, this is not a good practice from a security perspective as it is safer to assign 1 Identity to each App
+
+When you use USER-Assigned MI, assigning 1 Identity to each App , see one [App in Bicep](iac/bicep/modules/asa/asa.bicep#L247).
+In the Config used by the Config-server if you declare as many property-sources as the number of micro-services setting the client-id with the App Id (using Env. Var. set in the GH Workflow)  :
+
+      keyvault:
+        secret:
+          enabled: true
+          property-source-enabled: true
+          property-sources:
+            - name: kv-cfg-vets # KV Config for each App Vets-Service
+              endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+              credential:
+                managed-identity-enabled: true
+                client-id: ${VETS_SVC_APP_IDENTITY_CLIENT_ID}
+              #  client-secret: ${AZURE_CLIENT_SECRET} for SPN not for MI
+              # profile:
+              #  tenant-id: ${SPRING_CLOUD_AZURE_TENANT_ID}
+            - name: kv-cfg-visits # KV Config for each App Visits-Service
+              endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+              credential:
+                managed-identity-enabled: true
+                client-id: ${VISITS_SVC_APP_IDENTITY_CLIENT_ID}
+            - name: kv-cfg-customers # KV Config for each App Customers-Service
+              endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+              credential:
+                managed-identity-enabled: true
+                client-id: ${CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID}
+
+As a consequence this initially failed as each App uses the above Config and tried to fetch KV secrets from other App property-sources. which failed because it was not allowed as  it was assigned only 1/4 Identity.
+
+The solution is to remove all the above config from the Config repo and to add it instead in each App in \src\main\resources\application.yaml. 
+
+Ex for the vets-service, 1 & only 1 property-source is declared using 1 client-id only ${VETS_SVC_APP_IDENTITY_CLIENT_ID} :
+```code
+spring:
+  cloud:
+    azure:    
+      #profile: # spring.cloud.azure.profile
+        # subscription-id:
+        # tenant-id: ${SPRING_CLOUD_AZURE_TENANT_ID}
+      #credential:
+        #managed-identity-enabled: true        
+      keyvault:
+        secret:
+          enabled: true
+          property-source-enabled: true
+          # endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+          property-sources:
+            - name: kv-cfg-vets # KV Config for each App Vets-Service
+              endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
+              credential:
+                managed-identity-enabled: true
+                client-id: ${VETS_SVC_APP_IDENTITY_CLIENT_ID}
+              #  client-secret: ${AZURE_CLIENT_SECRET} for SPN not for MI
+              # profile:
+              #  tenant-id: ${SPRING_CLOUD_AZURE_TENANT_ID}
+  profiles:
+    active: mysql    
+```
 
 
 ## Next Steps
