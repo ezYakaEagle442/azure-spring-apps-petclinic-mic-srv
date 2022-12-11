@@ -17,7 +17,9 @@ env:
   SPN_APP_NAME: gha_asa_run # A Service Principal required for GitHub Action Runner
 
   # ==== Secrets ====
-  SPN_APP_ID: ${{ secrets.SPN_APP_ID }} # A Service Principal required for GitHub Action Runner
+  # /!\ In Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account"
+  # /!\ The SPN Id is NOT the App Registration Object ID, but the Enterprise Registration Object ID"
+  SPN_ID: ${{ secrets.SPN_ID }} # A Service Principal required for GitHub Action Runner
 
   # https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#consume-secrets-in-your-workflow
   # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-secrets
@@ -159,7 +161,7 @@ jobs:
             -p location=${{ env.LOCATION }} \
             -p kvName=${{ env.KV_NAME }} \
             -p kvRGName=${{ env.RG_KV }} \
-            -p ghRunnerSpnPrincipalId=${{ env.SPN_APP_ID }} \
+            -p ghRunnerSpnPrincipalId=${{ env.SPN_ID }} \
             -p deployToVNet=${{ env.DEPLOY_TO_VNET }}
               
       shell: bash
