@@ -221,6 +221,7 @@ var role = {
 }
 
 // GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account
+// /!\ The SPN Id is NOT the App Registration Object ID, but the Enterprise Registration Object ID
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.authorization/roleassignments?pivots=deployment-language-bicep
 resource StorageBlobDataContributorRoleAssignmentGHRunner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(azureblobservice.id, storageBlobRoleType , ghRunnerSpnPrincipalId)
