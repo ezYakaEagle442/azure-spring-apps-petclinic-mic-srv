@@ -343,53 +343,64 @@ az monitor log-analytics query -w $LOG_ANALYTICS_WORKSPACE_CLIENT_ID  --analytic
 
 Type and run the following Kusto query to see application logs:
 ```sql
-    AppPlatformLogsforSpring 
-    | where TimeGenerated > ago(24h) 
-    | limit 500
-    | sort by TimeGenerated
+AppPlatformLogsforSpring 
+| where TimeGenerated > ago(24h) 
+| limit 500
+| sort by TimeGenerated
 ```
 
 Type and run the following Kusto query to see `customers-service` application logs:
 ```sql
-        AppPlatformLogsforSpring 
-        | where AppName has "customers"
-        | limit 500
-        | sort by TimeGenerated
+AppPlatformLogsforSpring
+| project TimeGenerated, AppName, Log
+| where AppName has "customers"
+| limit 500
+| sort by TimeGenerated
 ```
 
 Type and run the following Kusto query  to see errors and exceptions thrown by each app:
 ```sql
-    AppPlatformLogsforSpring 
-    | where Log contains "error" or Log contains "exception"
-    | extend FullAppName = strcat(ServiceName, "/", AppName)
-    | summarize count_per_app = count() by FullAppName, ServiceName, AppName, _ResourceId
-    | sort by count_per_app desc 
-    | render piechart
+AppPlatformLogsforSpring 
+| where Log contains "error" or Log contains "exception"
+| extend FullAppName = strcat(ServiceName, "/", AppName)
+| summarize count_per_app = count() by FullAppName, ServiceName, AppName, _ResourceId
+| sort by count_per_app desc 
+| render piechart
 ```
 
 Type and run the following Kusto query to see all in the inbound calls into Azure Spring Apps:
 ```sql
-    AppPlatformIngressLogs
-    | project TimeGenerated, RemoteAddr, Host, Request, Status, BodyBytesSent, RequestTime, ReqId, RequestHeaders
-    | sort by TimeGenerated
+AppPlatformIngressLogs
+| project TimeGenerated, RemoteAddr, Host, Request, Status, BodyBytesSent, RequestTime, ReqId, RequestHeaders
+| sort by TimeGenerated
 ```
 
 Type and run the following Kusto query to see all the logs from the managed Spring Apps
 Config Server managed by Azure Spring Apps:
 ```sql
-    AppPlatformSystemLogs
-    | where LogType contains "ConfigServer"
-    | project TimeGenerated, Level, LogType, ServiceName, Log
-    | sort by TimeGenerated
+AppPlatformSystemLogs
+| where LogType contains "ConfigServer"
+| project TimeGenerated, Level, LogType, ServiceName, Log
+| sort by TimeGenerated
 ```
 
 Type and run the following Kusto query to see all the logs from the managed Spring Apps
 Service Registry managed by Azure Spring Apps:
 ```sql
-    AppPlatformSystemLogs
-    | where LogType contains "ServiceRegistry"
-    | project TimeGenerated, Level, LogType, ServiceName, Log
-    | sort by TimeGenerated
+AppPlatformSystemLogs
+| where LogType contains "ServiceRegistry"
+| project TimeGenerated, Level, LogType, ServiceName, Log
+| sort by TimeGenerated
+```
+
+Check if the Port 1025 is used (any other port is wrong and the App UI will then not be available from the browser)
+```sql
+AppPlatformLogsforSpring 
+| project TimeGenerated, AppName, Log
+| where AppName contains "api"
+| where Log contains "port"
+| where TimeGenerated > ago(45min)
+| order by TimeGenerated desc
 ```
 
 ## Unit-2 - Automate deployments using GitHub Actions
