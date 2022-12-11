@@ -37,6 +37,16 @@
         <spring-cloud-azure.version>4.4.0</spring-cloud-azure.version>
         <spring-boot.version>2.6.13</spring-boot.version> <!-- /!\ Bug in Netty with Spring Boot 2.6.6, see https://github.com/netty/netty/issues/12343 -->
         <spring-cloud.version>2021.0.4</spring-cloud.version>
+        <spring.jmx.enabled>true</spring.jmx.enabled>
+        <!-- 
+            https://docs.spring.io/spring-boot/docs/2.7.3/reference/html/application-properties.html#application-properties.core.spring.jmx.enabled
+            https://learn.microsoft.com/en-us/azure/spring-apps/how-to-prepare-app-deployment?tabs=basic-standard-tier&pivots=programming-language-java
+            You must specify spring.jmx.enabled=true in your configuration property. Otherwise, metrics can't be visualized in the Azure portal.
+            
+            https://docs.spring.io/spring-cloud/docs/2021.0.4/reference/html/configprops.html
+            Don't specify spring.cloud.config.enabled=false in your bootstrap configuration. Otherwise, your application stops working with Config Server.
+            It is true by default
+        -->            
         <chaos-monkey-spring-boot.version>2.3.10</chaos-monkey-spring-boot.version>
 
         <docker.image.prefix>springcommunity</docker.image.prefix>
