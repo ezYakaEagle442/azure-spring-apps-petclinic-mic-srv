@@ -311,7 +311,9 @@ jobs:
         # https://learn.microsoft.com/en-us/azure/storage/blobs/blob-cli
 
         # Runner will be blocked by network rules of storage account. Must Allow its IP
-        # TODO in Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account
+        echo "/!\ In Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account"
+        echo "/!\ The SPN Id is NOT the App Registration Object ID, but the Enterprise Registration Object ID"
+
 
         pwd
         ls -al
