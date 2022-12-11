@@ -332,6 +332,9 @@ jobs:
         echo "CUSTOMERS_SERVICE_PACKAGE_PATH=${{ env.CUSTOMERS_SERVICE_PACKAGE_PATH }}"
         echo "API_GATEWAY_PACKAGE_PATH=${{ env.API_GATEWAY_PACKAGE_PATH }}"
 
+        # TODO: need a workaround to resolve the network issues between GHA Runnr and Azure Storage
+        # https://github.com/actions/runner-images/blob/main/images/linux/scripts/helpers/install.sh
+
         echo "About to download Artifcats from Azure BLOB Storage"
         # --blob-url  ? https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
         az storage blob download --name ${{ env.VETS_SERVICE }} --file $VETS_SERVICE_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
