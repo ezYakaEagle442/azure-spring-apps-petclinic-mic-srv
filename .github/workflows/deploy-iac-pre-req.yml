@@ -16,6 +16,8 @@ env:
 
   SPN_APP_NAME: gha_asa_run # A Service Principal required for GitHub Action Runner
 
+  VM_ADMIN_USER_NAME: adm_aca
+
   # ==== Secrets ====
   # /!\ In Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account"
   # /!\ The SPN Id is NOT the App Registration Object ID, but the Enterprise Registration Object ID"
@@ -32,7 +34,7 @@ env:
 
   SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT: ${{ secrets.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}
   SPRING_CLOUD_AZURE_TENANT_ID: ${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }}
-  VM_ADMIN_USER_NAME: ${{ secrets.VM_ADMIN_USER_NAME }}
+
   VM_ADMIN_PASSWORD: ${{ secrets.VM_ADMIN_PASSWORD }}
 
   # https://learn.microsoft.com/en-us/azure/key-vault/secrets/secrets-best-practices#secrets-rotation
