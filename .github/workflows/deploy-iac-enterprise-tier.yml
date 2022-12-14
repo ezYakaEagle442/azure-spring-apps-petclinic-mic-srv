@@ -133,5 +133,6 @@ jobs:
       
   call-db-init-workflow:
     name: Load Data to DB
+    needs: [deploy-apps]
     uses: ./.github/workflows/sql-load.yml
     secrets: inherit
