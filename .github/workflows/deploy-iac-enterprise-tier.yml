@@ -1,7 +1,7 @@
 # This workflow will deploy all the Azure services, including ASA, KV & secrets, MYSQL (eventually with a Firewall rule to allow your workstation IP)
 # eventually if DEPLOY_TO_VNET is set to true : also VNet, ASA deployed to VNet, private DNS-Zone, client VM deployed to the VNet
 
-name: Deploy IaC with Azure Bicep
+name: Deploy ASA Enterprise Tier
 
 env:
   APP_NAME: petcliasa
