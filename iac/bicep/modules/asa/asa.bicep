@@ -220,7 +220,7 @@ resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities
   name: visitsServiceAppIdentityName
 }
 
-resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2022-09-01-preview' = {
+resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2022-09-01-preview' = if (azureSpringAppsTier=='Standard') {
   name: configServerName
   parent: azureSpringApps
   properties: {
@@ -232,6 +232,23 @@ resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers
         // https://docs.spring.io/spring-cloud-config/docs/3.1.4/reference/html/#_default_label
         // The default label used for Git is main. If you do not set spring.cloud.config.server.git.defaultLabel and a branch named main does not exist, the config server will by default also try to checkout a branch named master. If you would like to disable to the fallback branch behavior you can set spring.cloud.config.server.git.tryMasterBranch to false.
         label: configServerLabel
+      }
+    }
+  }
+}
+
+resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'default'
+  parent: azureSpringApps
+  properties: {
+    settings: {
+      gitProperty: {
+        repositories: [
+          {
+            label: configServerLabel
+            uri: gitConfigURI
+          }
+        ]
       }
     }
   }
@@ -357,45 +374,55 @@ resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = 
 }
 output apiGatewayIdentity string = apigatewayapp.identity.userAssignedIdentities['${apiGatewayIdentity.id}'].principalId
 
-/*
 
-resource customersservicebinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-03-01-preview' = {
-  name: 'customers-service MySQL DB Binding'
+
+
+resource customersservicebinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'customers-service Binding'
   parent: customersserviceapp
   properties: {
     bindingParameters: {}
-    resourceId: mySQLResourceID // MySQL ResourceID
+    resourceId: customersserviceapp.id
   }
 }
 
-resource vetsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-03-01-preview' = {
-  name: 'vets-service MySQL DB Binding'
+resource vetsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'vets-service Binding'
   parent: vetsserviceapp
   properties: {
     bindingParameters: {}
-    resourceId: mySQLResourceID // MySQL ResourceID
+    resourceId: vetsserviceapp.id
   }
 }
 
-resource visitsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-03-01-preview' = {
-  name: 'visits-service MySQL DB Binding'
+resource visitsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'visits-service Binding'
   parent: visitsservicerapp
   properties: {
     bindingParameters: {
+      /*
       databaseName: 'mydb'
       xxx: '' // username ? PWD ?
+      */
     }
-    key: 'string' // There is no API Key for MySQL
-    resourceId: mySQLResourceID // MySQL ResourceID
+    // key: 'string' // There is no API Key for MySQL
+    resourceId: visitsservicerapp.id
   }
 }
-*/
 
 
 /*
-resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-03-01-preview' = {
+// https://github.com/Azure/azure-rest-api-specs/issues/18286
+// Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
+resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-11-01-preview' existing = if (azureSpringAppsTier=='Enterprise') {
+  //scope: resourceGroup('my RG')
+  name: buildServiceName  
+}
+
+
+resource buildServices 'Microsoft.AppPlatform/Spring/buildServices/buildServices@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise'){
   name: 'string'
-  parent: azureSpringApps
+  parent: buildService
   properties: {
     kPackVersion: '0.5.1'
     resourceRequests: {
@@ -405,14 +432,8 @@ resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-03-01-pre
   }
 }
 
-// https://github.com/Azure/azure-rest-api-specs/issues/18286
-// Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
-resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-03-01-preview' existing = {
-  //scope: resourceGroup('my RG')
-  name: buildServiceName  
-}
 
-resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-03-01-preview' = {
+resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: buildAgentPoolName
   parent: buildService
   properties: {
@@ -426,7 +447,7 @@ resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2
 }
 
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal#default-builder-and-tanzu-buildpacks
-resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-03-01-preview' = {
+resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: builderName
   parent: buildService
   properties: {
@@ -442,7 +463,7 @@ resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-03-01
     ]
     stack: {
       id: 'tanzu-base-bionic-stack' // io.buildpacks.stacks.bionic-base  https://docs.pivotal.io/tanzu-buildpacks/stacks.html , OSS from https://github.com/paketo-buildpacks/java
-      version: '1.1.49'
+      version: '1.2.35'
     }
   }
   dependsOn: [
@@ -450,7 +471,7 @@ resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-03-01
   ]
 }
 
-resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-03-01-preview' = {
+resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: buildName
   parent: buildService
   properties: {
@@ -464,25 +485,22 @@ resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-03-01-pre
     builder
   ]
 }
-*/
 
-
-
-/* requires enterprise Tier: https://azure.microsoft.com/en-us/pricing/details/spring-apps/
+requires enterprise Tier: https://azure.microsoft.com/en-us/pricing/details/spring-apps/
 
 // https://github.com/MicrosoftDocs/azure-docs/issues/89924
-resource azureSpringAppsserviceregistry 'Microsoft.AppPlatform/Spring/serviceRegistries@2022-01-01-preview' = {
+resource azureSpringAppsserviceregistry 'Microsoft.AppPlatform/Spring/serviceRegistries@2022-01-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: serviceRegistryName
   parent: azureSpringApps
 }
 
 
-resource azureSpringAppsapiportal 'Microsoft.AppPlatform/Spring/apiPortals@2022-01-01-preview' = {
+resource azureSpringAppsapiportal 'Microsoft.AppPlatform/Spring/apiPortals@2022-01-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'string'
   sku: {
-    capacity: int
+    capacity: 2
     name: 'string'
-    tier: 'string'
+    tier: azureSpringAppsTier
   }
   parent: azureSpringApps
   properties: {
@@ -505,10 +523,10 @@ resource azureSpringAppsapiportal 'Microsoft.AppPlatform/Spring/apiPortals@2022-
   }
 }
 
-resource azureSpringAppsgateway 'Microsoft.AppPlatform/Spring/gateways@2022-01-01-preview' = {
+resource azureSpringAppsgateway 'Microsoft.AppPlatform/Spring/gateways@2022-01-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'string'
   sku: {
-    capacity: int
+    capacity: 2
     name: 'string'
     tier: 'string'
   }
@@ -550,36 +568,6 @@ resource azureSpringAppsgateway 'Microsoft.AppPlatform/Spring/gateways@2022-01-0
       scope: [
         'string'
       ]
-    }
-  }
-}
-
-resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@2022-03-01-preview' = {
-  name: 'string'
-  parent: azureSpringApps
-  properties: {
-    settings: {
-      gitProperty: {
-        repositories: [
-          {
-            hostKey: 'string'
-            hostKeyAlgorithm: 'string'
-            label: 'string'
-            name: 'string'
-            password: 'string'
-            patterns: [
-              'string'
-            ]
-            privateKey: 'string'
-            searchPaths: [
-              'string'
-            ]
-            strictHostKeyChecking: bool
-            uri: 'string'
-            username: 'string'
-          }
-        ]
-      }
     }
   }
 }
