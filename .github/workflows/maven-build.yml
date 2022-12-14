@@ -8,7 +8,7 @@ env:
   KV_NAME: kv-petcliasa21               # The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters
   
   RG_KV: rg-iac-kv21 # RG where to deploy KV
-  RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ACA, ACA Env., MySQL, etc.
+  RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
 
   # ==== Azure storage to store Artifacts , values must be consistent with the ones in storage.bicep ====:
   AZ_STORAGE_NAME : stasapetcliasa # customize this

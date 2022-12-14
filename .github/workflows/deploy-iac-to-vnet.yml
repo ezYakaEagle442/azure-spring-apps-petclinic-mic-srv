@@ -33,7 +33,7 @@ env:
   # https://learn.microsoft.com/en-us/azure/key-vault/secrets/secrets-best-practices#secrets-rotation
   # Because secrets are sensitive to leakage or exposure, it's important to rotate them often, at least every 60 days. 
   # Expiry date in seconds since 1970-01-01T00:00:00Z. Ex: 1672444800 ==> 31/12/2022'
-  SECRET_EXPIRY_DATE: 1672444800
+  SECRET_EXPIRY_DATE: 1703980800 # ==> 31/12/2023
 
   credentials: ${{ secrets.AZURE_CREDENTIALS }}
   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
