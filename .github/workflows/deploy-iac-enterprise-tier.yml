@@ -106,7 +106,7 @@ jobs:
           az deployment group create --name asa-petclinic-apps -f iac/bicep/petclinic-apps.bicep -g ${{ env.RG_APP }} \
             -p appName=${{ env.APP_NAME }} \
             -p azureSpringAppsSkuName=${{ env.ASA_SKU }} \
-            -p xazureSpringAppsTierxx=${{ env.ASA_TIER }} \
+            -p azureSpringAppsTier=${{ env.ASA_TIER }} \
             -p location=${{ env.LOCATION }} \
             -p kvName=${{ env.KV_NAME }} \
             -p kvRGName=${{ env.RG_KV }} \
