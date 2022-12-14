@@ -347,7 +347,7 @@ KV_NAME="kv-petcliasa42"
 az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn $APP_ID
 ```
 
-See GitHub Actions :
+See the GitHub Workflows :
 - [Deploy the Azure Infra pre-req services workflow](./.github/workflows/deploy-iac-pre-req.yml)
 - [Deploy the Azure Infra services workflow](./.github/workflows/deploy-iac.yml)
 - [Maven Backends Build workflow](./.github/workflows/maven-build.yml)
@@ -358,10 +358,6 @@ See GitHub Actions :
 - [Java Apps UI to Staging Production workflow](./.github/workflows/build-deploy-ui-prod-CLI.yml)
 - [Delete ALL the Azure Infra services workflow, except KeyVault](./.github/workflows/delete-rg.yml)
 
-
-<span style="color:red">****</span>
-
-Workflow Design
 
 The Workflow run the steps in this in this order :
 
@@ -392,8 +388,34 @@ Note:
 - the GH Hosted Runner / [Ubuntu latest image has already Azure CLI installed](https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#cli-tools)
 
 
-
 ## Deploy the petclinic microservices Apps with IaC
+
+Workflow Design
+
+The Workflow run the steps in this in this order :
+
+```
+├── Deploy the Azure Infra services workflow ./.github/workflows/deploy-iac.yml
+│   ├── Authorize local IP to access the Azure Key Vault ./.github/workflows/deploy-iac.yml#L143
+│   ├── Create the secrets ./.github/workflows/deploy-iac.yml#L150
+│   ├── Disable local IP access to the Key Vault ./.github/workflows/deploy-iac.yml#L262
+│   ├── Deploy the pre-req ./.github/workflows/deploy-iac.yml#L295
+│   ├── Whitelist asa Env. OutboundIP to KV and MySQL ./.github/workflows/deploy-iac.yml#L322
+│   ├── Call Maven Build ./.github/workflows/deploy-iac.yml#L369
+│       ├── Maven Build ./.github/workflows/maven-build.yml#L128
+│       ├── Publish the Maven package ./.github/workflows/maven-build.yml#L166
+│       ├── Check all Jar artifacts ./.github/workflows/maven-build.yml#L177
+│       ├── Build image and push it to ACR ./.github/workflows/maven-build.yml#L200
+│   ├── Call Maven Build-UI ./.github/workflows/deploy-iac.yml#L376
+│   ├── Deploy Backend Services ./.github/workflows/deploy-iac.yml#L382
+│       ├── Deploy Backend services calling iac/bicep/petclinic-apps.bicep
+│       ├── Deploy the UI calling iac/bicep/modules/asa/apps/asa-ui.bicep
+│   ├── Configure Diagnostic-Settings ./.github/workflows/deploy-iac.yml#L453
+│   ├── Configure GitHub-Action-Settings ./.github/workflows/deploy-iac.yml#460
+```
+
+You need to set your own param values in each Workflow.
+
 
 
 ## Database configuration
@@ -480,7 +502,7 @@ Read :
 - [https://learn.microsoft.com/en-us/azure/spring-apps/how-to-manage-user-assigned-managed-identities?tabs=azure-portal&pivots=sc-standard-tier](https://learn.microsoft.com/en-us/azure/spring-apps/how-to-manage-user-assigned-managed-identities?tabs=azure-portal&pivots=sc-standard-tier)
 - [https://learn.microsoft.com/en-us/azure/azure-app-configuration/use-key-vault-references-spring-boot?source=recommendations](https://learn.microsoft.com/en-us/azure/azure-app-configuration/use-key-vault-references-spring-boot?source=recommendations)
 - [https://learn.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-boot-starter-java-app-with-azure-key-vault](https://learn.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-boot-starter-java-app-with-azure-key-vault)
-- [https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#advanced-usage]https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#advanced-usage)
+- [https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#advanced-usage](https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#advanced-usage)
 - [https://github.com/Azure/azure-sdk-for-java/issues/28310](https://github.com/Azure/azure-sdk-for-java/issues/28310)
 - [Maven Project parent pom.xml](pom.xml#L304)
 
@@ -732,27 +754,6 @@ AppPlatformLogsforSpring
 | order by TimeGenerated desc
 ```
 
-
-
-
-
-
-In the end, add this service principal as secret named "AZURE_CREDENTIALS" in your forked GitHub repo following [the steps here](https://docs.microsoft.com/azure/spring-cloud/how-to-github-actions?pivots=programming-language-java#set-up-github-repository-and-authenticate-1).
-
-You can also read [Use GitHub Actions to connect to Azure documentation](https://docs.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Cwindows) to add the AZURE_CREDENTIALS to your repo.
-
-Also add your AZURE_SUBSCRIPTION to your GH repo secrets / Actions secrets / Repository secrets
-
-### Customize your workflow
-Read [GitHub Action for deploying to Azure Spring Apps](https://github.com/marketplace/actions/azure-spring-cloud)
-Finally, edit the workflow file `.github/workflows/action.yml` in your forked repo to fill in the Azure Spring Apps instance name, and Key Vault name that you just created:
-```yml
-env:
-  AZURE_SPRING_APPS_SERVICE: azure-spring-apps-name # name of your Azure Spring Apps instance
-  KEYVAULT: your-keyvault-name # customize this
-  DEPLOYMENT_JVM_OPTIONS: -Dazure.keyvault.uri=https://<your-keyvault-name>.vault.azure.net -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
-
-```
 
 ## Troubleshoot
 
