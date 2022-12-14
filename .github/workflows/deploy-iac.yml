@@ -22,6 +22,8 @@ env:
 
   GIT_CFG_URI: https://github.com/ezYakaEagle442/spring-petclinic-microservices-config
 
+  VM_ADMIN_USER_NAME: adm_asa
+  
   # https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#consume-secrets-in-your-workflow
   # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-secrets
 
@@ -38,7 +40,6 @@ env:
   SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT: ${{ secrets.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}
   SPRING_CLOUD_AZURE_TENANT_ID: ${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }}
   
-  VM_ADMIN_USER_NAME: ${{ secrets.VM_ADMIN_USER_NAME }}
   VM_ADMIN_PASSWORD: ${{ secrets.VM_ADMIN_PASSWORD }}
 
   # https://learn.microsoft.com/en-us/azure/key-vault/secrets/secrets-best-practices#secrets-rotation
