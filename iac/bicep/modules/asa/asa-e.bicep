@@ -543,7 +543,6 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
         uri: 'http://vets-service'
         order: 0
         ssoEnabled: apiPortalSsoEnabled
-
       }
     ]
   }
@@ -568,7 +567,6 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
         uri: 'http://visits-service'
         order: 0
         ssoEnabled: apiPortalSsoEnabled
-
       }
     ]
   }
@@ -593,7 +591,6 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
         uri: 'http://customers-service'
         order: 0
         ssoEnabled: apiPortalSsoEnabled
-
       }
     ]
   }
