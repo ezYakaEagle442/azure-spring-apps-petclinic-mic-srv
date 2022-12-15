@@ -5,12 +5,22 @@ name: Deploy ASA Enterprise Tier
 
 env:
   APP_NAME: petcliasa
+  ASA_INSTANCE_NAME: asa-petcliasa
+
   LOCATION: westeurope
   RG_KV: rg-iac-kv21 # RG where to deploy KV
   RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
   
   ASA_SKU: E0
   ASA_TIER: Enterprise
+
+  SSO_APP_NAME: asa-sso-petclinic
+  SSO_APPLICATION_ID: ${{ secrets.SSO_APPLICATION_ID }}
+
+  API_PORTAL_SSO_CLIENT_ID: ${{ secrets.API_PORTAL_SSO_CLIENT_ID }}
+  API_PORTAL_SSO_CLIENT_SECRET: ${{ secrets.API_PORTAL_SSO_CLIENT_SECRET }}
+  API_PORTAL_SSO_ISSUER_URI: ${{ secrets.API_PORTAL_SSO_ISSUER_URI }}
+  API_PORTAL_SSO_ENABLED: false
 
   MYSQL_SERVER_NAME: petcliasa
   MYSQL_ADM_USR: mys_adm
@@ -24,6 +34,7 @@ env:
   SET_KV_ACCESS_POLICIES: false # let it to false
 
   GIT_CFG_URI: https://github.com/ezYakaEagle442/spring-petclinic-microservices-config
+  GIT_CFG_LABEL: main
 
   # https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#consume-secrets-in-your-workflow
   # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-secrets
@@ -103,7 +114,7 @@ jobs:
           #    --product azure-spring-cloud-vmware-tanzu-2 \
           #    --plan tanzu-asc-ent-mtr
 
-          az deployment group create --name asa-petclinic-apps -f iac/bicep/petclinic-apps.bicep -g ${{ env.RG_APP }} \
+          az deployment group create --name asa-petclinic-apps -f iac/bicep/petclinic-apps-enterprise.bicep -g ${{ env.RG_APP }} \
             -p appName=${{ env.APP_NAME }} \
             -p azureSpringAppsSkuName=${{ env.ASA_SKU }} \
             -p azureSpringAppsTier=${{ env.ASA_TIER }} \
@@ -118,7 +129,31 @@ jobs:
             -p endIpAddress="10.0.0.255" \
             -p mySQLServerName=${{ env.MYSQL_SERVER_NAME }} \
             -p mySQLadministratorLogin=${{ env.MYSQL_ADM_USR }} \
-            -p gitConfigURI=${{ env.GIT_CFG_URI }}   
+            -p gitConfigURI=${{ env.GIT_CFG_URI }} \
+            -p configServerLabel=${{ env.GIT_CFG_LABEL }} \
+            -p apiPortalSsoClientId=${{ env.API_PORTAL_SSO_CLIENT_ID }} \
+            -p apiPortalSsoClientSecret=${{ env.API_PORTAL_SSO_CLIENT_SECRET }} \
+            -p apiPortalSsoIssuerUri=${{ env.API_PORTAL_SSO_ISSUER_URI }} \
+            -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }}
+
+            # https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise
+            GATEWAY_URL=$(az spring gateway show \
+                --resource-group ${{ env.RG_APP }} \
+                --service ${{ env.ASA_INSTANCE_NAME }} | jq -r '.properties.url')
+
+            PORTAL_URL=$(az spring api-portal show \
+                --resource-group ${{ env.RG_APP }} \
+                --service ${{ env.ASA_INSTANCE_NAME }} | jq -r '.properties.url')
+
+            echo "https://${GATEWAY_URL}/login/oauth2/code/sso"
+            echo "https://${PORTAL_URL}/oauth2-redirect.html"
+            echo "https://${PORTAL_URL}/login/oauth2/code/sso"
+
+            az ad app update \
+                --id ${APPLICATION_ID} \
+                --reply-urls "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
+
+
       shell: bash
 
     # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login

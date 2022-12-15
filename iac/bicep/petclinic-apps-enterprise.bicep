@@ -74,7 +74,7 @@ param azureSpringAppsSkuCapacity int = 25
   'S0'
   'E0'
 ])
-param azureSpringAppsSkuName string = 'S0'
+param azureSpringAppsSkuName string = 'E0'
 
 @allowed([
   'Basic'
@@ -82,7 +82,7 @@ param azureSpringAppsSkuName string = 'S0'
   'Enterprise'
 ])
 @description('The Azure Spring Apps SKU Tier')
-param azureSpringAppsTier string = 'Standard'
+param azureSpringAppsTier string = 'Enterprise'
 
 @description('The Azure Spring Apps Git Config Server name')
 @allowed([
@@ -90,11 +90,26 @@ param azureSpringAppsTier string = 'Standard'
 ])
 param configServerName string = 'default'
 
-@description('The Azure Spring Apps monitoring Settings name')
-@allowed([
-  'default'
-])
-param monitoringSettingsName string = 'default'
+@description('The Azure Spring Apps Config Server Git URI (The repo must be public).')
+param gitConfigURI string
+
+@description('The Azure Spring Apps Config Server Git label (branch/tag). Config Server takes master (on Git) as the default label if you do not specify one. To avoid Azure Spring Apps Config Server failure, be sure to pay attention to the default label when setting up Config Server with GitHub, especially for newly-created repositories. See https://learn.microsoft.com/en-us/azure/spring-apps/how-to-config-server https://docs.spring.io/spring-cloud-config/docs/3.1.4/reference/html/#_default_label . The default label used for Git is main. If you do not set spring.cloud.config.server.git.defaultLabel and a branch named main does not exist, the config server will by default also try to checkout a branch named master. If you would like to disable to the fallback branch behavior you can set spring.cloud.config.server.git.tryMasterBranch to false.')
+param configServerLabel string = 'main'
+
+@description('The Azure Spring Apps API Portal SSO Property clientId ')
+@secure()
+param apiPortalSsoClientId string
+
+@description('The Azure Spring Apps API Portal SSO Property clientSecret ')
+@secure()
+param apiPortalSsoClientSecret string
+
+@description('The Azure Spring Apps API Portal SSO Property issuerUri ')
+@secure()
+param apiPortalSsoIssuerUri string
+
+@description('The Azure Spring Apps API Portal SSO Property ssoEnabled ')
+param apiPortalSsoEnabled bool = false
 
 @description('The Azure Spring Apps Service Registry name. only "default" is supported')
 @allowed([
@@ -102,8 +117,11 @@ param monitoringSettingsName string = 'default'
 ])
 param serviceRegistryName string = 'default' // The resource name 'Azure Spring Apps Service Registry' is not valid
 
-@description('The Azure Spring Apps Config Server Git URI (The repo must be public).')
-param gitConfigURI string
+@description('The Azure Spring Apps monitoring Settings name')
+@allowed([
+  'default'
+])
+param monitoringSettingsName string = 'default'
 
 @description('The MySQL server name')
 param mySQLServerName string = 'petcliasa'
@@ -135,7 +153,7 @@ module rg 'rg.bicep' = {
 */
 
 
-module azurespringapps './modules/asa/asa.bicep' = if (azureSpringAppsTier=='Standard') {
+module azurespringapps './modules/asa/asa-e.bicep' = if (azureSpringAppsTier=='Enterprise') {
   name: 'asa-pub'
   // scope: resourceGroup(rg.name)
   params: {
@@ -148,14 +166,18 @@ module azurespringapps './modules/asa/asa.bicep' = if (azureSpringAppsTier=='Sta
     azureSpringAppsSkuName: azureSpringAppsSkuName
     azureSpringAppsTier: azureSpringAppsTier
     monitoringSettingsName: monitoringSettingsName
-    configServerName: configServerName
+    applicationConfigurationServiceName: configServerName
     gitConfigURI: gitConfigURI
-    serviceRegistryName: serviceRegistryName
+    configServerLabel: configServerLabel
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     appInsightsName: appInsightsName
     appInsightsDiagnosticSettingsName: appInsightsDiagnosticSettingsName
     zoneRedundant: zoneRedundant
     deployToVNet: deployToVNet
+    apiPortalSsoClientId: apiPortalSsoClientId
+    apiPortalSsoClientSecret: apiPortalSsoClientSecret
+    apiPortalSsoIssuerUri: apiPortalSsoIssuerUri
+    apiPortalSsoEnabled: apiPortalSsoEnabled
   }
 }
 
@@ -168,7 +190,6 @@ resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: kvName
   scope: kvRG
 }  
-
 
 var  vNetRules = []
 var  ipRules = azurespringapps.outputs.azureSpringAppsOutboundPubIP // /!\ has 2 IP separated from a coma, ex: 20.31.114.2,20.238.165.131

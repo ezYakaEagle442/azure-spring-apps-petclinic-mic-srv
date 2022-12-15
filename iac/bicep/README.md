@@ -13,6 +13,44 @@ az term accept \
      --plan tanzu-asc-ent-mtr
 ```
 
+[https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise#create-and-configure-an-application-registration-with-azure-active-directory](https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise#create-and-configure-an-application-registration-with-azure-active-directory)
+```sh
+
+LOCATION="westeurope"
+RG_APP="rg-iac-asa-petclinic-mic-srv"
+
+az group create --name $RG_APP --location $LOCATION
+
+SSO_APP_NAME="asa-sso-petclinic"
+
+# Use the following command to create an application registration with AAD
+az ad app create --display-name ${SSO_APP_NAME} > ad.json
+
+# Use the following command to retrieve the application ID and collect the client secret:
+SSO_APPLICATION_ID=$(cat ad.json | jq -r '.appId')
+az ad app credential reset --id ${SSO_APPLICATION_ID} --append > sso.json
+
+# Use the following command to assign a Service Principal to the application registration:
+az ad sp create --id ${SSO_APPLICATION_ID}
+
+# retrieve the application's Client ID. 
+SSO_APPLICATION_CLIENT_ID=$(cat sso.json | jq -r '.appId')
+
+# retrieve the application's Client Secret. 
+SSO_APPLICATION_CLIENT_PWD=$(cat sso.json | jq -r '.password')
+
+# retrieve the Issuer URI
+TENANT_ID=$(cat sso.json | jq -r '.tenant')
+SSO_APPLICATION_ISSUER_URI="https://login.microsoftonline.com/${TENANT_ID}/v2.0"
+echo $SSO_APPLICATION_ISSUER_URI
+
+# Retrieve the JWK URI from the output of the following command. The Identity Service application will use the public JSON Web Keys (JWK) to verify JSON Web Tokens (JWT) issued by Active Directory.
+TENANT_ID=$(cat sso.json | jq -r '.tenant')
+SSO_APPLICATION_ISSUER_URI="https://login.microsoftonline.com/${TENANT_ID}/discovery/v2.0/keys"
+echo $SSO_APPLICATION_ISSUER_URI
+
+```
+
 
 ## Standard Tier
 
