@@ -376,9 +376,9 @@ output apiGatewayIdentity string = apigatewayapp.identity.userAssignedIdentities
 
 
 
-
+// Binding name can contain only lowercase letters, numbers and hyphens.
 resource customersservicebinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: 'customers-service Binding'
+  name: 'customers-service-binding'
   parent: customersserviceapp
   properties: {
     bindingParameters: {}
@@ -386,8 +386,9 @@ resource customersservicebinding 'Microsoft.AppPlatform/Spring/apps/bindings@202
   }
 }
 
+// Binding name can contain only lowercase letters, numbers and hyphens.
 resource vetsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: 'vets-service Binding'
+  name: 'vets-service-binding'
   parent: vetsserviceapp
   properties: {
     bindingParameters: {}
@@ -395,8 +396,9 @@ resource vetsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-prev
   }
 }
 
+// Binding name can contain only lowercase letters, numbers and hyphens.
 resource visitsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: 'visits-service Binding'
+  name: 'visits-service-binding'
   parent: visitsservicerapp
   properties: {
     bindingParameters: {
