@@ -377,40 +377,59 @@ output apiGatewayIdentity string = apigatewayapp.identity.userAssignedIdentities
 
 
 // Binding name can contain only lowercase letters, numbers and hyphens.
-resource customersservicebinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+// https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-service-registry
+/*
+az spring service-registry bind \
+--resource-group $RESOURCE_GROUP \
+--service $AZURE_SPRING_APPS_NAME \
+--app serviceA
+
+
+resource customersservicebinding 'Microsoft.AppPlatform/Spring/serviceRegistries@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'customers-service-binding'
-  parent: customersserviceapp
-  properties: {
-    bindingParameters: {}
-    resourceId: customersserviceapp.id
-  }
+  parent: azureSpringApps
 }
 
+
 // Binding name can contain only lowercase letters, numbers and hyphens.
+resource vetsbinding 'Microsoft.AppPlatform/Spring/serviceRegistries@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'vets-service-binding'
+  parent: azureSpringApps
+}
+
+resource visitsbinding 'Microsoft.AppPlatform/Spring/serviceRegistries@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'visits-service-binding'
+  parent: azureSpringApps
+}
+*/
+
+/*
 resource vetsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'vets-service-binding'
   parent: vetsserviceapp
   properties: {
     bindingParameters: {}
     resourceId: vetsserviceapp.id
+    key: 'vets-service' // There is no API Key for MySQL
   }
 }
 
-// Binding name can contain only lowercase letters, numbers and hyphens.
 resource visitsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'visits-service-binding'
   parent: visitsservicerapp
   properties: {
     bindingParameters: {
-      /*
+      
       databaseName: 'mydb'
       xxx: '' // username ? PWD ?
-      */
+      
     }
-    // key: 'string' // There is no API Key for MySQL
+    key: 'visits-service' // There is no API Key for MySQL
     resourceId: visitsservicerapp.id
   }
 }
+*/
+
 
 
 /*
