@@ -443,14 +443,16 @@ az spring service-registry bind \
 */
 
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-apps-enterprise#activate-service-registration-and-discovery
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/serviceregistries?pivots=deployment-language-bicep
 resource serviceRegistry 'Microsoft.AppPlatform/Spring/serviceRegistries@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: serviceRegistryName
   parent: azureSpringApps
+
 }
 output serviceRegistryId string = serviceRegistry.id
-output serviceRegistryCpu string = serviceRegistry.properties.resourceRequests.cpu
-output serviceRegistryInstanceCount int = serviceRegistry.properties.resourceRequests.instanceCount
-output serviceRegistryMemory string = serviceRegistry.properties.resourceRequests.memory
+//output serviceRegistryCpu string = serviceRegistry.properties.resourceRequests.cpu
+//output serviceRegistryInstanceCount int = serviceRegistry.properties.resourceRequests.instanceCount
+//output serviceRegistryMemory string = serviceRegistry.properties.resourceRequests.memory
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apiportals?pivots=deployment-language-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise
@@ -486,7 +488,7 @@ output apiPortalType string = apiPortal.type
 output apiPortalUrl string = apiPortal.properties.url
 output gatewayIds array = apiPortal.properties.gatewayIds
 
-
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways?pivots=deployment-language-bicep
 resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: gatewayName
   parent: azureSpringApps
@@ -510,9 +512,10 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if
     }
     httpsOnly: false
     public: true
+    // az spring gateway update --help
     resourceRequests: {
-      cpu: '1'
-      memory: '1'
+      cpu: '1' // CPU resource quantity. Should be 500m or number of CPU cores.
+      memory: '1Gi' // Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi.
     }
     ssoProperties: {
       clientId: apiPortalSsoClientId
@@ -527,7 +530,6 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if
   }
 }
 output gatewayId string = gateway.id
-output gatewayType string = gateway.type
 output gatewayUrl string = gateway.properties.url
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways/routeconfigs?pivots=deployment-language-bicep
@@ -546,14 +548,20 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
     ]
     routes: [
       {
-        id: 'vets-service'
+        title: 'vets-service'
+        description: 'vets-service'
         uri: 'http://vets-service'
-        order: 0
+        order: 2
         ssoEnabled: apiPortalSsoEnabled
       }
     ]
   }
 }
+output VetsGatewayRouteConfigId string = VetsGatewayRouteConfig.id
+output VetsGatewayRouteConfigAppResourceId string = VetsGatewayRouteConfig.properties.appResourceId
+output VetsGatewayRouteConfigRoutes array = VetsGatewayRouteConfig.properties.routes
+output VetsGatewayRouteConfigIsSsoEnabled bool = VetsGatewayRouteConfig.properties.ssoEnabled
+output VetsGatewayRouteConfigPredicates array = VetsGatewayRouteConfig.properties.predicates
 
 resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'visits-service-gateway-route-config'
@@ -570,14 +578,20 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
     ]
     routes: [
       {
-        id: 'visits-service'
+        title: 'visits-service' 
+        description: 'visits-service'
         uri: 'http://visits-service'
-        order: 0
+        order: 3
         ssoEnabled: apiPortalSsoEnabled
       }
     ]
   }
 }
+output VisitsGatewayRouteConfigId string = VisitsGatewayRouteConfig.id
+output VisitsGatewayRouteConfigAppResourceId string = VisitsGatewayRouteConfig.properties.appResourceId
+output VisitsGatewayRouteConfigRoutes array = VisitsGatewayRouteConfig.properties.routes
+output VisitsGatewayRouteConfigIsSsoEnabled bool = VisitsGatewayRouteConfig.properties.ssoEnabled
+output VisitsGatewayRouteConfigPredicates array = VisitsGatewayRouteConfig.properties.predicates
 
 resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'customers-service-gateway-route-config'
@@ -594,14 +608,21 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
     ]
     routes: [
       {
-        id: 'customers-service'
+        description: 'customers-service'
+        title: 'customers-service'
         uri: 'http://customers-service'
-        order: 0
+        order: 1
         ssoEnabled: apiPortalSsoEnabled
+
       }
     ]
   }
 }
+output CustomersGatewayRouteConfigId string = CustomersGatewayRouteConfig.id
+output CustomersGatewayRouteConfigAppResourceId string = CustomersGatewayRouteConfig.properties.appResourceId
+output CustomersGatewayRouteConfigRoutes array = CustomersGatewayRouteConfig.properties.routes
+output CustomersGatewayRouteConfigIsSsoEnabled bool = CustomersGatewayRouteConfig.properties.ssoEnabled
+output CustomersGatewayRouteConfigPredicates array = CustomersGatewayRouteConfig.properties.predicates
 
 resource customersbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'customers-service-binding'
