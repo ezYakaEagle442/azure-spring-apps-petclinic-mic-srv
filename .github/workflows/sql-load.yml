@@ -57,6 +57,9 @@ jobs:
 
             # https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-connection-using-parameters.html
             echo Init Vets
+
+            mysql -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} --execute 'CREATE DATABASE IF NOT EXISTS ${{ env.MYSQL_DB_NAME }};'
+
             mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-vets-service/src/main/resources/db/mysql/schema.sql
             mysql ${{ env.MYSQL_DB_NAME }} -u ${{ env.MYSQL_ADM_USR }} --password=${{ env.MYSQL_ADM_PWD }} -h ${{ env.MYSQL_SERVER_NAME }}.mysql.database.azure.com -P ${{ env.MYSQL_PORT }} < spring-petclinic-vets-service/src/main/resources/db/mysql/data.sql
 
