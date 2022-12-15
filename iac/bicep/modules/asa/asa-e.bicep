@@ -460,7 +460,7 @@ resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-11-01-preview' 
   parent: azureSpringApps
   sku: {
     name: azureSpringAppsSkuName
-    capacity: 1
+    capacity: any(1)
     tier: azureSpringAppsTier
   }
   properties: {
@@ -492,7 +492,7 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if
   parent: azureSpringApps
   sku: {
     name: azureSpringAppsSkuName
-    capacity: 1
+    capacity: any(1)
     tier: azureSpringAppsTier
   }
   properties: {
@@ -511,11 +511,18 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if
     httpsOnly: false
     public: true
     resourceRequests: {
-      cpu: 1
-      memoryInGB: 1
+      cpu: '1'
+      memory: '1'
     }
     ssoProperties: {
-      enabled: apiPortalSsoEnabled
+      clientId: apiPortalSsoClientId
+      clientSecret: apiPortalSsoClientSecret
+      issuerUri: apiPortalSsoIssuerUri
+      scope: [
+        'openid'
+        'profile'
+        'email'
+      ]
     }  
   }
 }
