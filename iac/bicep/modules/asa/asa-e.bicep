@@ -1,3 +1,12 @@
+/*=====================================================================================================================================
+=                                                                                                                                    =
+=                                                                                                                                    =
+= https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-enterprise  =                                                    *
+=                                                                                                                                    =
+=                                                                                                                                    =
+=====================================================================================================================================*/
+
+
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring?tabs=bicep
 @description('A UNIQUE name')
 @maxLength(20)
@@ -152,7 +161,7 @@ resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 }
 // pre-req: https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-azure-cli#prerequisites
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-09-01-preview' = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-11-01-preview' = {
   name: azureSpringAppsInstanceName
   location: location
   sku: {
@@ -162,13 +171,13 @@ resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-09-01-preview' = {
   }
   properties: {
     zoneRedundant: zoneRedundant
-    /*
-    marketplaceResource: {
-      plan:
-      product:
-      publisher:
-    }
-    */
+    //
+    //marketplaceResource: {
+    //  plan:
+    //  product:
+    //  publisher:
+    //}
+    //
   }
 }
 
@@ -231,11 +240,21 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 }
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/monitoringsettings?pivots=deployment-language-bicep
-resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-09-01-preview' = {
+resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-09-01-preview' = if (azureSpringAppsTier=='Standard') {
   name: monitoringSettingsName
   parent: azureSpringApps
   properties: {
-    appInsightsInstrumentationKey: appInsights.properties.InstrumentationKey
+    appInsightsInstrumentationKey: appInsights.properties.InstrumentationKey // /!\ ConnectionString for Enterprise tier ,  InstrumentationKey for Standard Tier 
+    appInsightsSamplingRate: 10
+    // traceEnabled: true Indicates whether enable the trace functionality, which will be deprecated since api version 2020-11-01-preview. Please leverage appInsightsInstrumentationKey to indicate if monitoringSettings enabled or not
+  }
+}
+
+resource azureSpringAppsEnterpriseMonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-09-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: monitoringSettingsName
+  parent: azureSpringApps
+  properties: {
+    appInsightsInstrumentationKey: appInsights.properties.ConnectionString // /!\ ConnectionString for Enterprise tier ,  InstrumentationKey for Standard Tier 
     appInsightsSamplingRate: 10
     // traceEnabled: true Indicates whether enable the trace functionality, which will be deprecated since api version 2020-11-01-preview. Please leverage appInsightsInstrumentationKey to indicate if monitoringSettings enabled or not
   }
@@ -276,9 +295,9 @@ resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@20
             patterns: [
               'application'
             ]
-            /*searchPaths: [
-              '/'
-            ]*/
+            //searchPaths: [
+            //  '/'
+            //]
             uri: gitConfigURI
           }
         ]
@@ -457,17 +476,18 @@ output serviceRegistryId string = serviceRegistry.id
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/apiportals?pivots=deployment-language-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-use-enterprise-api-portal
+// az spring api-portal  update  --help
 resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: apiPortalName
   parent: azureSpringApps
   sku: {
     name: azureSpringAppsSkuName
-    capacity: any(1)
+    capacity: any(1) // Number of instance ?
     tier: azureSpringAppsTier
   }
   properties: {
     gatewayIds: [
-        gateway.id
+        '${azureSpringApps.id}/gateways/${gatewayName}'
       ]
     httpsOnly: false
     public: true
@@ -484,7 +504,6 @@ resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-11-01-preview' 
   }
 }
 output apiPortalId string = apiPortal.id
-output apiPortalType string = apiPortal.type
 output apiPortalUrl string = apiPortal.properties.url
 output gatewayIds array = apiPortal.properties.gatewayIds
 
@@ -668,27 +687,12 @@ resource visitsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-pr
   ]  
 }
 
-/*
 // https://github.com/Azure/azure-rest-api-specs/issues/18286
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
 resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-11-01-preview' existing = if (azureSpringAppsTier=='Enterprise') {
   //scope: resourceGroup('my RG')
-  name: buildServiceName  
+  name: buildServiceName
 }
-
-
-resource buildServices 'Microsoft.AppPlatform/Spring/buildServices/buildServices@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise'){
-  name: 'string'
-  parent: buildService
-  properties: {
-    kPackVersion: '0.5.1'
-    resourceRequests: {
-      cpu: '200m'
-      memory: '4Gi'
-    }
-  }
-}
-
 
 resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: buildAgentPoolName
@@ -698,9 +702,6 @@ resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2
       name: 'S1'
     }
   }
-  dependsOn: [
-    azureSpringApps
-  ]  
 }
 
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal#default-builder-and-tanzu-buildpacks
@@ -742,7 +743,3 @@ resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-11-01-pre
     builder
   ]
 }
-
-requires enterprise Tier: https://azure.microsoft.com/en-us/pricing/details/spring-apps/
-
-*/
