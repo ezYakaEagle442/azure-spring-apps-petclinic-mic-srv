@@ -237,6 +237,7 @@ resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers
   }
 }
 
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/configurationservices?pivots=deployment-language-bicep
 resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'default'
   parent: azureSpringApps
@@ -245,7 +246,18 @@ resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@20
       gitProperty: {
         repositories: [
           {
+            name: 'default'
             label: configServerLabel
+            // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-application-configuration-service#pattern
+            // {profile} - Optional. The name of a profile whose properties you may be retrieving. 
+            // An empty value, or the value default, includes properties that are shared across profiles. 
+            // Non-default values include properties for the specified profile and properties for the default profile.
+            patterns: [
+              'application'
+            ]
+            /*searchPaths: [
+              '/'
+            ]*/
             uri: gitConfigURI
           }
         ]
