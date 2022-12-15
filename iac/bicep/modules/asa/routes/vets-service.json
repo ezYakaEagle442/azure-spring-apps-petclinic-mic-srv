@@ -1,0 +1,16 @@
+[
+    {
+      "predicates": [
+        "Path=/api/vet/**",
+        "Method=GET"
+      ],
+      "ssoEnabled": false,      
+      "filters": [
+        "StripPrefix=0"
+      ],
+      "order": "2",
+      "tags": [
+        "vets-service"
+      ]
+    }
+  ]

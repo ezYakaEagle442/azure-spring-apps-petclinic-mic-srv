@@ -1,0 +1,16 @@
+[
+    {
+      "predicates": [
+        "Path=/api/visit/**",
+        "Method=GET"
+      ],
+      "ssoEnabled": false,      
+      "filters": [
+        "StripPrefix=0"
+      ],
+      "order": "3",
+      "tags": [
+        "visits-service"
+      ]
+    }
+  ]
