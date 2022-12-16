@@ -239,13 +239,18 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appInsightsName
 }
 
-resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-09-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: monitoringSettingsName
-  parent: azureSpringApps
+// https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-enterprise
+// 
+resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: '${azureSpringApps.name}/${monitoringSettingsName}'
   properties: {
-    appInsightsInstrumentationKey: appInsights.properties.ConnectionString // /!\ ConnectionString for Enterprise tier ,  InstrumentationKey for Standard Tier 
-    appInsightsSamplingRate: 10
-    // traceEnabled: true Indicates whether enable the trace functionality, which will be deprecated since api version 2020-11-01-preview. Please leverage appInsightsInstrumentationKey to indicate if monitoringSettings enabled or not
+    bindingType: 'ApplicationInsights'
+    launchProperties: {
+      properties: {
+        sampling_percentage: '10'
+        connection_string: appInsights.properties.ConnectionString // /!\ ConnectionString for Enterprise tier ,  InstrumentationKey for Standard Tier 
+      }
+    }   
   }
 }
 
@@ -401,6 +406,7 @@ resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview
 output visitsServiceIdentity string = visitsservicerapp.identity.userAssignedIdentities['${visitsServiceIdentity.id}'].principalId
 
 
+// https://github.com/MicrosoftDocs/azure-docs/issues/102825
 resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
   name: 'api-gateway'
   location: location
@@ -709,9 +715,11 @@ resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-11-01
         name: 'java'
       }
     ]
+    // https://docs.vmware.com/en/VMware-Tanzu-Buildpacks/services/tanzu-buildpacks/GUID-full-stack-release-notes.html
+    // 
     stack: {
       id: 'io.buildpacks.stacks.bionic' // io.buildpacks.stacks.bionic-base or tanzu-base-bionic-stack ?   https://docs.pivotal.io/tanzu-buildpacks/stacks.html , OSS from https://github.com/paketo-buildpacks/java
-      version: 'base' // https://docs.vmware.com/en/VMware-Tanzu-Buildpacks/services/tanzu-buildpacks/GUID-full-stack-release-notes.html
+      version: 'base' // 1.2.35 https://network.tanzu.vmware.com/products/tanzu-base-bionic-stack#/releases/1218795/artifact_references
     }
   }
   dependsOn: [
@@ -719,6 +727,7 @@ resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-11-01
   ]
 }
 
+// https://github.com/Azure/Azure-Spring-Apps/issues/28
 resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: buildName
   parent: buildService
