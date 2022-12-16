@@ -696,7 +696,7 @@ resource visitsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-pr
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
 resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-11-01-preview' existing = if (azureSpringAppsTier=='Enterprise') {
   //scope: resourceGroup('my RG')
-  name: '${azureSpringAppsInstanceName}/buildServiceName'
+  name: '${azureSpringAppsInstanceName}/buildServiceName' 
 }
 
 resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
@@ -707,6 +707,9 @@ resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2
       name: 'S1'
     }
   }
+  dependsOn: [
+    azureSpringApps
+  ]  
 }
 
 // az spring build-service builder create --help
@@ -750,5 +753,6 @@ resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-11-01-pre
   dependsOn: [
     buildagentpool
     builder
+    azureSpringApps
   ]
 }
