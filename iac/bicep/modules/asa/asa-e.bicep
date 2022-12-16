@@ -710,9 +710,11 @@ resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2
   }
   dependsOn: [
     azureSpringApps
+    buildService
   ]  
 }
 
+// /!\ If you're using the tanzu-buildpacks/java-azure buildpack, we recommend that you set the BP_JVM_VERSION environment variable in the build-env argument.
 // az spring build-service builder create --help
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal#default-builder-and-tanzu-buildpacks
 resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {

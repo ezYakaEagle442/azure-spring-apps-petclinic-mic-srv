@@ -15,12 +15,6 @@ az term accept \
 
 [https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise#create-and-configure-an-application-registration-with-azure-active-directory](https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise#create-and-configure-an-application-registration-with-azure-active-directory)
 ```sh
-
-LOCATION="westeurope"
-RG_APP="rg-iac-asa-petclinic-mic-srv"
-
-az group create --name $RG_APP --location $LOCATION
-
 SSO_APP_NAME="asa-sso-petclinic"
 
 # Use the following command to create an application registration with AAD
