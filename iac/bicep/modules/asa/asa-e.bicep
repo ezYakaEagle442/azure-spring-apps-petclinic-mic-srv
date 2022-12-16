@@ -632,7 +632,7 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if
       allowedHeaders: [
         '*'
       ]
-    }    
+    }
   }
 }
 output gatewayId string = gateway.id
@@ -732,7 +732,7 @@ output CustomersGatewayRouteConfigPredicates array = CustomersGatewayRouteConfig
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
 resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-11-01-preview' existing = if (azureSpringAppsTier=='Enterprise') {
   //scope: resourceGroup('my RG')
-  name: '${azureSpringAppsInstanceName}/buildServiceName' 
+  name: '${azureSpringAppsInstanceName}/${buildServiceName}' 
 }
 
 resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
