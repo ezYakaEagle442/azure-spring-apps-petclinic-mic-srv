@@ -197,7 +197,8 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 }
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/monitoringsettings?pivots=deployment-language-bicep
-resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-09-01-preview' = {
+// https://learn.microsoft.com/en-us/azure/spring-apps/how-to-application-insights?pivots=sc-standard-tier
+resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-11-01-preview' = {
   name: monitoringSettingsName
   parent: azureSpringApps
   properties: {
