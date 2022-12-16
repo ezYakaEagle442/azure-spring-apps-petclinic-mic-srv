@@ -54,18 +54,18 @@ param deployToVNet bool = false
 
 param zoneRedundant bool = false
 
-@description('The Azure Spring Apps monitoring Settings name. Only "default" is supported')
+@description('The Azure Spring Apps monitoring Settings name. see https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal')
 @allowed([
   'default'
   'binding-ai'
 ])
-param monitoringSettingsName string = 'binding-ai' // ex: 'default' or binding-ai , see https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal
+param monitoringSettingsName string = 'binding-ai'
 
 @description('The Azure Spring Apps Service Registry name. Only "default" is supported')
 @allowed([
   'default'
 ])
-param serviceRegistryName string = 'default' // The resource name 'Azure Spring Apps Service Registry' is not valid
+param serviceRegistryName string = 'default'
 
 @description('The Azure Spring Apps Application Configuration Service name. Only "default" is supported')
 @allowed([
@@ -118,11 +118,16 @@ param configServerLabel string = 'main'
   'default'
 ])
 param buildAgentPoolName string = 'default'
-param builderName string = 'java-builder'
-param buildName string = '${appName}-build'
 
 @description('The Azure Spring Apps Build service name. Only "{azureSpringAppsInstanceName}/default" is supported') // to be checked
-param buildServiceName string = 'default' // '{your-service-name}/default/default'  //{your-service-name}/{build-service-name}/{agenpool-name}
+@allowed([
+  'default'
+])
+param buildServiceName string = 'default'
+
+param builderName string = 'java-builder'
+param buildName string = 'build-${appName}'
+
 
 @maxLength(24)
 @description('The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters.')
@@ -243,7 +248,8 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-enterprise
 // 
 resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' // /default (for Build Service ) /default (Builder) /default (Build Pack binding name)
+  // name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' default (for Build Service ) /default (Builder) /default (Build Pack binding name)
+  name: '${azureSpringApps.name}/default/default/default' 
   properties: {
     bindingType: 'ApplicationInsights'
     launchProperties: {
@@ -254,7 +260,6 @@ resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildSe
     }   
   }
   dependsOn: [
-    appInsights
     buildService
   ]
 }
@@ -695,8 +700,8 @@ resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-11-01-pre
 }
 
 resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: buildAgentPoolName
-  parent: buildService
+  // '{your-service-name}/default/default'  //{your-service-name}/{build-service-name}/{agenpool-name}
+  name: '${azureSpringAppsInstanceName}/${buildServiceName}/${buildAgentPoolName}' // default/default as buildServiceName / agentpoolName
   properties: {
     poolSize: {
       name: 'S1'
