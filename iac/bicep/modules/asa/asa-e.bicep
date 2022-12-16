@@ -246,7 +246,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 }
 
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-enterprise
-// 
+// https://learn.microsoft.com/en-us/azure/spring-apps/how-to-application-insights?pivots=sc-enterprise-tier
 resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   // name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' default (for Build Service ) /default (Builder) /default (Build Pack binding name)
   name: '${azureSpringApps.name}/default/default/default' 
@@ -616,9 +616,11 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if
       serverUrl: '/api' // Base URL that API consumers will use to access APIs on the Gateway instance.
       documentation: '' // Location of additional documentation for the APIs available on the Gateway instance
     }
+    /* Spring Cloud Gateway APM feature is not enabled
     apmTypes: [
       'ApplicationInsights'
     ]
+    */
     corsProperties: {
       allowCredentials: false
       allowedOrigins: [
