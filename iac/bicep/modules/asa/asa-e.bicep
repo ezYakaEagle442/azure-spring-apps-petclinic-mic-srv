@@ -797,13 +797,13 @@ output appAcceleratorsId string = appAccelerators.id
 output appAcceleratorsComponents array = appAccelerators.properties.components
 
 // az spring application-accelerator predefined-accelerator show -n "Acme Fitness Store" -g rg-iac-asa-petclinic-mic-srv
-// Acme Fitness Store
-// Tanzu Java Restful Web App
-// Node Express
-// Spring Cloud Serverless
-// C# Weather Forecast
+// Acme Fitness Store (does not work) or asa-acme-fitness-store ?
+// Tanzu Java Restful Web App ? or asa-java-rest-service ?
+// Node Express ? or asa-node-express ?
+// Spring Cloud Serverless ? or asa-spring-cloud-serverless ? 
+// C# Weather Forecast ? or asa-weatherforecast-csharp ?
 resource predefinedAccelerators 'Microsoft.AppPlatform/Spring/applicationAccelerators/predefinedAccelerators@2022-11-01-preview' existing  = if (azureSpringAppsTier=='Enterprise') {
-  name: 'Acme Fitness Store'
+  name: 'asa-acme-fitness-store'
   parent: appAccelerators
 }
 output predefinedAcceleratorsId string = predefinedAccelerators.id
