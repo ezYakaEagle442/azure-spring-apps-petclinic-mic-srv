@@ -572,16 +572,6 @@ resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-11-01-preview' 
       ]
     httpsOnly: false
     public: true
-    ssoProperties: {
-      clientId: apiPortalSsoClientId
-      clientSecret: apiPortalSsoClientSecret
-      issuerUri: apiPortalSsoIssuerUri
-      scope: [
-        'openid'
-        'profile'
-        'email'
-      ]
-    }
   }
   dependsOn:  [
     gateway
@@ -590,16 +580,6 @@ resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-11-01-preview' 
 output apiPortalId string = apiPortal.id
 output apiPortalUrl string = apiPortal.properties.url
 output gatewayIds array = apiPortal.properties.gatewayIds
-
-/*x
-resource gatewayCustomdomain 'Microsoft.AppPlatform/Spring/gateways/domains@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: 'javarocks.com'
-  parent: gateway
-  properties: {
-    thumbprint: 'xxx'
-  }
-}
-*/
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways?pivots=deployment-language-bicep
 resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
@@ -617,16 +597,6 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if
     resourceRequests: {
       cpu: '1' // CPU resource quantity. Should be 500m or number of CPU cores.
       memory: '1Gi' // Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi.
-    }
-    ssoProperties: {
-      clientId: apiPortalSsoClientId
-      clientSecret: apiPortalSsoClientSecret
-      issuerUri: apiPortalSsoIssuerUri
-      scope: [
-        'openid'
-        'profile'
-        'email'
-      ]
     }
     apiMetadataProperties: {
       title: 'Spring Cloud Gateway for Petclinic' // Title describing the context of the APIs available on the Gateway instance (default: Spring Cloud Gateway for K8S)

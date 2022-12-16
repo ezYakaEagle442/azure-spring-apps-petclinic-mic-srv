@@ -149,10 +149,22 @@ jobs:
             echo "https://${PORTAL_URL}/oauth2-redirect.html"
             echo "https://${PORTAL_URL}/login/oauth2/code/sso"
 
+            # Get the APPLICATION_ID
+            APPLICATION_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${{ env.SSO_APP_NAME }}'].{id:appId}" --output tsv)
+
             az ad app update \
                 --id ${APPLICATION_ID} \
                 --reply-urls "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
 
+          az deployment group create --name asa-petclinic-apps -f iac/bicep/modules/asa/asa-e-api-portal-gateway.bicep -g ${{ env.RG_APP }} \
+            -p appName=${{ env.APP_NAME }} \
+            -p azureSpringAppsSkuName=${{ env.ASA_SKU }} \
+            -p azureSpringAppsTier=${{ env.ASA_TIER }} \
+            -p location=${{ env.LOCATION }} \
+            -p apiPortalSsoClientId=${{ env.API_PORTAL_SSO_CLIENT_ID }} \
+            -p apiPortalSsoClientSecret=${{ env.API_PORTAL_SSO_CLIENT_SECRET }} \
+            -p apiPortalSsoIssuerUri=${{ env.SSO_APPLICATION_ISSUER_URI }} \
+            -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }}
 
       shell: bash
 
