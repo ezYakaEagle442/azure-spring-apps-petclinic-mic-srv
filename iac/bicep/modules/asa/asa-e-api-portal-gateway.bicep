@@ -185,6 +185,7 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
     protocol: 'HTTP'
     filters: [
       'StripPrefix=0'
+      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
     ]
     predicates: [
       '/api/vet/**'
@@ -214,6 +215,7 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
     protocol: 'HTTP'
     filters: [
       'StripPrefix=0'
+      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
     ]
     predicates: [
       '/api/visit/**'
@@ -243,6 +245,7 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
     protocol: 'HTTP'
     filters: [
       'StripPrefix=0'
+      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
     ]
     predicates: [
       '/api/customer/**'

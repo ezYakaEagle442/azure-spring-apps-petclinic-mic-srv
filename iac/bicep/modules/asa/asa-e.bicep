@@ -639,6 +639,7 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
     ]
     predicates: [
       '/api/vet/**'
+      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
     ]
     routes: [
       {
@@ -665,6 +666,7 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
     protocol: 'HTTP'
     filters: [
       'StripPrefix=0'
+      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
     ]
     predicates: [
       '/api/visit/**'
@@ -694,6 +696,7 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
     protocol: 'HTTP'
     filters: [
       'StripPrefix=0'
+      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
     ]
     predicates: [
       '/api/customer/**'
@@ -782,3 +785,25 @@ resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-11-01-pre
     azureSpringApps
   ]
 }
+
+resource appAccelerators 'Microsoft.AppPlatform/Spring/applicationAccelerators@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+ name: 'default'
+ parent: azureSpringApps
+ sku: {
+   name: 'S1'
+ }
+}
+output appAcceleratorsId string = appAccelerators.id
+output appAcceleratorsComponents array = appAccelerators.properties.components
+
+resource predefinedAccelerators 'Microsoft.AppPlatform/Spring/applicationAccelerators/predefinedAccelerators@2022-11-01-preview' existing  = if (azureSpringAppsTier=='Enterprise') {
+  name: 'acme'
+  parent: appAccelerators
+}
+output predefinedAcceleratorsId string = predefinedAccelerators.id
+output predefinedAcceleratorsDescription string = predefinedAccelerators.properties.description
+
+resource appLiveViews 'Microsoft.AppPlatform/Spring/applicationLiveViews@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'default'
+  parent: azureSpringApps
+ }
