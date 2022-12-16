@@ -796,14 +796,23 @@ resource appAccelerators 'Microsoft.AppPlatform/Spring/applicationAccelerators@2
 output appAcceleratorsId string = appAccelerators.id
 output appAcceleratorsComponents array = appAccelerators.properties.components
 
+// az spring application-accelerator predefined-accelerator show -n "Acme Fitness Store" -g rg-iac-asa-petclinic-mic-srv
+// Acme Fitness Store
+// Tanzu Java Restful Web App
+// Node Express
+// Spring Cloud Serverless
+// C# Weather Forecast
 resource predefinedAccelerators 'Microsoft.AppPlatform/Spring/applicationAccelerators/predefinedAccelerators@2022-11-01-preview' existing  = if (azureSpringAppsTier=='Enterprise') {
-  name: 'acme'
+  name: 'Acme Fitness Store'
   parent: appAccelerators
 }
 output predefinedAcceleratorsId string = predefinedAccelerators.id
+output predefinedAcceleratorsName string = predefinedAccelerators.name
 output predefinedAcceleratorsDescription string = predefinedAccelerators.properties.description
 
 resource appLiveViews 'Microsoft.AppPlatform/Spring/applicationLiveViews@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'default'
   parent: azureSpringApps
  }
+ output appLiveViewsId string = appLiveViews.id
+ output appLiveViewsComponents array = appLiveViews.properties.components
