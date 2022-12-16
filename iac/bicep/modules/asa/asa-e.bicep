@@ -693,6 +693,7 @@ resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2
   }
 }
 
+// az spring build-service builder create --help
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal#default-builder-and-tanzu-buildpacks
 resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: builderName
@@ -709,8 +710,8 @@ resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-11-01
       }
     ]
     stack: {
-      id: 'tanzu-base-bionic-stack' // io.buildpacks.stacks.bionic-base  https://docs.pivotal.io/tanzu-buildpacks/stacks.html , OSS from https://github.com/paketo-buildpacks/java
-      version: '1.2.35'
+      id: 'io.buildpacks.stacks.bionic' // io.buildpacks.stacks.bionic-base or tanzu-base-bionic-stack ?   https://docs.pivotal.io/tanzu-buildpacks/stacks.html , OSS from https://github.com/paketo-buildpacks/java
+      version: 'base' // https://docs.vmware.com/en/VMware-Tanzu-Buildpacks/services/tanzu-buildpacks/GUID-full-stack-release-notes.html
     }
   }
   dependsOn: [
