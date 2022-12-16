@@ -125,7 +125,9 @@ param buildAgentPoolName string = 'default'
 ])
 param buildServiceName string = 'default'
 
+@description('The Azure Spring Apps Java Builder name.')
 param builderName string = 'java-builder'
+
 param buildName string = 'build-${appName}'
 
 
@@ -250,6 +252,23 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   // name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' default (for Build Service ) /default (Builder) /default (Build Pack binding name)
   name: '${azureSpringApps.name}/default/default/default' 
+  properties: {
+    bindingType: 'ApplicationInsights'
+    launchProperties: {
+      properties: {
+        sampling_percentage: '10'
+        connection_string: appInsights.properties.ConnectionString // /!\ ConnectionString for Enterprise tier ,  InstrumentationKey for Standard Tier 
+      }
+    }   
+  }
+  dependsOn: [
+    buildService
+  ]
+}
+
+resource azureSpringAppsJavaBuilderAppInsightsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  // name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' default (for Build Service ) /default (Builder) /default (Build Pack binding name)
+  name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' 
   properties: {
     bindingType: 'ApplicationInsights'
     launchProperties: {
@@ -735,6 +754,7 @@ resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-11-01-pre
   name: '${azureSpringAppsInstanceName}/${buildServiceName}' 
 }
 
+// /!\ should add ' existing' = if (azureSpringAppsTier=='Enterprise') {
 resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   // '{your-service-name}/default/default'  //{your-service-name}/{build-service-name}/{agenpool-name}
   name: '${azureSpringAppsInstanceName}/${buildServiceName}/${buildAgentPoolName}' // default/default as buildServiceName / agentpoolName
