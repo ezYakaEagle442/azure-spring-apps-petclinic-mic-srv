@@ -330,7 +330,10 @@ resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-previ
       }
       serviceRegistry: {
           resourceId: '${azureSpringApps.id}/serviceRegistries/${serviceRegistryName}'
-      }      
+      }
+      buildService: {
+        resourceId: '${azureSpringApps.id}/buildServices/${buildServiceName}'
+      }
     }
     httpsOnly: false
     public: true
@@ -365,7 +368,10 @@ resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' =
       }
       serviceRegistry: {
           resourceId: '${azureSpringApps.id}/serviceRegistries/${serviceRegistryName}'
-      }       
+      }
+      buildService: {
+        resourceId: '${azureSpringApps.id}/buildServices/${buildServiceName}'
+      }   
     }
     httpsOnly: false
     public: true
@@ -400,7 +406,10 @@ resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview
       }
       serviceRegistry: {
           resourceId: '${azureSpringApps.id}/serviceRegistries/${serviceRegistryName}'
-      }       
+      }
+      buildService: {
+        resourceId: '${azureSpringApps.id}/buildServices/${buildServiceName}'
+      }
     }
     httpsOnly: false
     public: true
@@ -437,7 +446,10 @@ resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = 
       }
       serviceRegistry: {
           resourceId: '${azureSpringApps.id}/serviceRegistries/${serviceRegistryName}'
-      }       
+      }
+      buildService: {
+        resourceId: '${azureSpringApps.id}/buildServices/${buildServiceName}'
+      }    
     }
     httpsOnly: false
     public: true
@@ -531,12 +543,13 @@ resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-11-01-preview' 
   parent: azureSpringApps
   sku: {
     name: azureSpringAppsSkuName
-    capacity: any(1) // Number of instance ?
+    capacity: any(1) // Number of instance
     tier: azureSpringAppsTier
   }
   properties: {
     gatewayIds: [
-        '${azureSpringApps.id}/gateways/${gatewayName}'
+        //'${azureSpringApps.id}/gateways/${gatewayName}'
+        gateway.id
       ]
     httpsOnly: false
     public: true
@@ -559,6 +572,16 @@ output apiPortalId string = apiPortal.id
 output apiPortalUrl string = apiPortal.properties.url
 output gatewayIds array = apiPortal.properties.gatewayIds
 
+/*x
+resource gatewayCustomdomain 'Microsoft.AppPlatform/Spring/gateways/domains@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'javarocks.com'
+  parent: gateway
+  properties: {
+    thumbprint: 'xxx'
+  }
+}
+*/
+
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways?pivots=deployment-language-bicep
 resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: gatewayName
@@ -569,19 +592,7 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if
     tier: azureSpringAppsTier
   }
   properties: {
-    corsProperties: {
-      allowCredentials: false
-      allowedOrigins: [
-        '*'
-      ]
-      allowedMethods: [
-        'GET'
-      ]
-      allowedHeaders: [
-        '*'
-      ]
-    }
-    httpsOnly: false
+    httpsOnly: false // for custom domain ONLY ?
     public: true
     // az spring gateway update --help
     resourceRequests: {
@@ -597,7 +608,29 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if
         'profile'
         'email'
       ]
-    }  
+    }
+    apiMetadataProperties: {
+      title: 'Spring Cloud Gateway for Petclinic' // Title describing the context of the APIs available on the Gateway instance (default: Spring Cloud Gateway for K8S)
+      description: '' // description of the APIs available on the Gateway instance (default: Generated OpenAPI 3 document that describes the API routes configured for '[Gateway instance name]' Spring Cloud Gateway instance deployed under '[namespace]' namespace.)
+      version: '1.0.0' // Version of APIs available on this Gateway instance (default: unspecified)
+      serverUrl: '/api' // Base URL that API consumers will use to access APIs on the Gateway instance.
+      documentation: '' // Location of additional documentation for the APIs available on the Gateway instance
+    }
+    apmTypes: [
+      'ApplicationInsights'
+    ]
+    corsProperties: {
+      allowCredentials: false
+      allowedOrigins: [
+        '*'
+      ]
+      allowedMethods: [
+        'GET'
+      ]
+      allowedHeaders: [
+        '*'
+      ]
+    }    
   }
 }
 output gatewayId string = gateway.id
@@ -615,7 +648,6 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
     ]
     predicates: [
       '/api/vet/**'
-      '/vets'
     ]
     routes: [
       {
@@ -645,7 +677,6 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
     ]
     predicates: [
       '/api/visit/**'
-      '/visits'
     ]
     routes: [
       {
@@ -675,7 +706,6 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
     ]
     predicates: [
       '/api/customer/**'
-      '/owners'
     ]
     routes: [
       {
