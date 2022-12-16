@@ -57,8 +57,9 @@ param zoneRedundant bool = false
 @description('The Azure Spring Apps monitoring Settings name. Only "default" is supported')
 @allowed([
   'default'
+  'binding-ai'
 ])
-param monitoringSettingsName string = 'default'
+param monitoringSettingsName string = 'binding-ai' // ex: 'default' or binding-ai , see https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal
 
 @description('The Azure Spring Apps Service Registry name. Only "default" is supported')
 @allowed([
@@ -121,7 +122,7 @@ param builderName string = 'java-builder'
 param buildName string = '${appName}-build'
 
 @description('The Azure Spring Apps Build service name. Only "{azureSpringAppsInstanceName}/default" is supported') // to be checked
-param buildServiceName string = '${azureSpringAppsInstanceName}/default' // '{your-service-name}/default/default'  //{your-service-name}/{build-service-name}/{agenpool-name}
+param buildServiceName string = 'default' // '{your-service-name}/default/default'  //{your-service-name}/{build-service-name}/{agenpool-name}
 
 @maxLength(24)
 @description('The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters.')
@@ -242,7 +243,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-enterprise
 // 
 resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: '${azureSpringApps.name}/${monitoringSettingsName}'
+  name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' // /default (for Build Service ) /default (Builder) /default (Build Pack binding name)
   properties: {
     bindingType: 'ApplicationInsights'
     launchProperties: {
@@ -252,6 +253,10 @@ resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildSe
       }
     }   
   }
+  dependsOn: [
+    appInsights
+    buildService
+  ]
 }
 
 resource apiGatewayIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
@@ -686,7 +691,7 @@ resource visitsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-pr
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
 resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-11-01-preview' existing = if (azureSpringAppsTier=='Enterprise') {
   //scope: resourceGroup('my RG')
-  name: buildServiceName
+  name: '${azureSpringAppsInstanceName}/buildServiceName'
 }
 
 resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
