@@ -239,18 +239,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appInsightsName
 }
 
-// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/monitoringsettings?pivots=deployment-language-bicep
-resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-09-01-preview' = if (azureSpringAppsTier=='Standard') {
-  name: monitoringSettingsName
-  parent: azureSpringApps
-  properties: {
-    appInsightsInstrumentationKey: appInsights.properties.InstrumentationKey // /!\ ConnectionString for Enterprise tier ,  InstrumentationKey for Standard Tier 
-    appInsightsSamplingRate: 10
-    // traceEnabled: true Indicates whether enable the trace functionality, which will be deprecated since api version 2020-11-01-preview. Please leverage appInsightsInstrumentationKey to indicate if monitoringSettings enabled or not
-  }
-}
-
-resource azureSpringAppsEnterpriseMonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-09-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-09-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: monitoringSettingsName
   parent: azureSpringApps
   properties: {

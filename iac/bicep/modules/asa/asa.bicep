@@ -201,7 +201,7 @@ resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/monitor
   name: monitoringSettingsName
   parent: azureSpringApps
   properties: {
-    appInsightsInstrumentationKey: appInsights.properties.InstrumentationKey
+    appInsightsInstrumentationKey: appInsights.properties.InstrumentationKey // /!\ ConnectionString for Enterprise tier ,  InstrumentationKey for Standard Tier
     appInsightsSamplingRate: 10
     // traceEnabled: true Indicates whether enable the trace functionality, which will be deprecated since api version 2020-11-01-preview. Please leverage appInsightsInstrumentationKey to indicate if monitoringSettings enabled or not
   }
