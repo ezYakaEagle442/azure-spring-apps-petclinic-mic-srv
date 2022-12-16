@@ -551,6 +551,9 @@ resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-11-01-preview' 
       ]
     }
   }
+  dependsOn:  [
+    gateway
+  ]
 }
 output apiPortalId string = apiPortal.id
 output apiPortalUrl string = apiPortal.properties.url
