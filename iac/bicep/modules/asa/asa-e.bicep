@@ -456,6 +456,50 @@ resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = 
 output apiGatewayIdentity string = apigatewayapp.identity.userAssignedIdentities['${apiGatewayIdentity.id}'].principalId
 
 
+resource customersbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'customers-service-binding'
+  parent: customersserviceapp
+  properties: {
+    bindingParameters: {}
+    resourceId: customersserviceapp.id
+    key: 'customers-service' // There is no API Key for MySQL
+  }
+  dependsOn: [
+    serviceRegistry
+  ]
+}
+
+resource vetsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'vets-service-binding'
+  parent: vetsserviceapp
+  properties: {
+    bindingParameters: {}
+    resourceId: vetsserviceapp.id
+    key: 'vets-service' // There is no API Key for MySQL
+  }
+  dependsOn: [
+    serviceRegistry
+  ]  
+}
+
+resource visitsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'visits-service-binding'
+  parent: visitsservicerapp
+  properties: {
+    bindingParameters: {
+      /*
+      databaseName: 'mydb'
+      xxx: '' // username ? PWD ?
+      */
+    }
+    key: 'visits-service' // There is no API Key for MySQL
+    resourceId: visitsservicerapp.id
+  }
+  dependsOn: [
+    serviceRegistry
+  ]  
+}
+
 
 // Binding name can contain only lowercase letters, numbers and hyphens.
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-service-registry
@@ -648,49 +692,6 @@ output CustomersGatewayRouteConfigRoutes array = CustomersGatewayRouteConfig.pro
 output CustomersGatewayRouteConfigIsSsoEnabled bool = CustomersGatewayRouteConfig.properties.ssoEnabled
 output CustomersGatewayRouteConfigPredicates array = CustomersGatewayRouteConfig.properties.predicates
 
-resource customersbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: 'customers-service-binding'
-  parent: customersserviceapp
-  properties: {
-    bindingParameters: {}
-    resourceId: customersserviceapp.id
-    key: 'customers-service' // There is no API Key for MySQL
-  }
-  dependsOn: [
-    serviceRegistry
-  ]
-}
-
-resource vetsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: 'vets-service-binding'
-  parent: vetsserviceapp
-  properties: {
-    bindingParameters: {}
-    resourceId: vetsserviceapp.id
-    key: 'vets-service' // There is no API Key for MySQL
-  }
-  dependsOn: [
-    serviceRegistry
-  ]  
-}
-
-resource visitsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: 'visits-service-binding'
-  parent: visitsservicerapp
-  properties: {
-    bindingParameters: {
-      /*
-      databaseName: 'mydb'
-      xxx: '' // username ? PWD ?
-      */
-    }
-    key: 'visits-service' // There is no API Key for MySQL
-    resourceId: visitsservicerapp.id
-  }
-  dependsOn: [
-    serviceRegistry
-  ]  
-}
 
 // https://github.com/Azure/azure-rest-api-specs/issues/18286
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
@@ -745,14 +746,12 @@ resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-11-01-pre
   name: buildName
   parent: buildService
   properties: {
-    agentPool: buildAgentPoolName
-    builder: builderName
+    agentPool: buildagentpool.id
+    builder: builder.id
     env: {}
     relativePath: '/'
   }
   dependsOn: [
-    buildagentpool
-    builder
     azureSpringApps
   ]
 }
