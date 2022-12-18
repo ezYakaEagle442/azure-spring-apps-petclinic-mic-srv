@@ -506,6 +506,12 @@ resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = 
 output apiGatewayIdentity string = apigatewayapp.identity.userAssignedIdentities['${apiGatewayIdentity.id}'].principalId
 
 
+/*
+az spring app binding --help
+Group
+    az spring app binding : Commands to manage bindings with Azure Data Services, you need to
+    manually restart app to make settings take effect.
+
 resource customersbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'customers-service-binding'
   parent: customersserviceapp
@@ -537,10 +543,8 @@ resource visitsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-pr
   parent: visitsservicerapp
   properties: {
     bindingParameters: {
-      /*
-      databaseName: 'mydb'
-      xxx: '' // username ? PWD ?
-      */
+      //databaseName: 'mydb'
+      //xxx: '' // username ? PWD ?
     }
     key: 'visits-service' // There is no API Key for MySQL
     resourceId: visitsservicerapp.id
@@ -549,7 +553,7 @@ resource visitsbinding 'Microsoft.AppPlatform/Spring/apps/bindings@2022-11-01-pr
     serviceRegistry
   ]  
 }
-
+*/
 
 // Binding name can contain only lowercase letters, numbers and hyphens.
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-service-registry
