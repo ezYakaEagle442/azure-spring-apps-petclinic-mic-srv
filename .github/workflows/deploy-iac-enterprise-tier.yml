@@ -136,6 +136,8 @@ jobs:
             -p apiPortalSsoIssuerUri=${{ env.SSO_APPLICATION_ISSUER_URI }} \
             -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }}
 
+            az config set extension.use_dynamic_install=yes_without_prompt
+            
             # https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise
             GATEWAY_URL=$(az spring gateway show \
                 --resource-group ${{ env.RG_APP }} \
