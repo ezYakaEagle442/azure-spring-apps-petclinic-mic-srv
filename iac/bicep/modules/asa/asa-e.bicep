@@ -834,7 +834,7 @@ resource predefinedAccelerators 'Microsoft.AppPlatform/Spring/applicationAcceler
 }
 output predefinedAcceleratorsId string = predefinedAccelerators.id
 output predefinedAcceleratorsName string = predefinedAccelerators.name
-output predefinedAcceleratorsDescription string = predefinedAccelerators.properties.description
+output predefinedAcceleratorsDisplayName string = predefinedAccelerators.properties.displayName
 
 resource appLiveViews 'Microsoft.AppPlatform/Spring/applicationLiveViews@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'default'
