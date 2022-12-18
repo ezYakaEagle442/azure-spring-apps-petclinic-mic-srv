@@ -374,6 +374,8 @@ resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-previ
   }
   dependsOn: [
     appconfigservice
+    serviceRegistry
+    buildService
   ]  
 }
 output customersServiceIdentity string = customersserviceapp.identity.userAssignedIdentities['${customersServicedentity.id}'].principalId
@@ -412,6 +414,8 @@ resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' =
   }
   dependsOn: [
     appconfigservice
+    serviceRegistry
+    buildService    
   ]  
 }
 output vetsServiceIdentity string = vetsserviceapp.identity.userAssignedIdentities['${vetsServiceAppIdentity.id}'].principalId
@@ -450,6 +454,8 @@ resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview
   }
   dependsOn: [
     appconfigservice
+    serviceRegistry
+    buildService    
   ]
 }
 output visitsServiceIdentity string = visitsservicerapp.identity.userAssignedIdentities['${visitsServiceIdentity.id}'].principalId
@@ -490,6 +496,8 @@ resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = 
   }
   dependsOn: [
     appconfigservice
+    serviceRegistry
+    buildService    
     customersserviceapp
     vetsserviceapp
     visitsservicerapp
