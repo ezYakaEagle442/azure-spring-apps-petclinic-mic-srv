@@ -137,7 +137,7 @@ jobs:
             -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }}
 
             az config set extension.use_dynamic_install=yes_without_prompt
-            
+
             # https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise
             GATEWAY_URL=$(az spring gateway show \
                 --resource-group ${{ env.RG_APP }} \
@@ -152,11 +152,14 @@ jobs:
             echo "https://${PORTAL_URL}/login/oauth2/code/sso"
 
             # Get the APPLICATION_ID
-            APPLICATION_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${{ env.SSO_APP_NAME }}'].{id:appId}" --output tsv)
+            APPLICATION_ID=$(az ad sp list --filter "displayName eq '${{ env.SSO_APP_NAME }}'" --query "[?appDisplayName=='${{ env.SSO_APP_NAME }}'].{id:appId}" -o tsv)
+            echo "APPLICATION_ID=$APPLICATION_ID"
 
             az ad app update \
                 --id ${APPLICATION_ID} \
                 --reply-urls "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
+          
+          echo "App updated"
 
           az deployment group create --name asa-petclinic-apps -f iac/bicep/modules/asa/asa-e-api-portal-gateway.bicep -g ${{ env.RG_APP }} \
             -p appName=${{ env.APP_NAME }} \
@@ -167,6 +170,8 @@ jobs:
             -p apiPortalSsoClientSecret=${{ env.API_PORTAL_SSO_CLIENT_SECRET }} \
             -p apiPortalSsoIssuerUri=${{ env.SSO_APPLICATION_ISSUER_URI }} \
             -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }}
+
+            echo "SSO configured on API Portal + Gateway"
 
       shell: bash
 
