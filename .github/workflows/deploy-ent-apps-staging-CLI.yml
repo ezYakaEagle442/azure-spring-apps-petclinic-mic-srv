@@ -67,7 +67,7 @@ env:
   BUILD_ENV: BP_JVM_VERSION=Java_11 # Space-separated environment variables in 'key[=value]' format: <key1=value1>, <key2=value2>
   BUILD_CPU: 1 # CPU resource quantity. Should be 500m or number of CPU cores. Default: 1.
   BUILD_MEMORY: 2Gi # Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Default: 2Gi.
-  BUILDER: default # java-builder
+  BUILDER: default # default or java-builder
   CFG_FILE_PATTERNS: application # Config file patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '""' to clear existing configurations.
 
   DEPLOYMENT_DISABLE_PROBE: false
