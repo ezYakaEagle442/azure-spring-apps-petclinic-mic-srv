@@ -55,11 +55,20 @@ env:
   DEPLOYMENT_JVM_OPTIONS: -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
   
   DEPLOYMENT_VERSION: 2.6.13
-  DEPLOYMENT_RUNTIME_VERSION: Java_11
   DEPLOYMENT_CPU: 500m
   DEPLOYMENT_MEMORY: 1Gi
   DEPLOYMENT_INSTANCE_COUNT: 1
-  
+
+  # https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal
+  # If you're using the tanzu-buildpacks/java-azure buildpack, we recommend that you set the BP_JVM_VERSION environment variable in the build-env argument.
+  # https://github.com/Azure/Azure-Spring-Apps/issues/30
+  # az spring app deploy --help
+  BP_JVM_VERSION: Java_11 #
+  BUILD_ENV: BP_JVM_VERSION=Java_11 # Space-separated environment variables in 'key[=value]' format: <key1=value1>, <key2=value2>
+  BUILD_CPU: 1 # CPU resource quantity. Should be 500m or number of CPU cores. Default: 1.
+  BUILD_MEMORY: 2Gi # Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Default: 2Gi.
+  BUILDER: default # java-builder
+
   DEPLOYMENT_DISABLE_PROBE: false
   DEPLOYMENT_ENABLE_STARTUP_PROBE: true
   DEPLOYMENT_ENABLE_LIVENESS_PROBE: true
@@ -465,7 +474,7 @@ jobs:
             --cpu ${{ env.DEPLOYMENT_CPU }} \
             --memory ${{ env.DEPLOYMENT_MEMORY }} \
             --version ${{ env.DEPLOYMENT_VERSION }} \
-            --skip-clone-settings            
+            --skip-clone-settings
         else
             echo "There are existing deployment(s) for ${{ env.VETS_SERVICE }}"
             FOUND_DEPLOYMENT=false
@@ -517,7 +526,11 @@ jobs:
         --disable-probe true \
         --env SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} VETS_SVC_APP_IDENTITY_CLIENT_ID=${{ env.VETS_SVC_APP_IDENTITY_CLIENT_ID }} SPRING_CLOUD_AZURE_TENANT_ID=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }} \
         --jvm-options="${{ env.DEPLOYMENT_JVM_OPTIONS }}" \
-        --version ${{ env.DEPLOYMENT_VERSION }}         
+        --version ${{ env.DEPLOYMENT_VERSION }} \
+        --build-env ${{ env.BUILD_ENV }}  \
+        --build-cpu ${{ env.BUILD_CPU }} \
+        --build-memory ${{ env.BUILD_MEMORY }} \
+        --builder ${{ env.BUILDER }}
 
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
@@ -649,7 +662,11 @@ jobs:
         --disable-probe true \
         --env SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} VISITS_SVC_APP_IDENTITY_CLIENT_ID=${{ env.VISITS_SVC_APP_IDENTITY_CLIENT_ID }} SPRING_CLOUD_AZURE_TENANT_ID=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }} \
         --jvm-options="${{ env.DEPLOYMENT_JVM_OPTIONS }}" \
-        --version ${{ env.DEPLOYMENT_VERSION }}     
+        --version ${{ env.DEPLOYMENT_VERSION }} \
+        --build-env ${{ env.BUILD_ENV }}  \
+        --build-cpu ${{ env.BUILD_CPU }} \
+        --build-memory ${{ env.BUILD_MEMORY }} \
+        --builder ${{ env.BUILDER }}
 
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
@@ -781,7 +798,11 @@ jobs:
         --disable-probe true \
         --env SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT=${{ env.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }} CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=${{ env.CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID }} SPRING_CLOUD_AZURE_TENANT_ID=${{ env.SPRING_CLOUD_AZURE_TENANT_ID }} \
         --jvm-options="${{ env.DEPLOYMENT_JVM_OPTIONS }}" \
-        --version ${{ env.DEPLOYMENT_VERSION }}      
+        --version ${{ env.DEPLOYMENT_VERSION }} \
+        --build-env ${{ env.BUILD_ENV }}  \
+        --build-cpu ${{ env.BUILD_CPU }} \
+        --build-memory ${{ env.BUILD_MEMORY }} \
+        --builder ${{ env.BUILDER }}      
 
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
