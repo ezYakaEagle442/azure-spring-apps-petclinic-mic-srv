@@ -290,6 +290,7 @@ resource azureSpringAppsJavaBuilderAppInsightsMonitoringSettings 'Microsoft.AppP
   }
   dependsOn: [
     buildService
+    builder
   ]
 }
 
