@@ -128,8 +128,18 @@ param buildServiceName string = 'default'
 @description('The Azure Spring Apps Java Builder name.')
 param builderName string = 'java-builder'
 
+@description('The Azure Spring Apps Java Builder version.')
+@allowed([
+  'base'
+  'full'
+])
+param builderVersion string = 'full'
+
+@description('The Azure Spring Apps Java Build name')
 param buildName string = 'build-${appName}'
 
+@description('The Azure Spring Apps Java Build Environment varibales: Space-separated environment variables in "key[=value]" format: <key1=value1>, <key2=value2>. Ex: BP_JVM_VERSION=Java_11 .')
+param buildEnvJvmVersion string = 'Java_11'
 
 @maxLength(24)
 @description('The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters.')
@@ -646,7 +656,7 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
         title: 'vets-service'
         description: 'vets-service'
         uri: 'http://vets-service'
-        order: 2
+        order: 102
         ssoEnabled: apiPortalSsoEnabled
       }
     ]
@@ -676,7 +686,7 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
         title: 'visits-service' 
         description: 'visits-service'
         uri: 'http://visits-service'
-        order: 3
+        order: 103
         ssoEnabled: apiPortalSsoEnabled
       }
     ]
@@ -706,7 +716,7 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
         description: 'customers-service'
         title: 'customers-service'
         uri: 'http://customers-service'
-        order: 1
+        order: 101
         ssoEnabled: apiPortalSsoEnabled
 
       }
@@ -763,7 +773,7 @@ resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-11-01
     // 
     stack: {
       id: 'io.buildpacks.stacks.bionic' // io.buildpacks.stacks.bionic-base or tanzu-base-bionic-stack ?   https://docs.pivotal.io/tanzu-buildpacks/stacks.html , OSS from https://github.com/paketo-buildpacks/java
-      version: 'base' // 1.2.35 https://network.tanzu.vmware.com/products/tanzu-base-bionic-stack#/releases/1218795/artifact_references
+      version: builderVersion // base or full  | NOT 1.2.35 https://network.tanzu.vmware.com/products/tanzu-base-bionic-stack#/releases/1218795/artifact_references
     }
   }
   dependsOn: [
@@ -772,13 +782,16 @@ resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-11-01
 }
 
 // https://github.com/Azure/Azure-Spring-Apps/issues/28
+// 
 resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: buildName
   parent: buildService
   properties: {
     agentPool: buildagentpool.id
     builder: builder.id
-    env: {}
+    env: { // Space-separated environment variables in 'key[=value]' format: <key1=value1>, <key2=value2>. Ex: BP_JVM_VERSION=Java_11
+      BP_JVM_VERSION: buildEnvJvmVersion
+    } 
     relativePath: '/'
   }
   dependsOn: [
