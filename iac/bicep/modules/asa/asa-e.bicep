@@ -678,7 +678,7 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
 output VetsGatewayRouteConfigId string = VetsGatewayRouteConfig.id
 output VetsGatewayRouteConfigAppResourceId string = VetsGatewayRouteConfig.properties.appResourceId
 output VetsGatewayRouteConfigRoutes array = VetsGatewayRouteConfig.properties.routes
-output VetsGatewayRouteConfigIsSsoEnabled bool = VetsGatewayRouteConfig.properties.ssoEnabled
+output VetsGatewayRouteConfigIsSsoEnabled bool = VetsGatewayRouteConfig.properties.routes[0].ssoEnabled
 output VetsGatewayRouteConfigPredicates array = VetsGatewayRouteConfig.properties.predicates
 
 resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
@@ -708,7 +708,7 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
 output VisitsGatewayRouteConfigId string = VisitsGatewayRouteConfig.id
 output VisitsGatewayRouteConfigAppResourceId string = VisitsGatewayRouteConfig.properties.appResourceId
 output VisitsGatewayRouteConfigRoutes array = VisitsGatewayRouteConfig.properties.routes
-output VisitsGatewayRouteConfigIsSsoEnabled bool = VisitsGatewayRouteConfig.properties.ssoEnabled
+output VisitsGatewayRouteConfigIsSsoEnabled bool = VisitsGatewayRouteConfig.properties.routes[0].ssoEnabled
 output VisitsGatewayRouteConfigPredicates array = VisitsGatewayRouteConfig.properties.predicates
 
 resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
@@ -739,7 +739,7 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
 output CustomersGatewayRouteConfigId string = CustomersGatewayRouteConfig.id
 output CustomersGatewayRouteConfigAppResourceId string = CustomersGatewayRouteConfig.properties.appResourceId
 output CustomersGatewayRouteConfigRoutes array = CustomersGatewayRouteConfig.properties.routes
-output CustomersGatewayRouteConfigIsSsoEnabled bool = CustomersGatewayRouteConfig.properties.ssoEnabled
+output CustomersGatewayRouteConfigIsSsoEnabled bool = CustomersGatewayRouteConfig.properties.routes[0].ssoEnabled
 output CustomersGatewayRouteConfigPredicates array = CustomersGatewayRouteConfig.properties.predicates
 
 
