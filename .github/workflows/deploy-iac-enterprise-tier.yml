@@ -159,9 +159,10 @@ jobs:
 
             echo "About to Update App ${{ env.SSO_APP_NAME }} ..."
 
+            # https://github.com/MicrosoftDocs/azure-docs/issues/102889
             az ad app update \
                 --id ${{ env.SSO_APPLICATION_ID }} \
-                --reply-urls "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
+                --web-redirect-uris "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
           
           echo "App updated"
 
