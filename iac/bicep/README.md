@@ -14,6 +14,44 @@ az term accept \
 ```
 
 [https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise#create-and-configure-an-application-registration-with-azure-active-directory](https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise#create-and-configure-an-application-registration-with-azure-active-directory)
+
+
+The steps below will be implemented in the [workflow](./.github/workflows/deploy-iac-enterprise-tier.yml)
+az ad sp list --filter will fails with "ERROR: Insufficient privileges to complete the operation"
+
+see on:
+- [stackoverflow](https://stackoverflow.com/questions/64333681/insufficient-privileges-to-complete-the-operation-with-listing-service-principal)
+- [MS learn](https://learn.microsoft.com/en-us/answers/questions/899080/insufficient-privileges-to-complete-the-operation-3.html)
+
+Giving the GH Runner SP the 'Owner' role is not enough. You have the give it the '[Directory Readers](https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference)' role. 
+
+Read [https://lnx.azurewebsites.net/directory-roles-for-azure-ad-service-principal/](https://lnx.azurewebsites.net/directory-roles-for-azure-ad-service-principal/)
+
+This is not possible using the Azure CLI or Portal though. You have to use the Azure AD Graph API, easiest way to do this is using [https://graphexplorer.azurewebsites.net](https://graphexplorer.azurewebsites.net) :
+
+
+GET
+https://graph.windows.net/free-media.eu/directoryRoles?api-version=1.6
+(you need to change free-media.eu to your tenant name, ex for MS FTE: https://graph.windows.net/microsoft.com/directoryRoles)
+
+
+```sh
+SPN_APP_NAME="gha_asa_run"
+
+APP_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${SPN_APP_NAME}'].{id:appId}" --output tsv)
+TENANT_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${SPN_APP_NAME}'].{t:appOwnerOrganizationId}" --output tsv)
+
+# /!\ In Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account"
+# /!\ The SPN Id is NOT the App Registration Object ID, but the Enterprise Registration Object ID"
+SPN_ID=$(az ad sp show --id $APP_ID --query id -o tsv)
+
+# Directory Readers: 88d8e3e3-8f55-4a1e-953a-9b9898b8876b
+# az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_APP} --role 88d8e3e3-8f55-4a1e-953a-9b9898b8876b 
+
+
+```
+
+
 ```sh
 SSO_APP_NAME="asa-sso-petclinic"
 

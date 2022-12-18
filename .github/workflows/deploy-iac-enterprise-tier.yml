@@ -152,11 +152,15 @@ jobs:
             echo "https://${PORTAL_URL}/login/oauth2/code/sso"
 
             # Get the APPLICATION_ID
-            APPLICATION_ID=$(az ad sp list --filter "displayName eq '${{ env.SSO_APP_NAME }}'" --query "[?appDisplayName=='${{ env.SSO_APP_NAME }}'].{id:appId}" -o tsv)
-            echo "APPLICATION_ID=$APPLICATION_ID"
+            # Giving the GH Runner SP the 'Owner' role is not enough to run 'az ad sp list --filter'. You have the give it the 'Directory Readers' role
+            # https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference  
+            # APPLICATION_ID=$(az ad sp list --filter "displayName eq '${{ env.SSO_APP_NAME }}'" --query "[?appDisplayName=='${{ env.SSO_APP_NAME }}'].{id:appId}" -o tsv)
+            # echo "APPLICATION_ID=$APPLICATION_ID"
+
+            echo "About to Update App ${{ env.SSO_APP_NAME }} ..."
 
             az ad app update \
-                --id ${APPLICATION_ID} \
+                --id ${{ env.SSO_APPLICATION_ID }} \
                 --reply-urls "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
           
           echo "App updated"
