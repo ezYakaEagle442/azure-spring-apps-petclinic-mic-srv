@@ -68,6 +68,7 @@ env:
   BUILD_CPU: 1 # CPU resource quantity. Should be 500m or number of CPU cores. Default: 1.
   BUILD_MEMORY: 2Gi # Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Default: 2Gi.
   BUILDER: default # java-builder
+  CFG_FILE_PATTERNS: application # Config file patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '""' to clear existing configurations.
 
   DEPLOYMENT_DISABLE_PROBE: false
   DEPLOYMENT_ENABLE_STARTUP_PROBE: true
@@ -530,7 +531,8 @@ jobs:
         --build-env ${{ env.BUILD_ENV }}  \
         --build-cpu ${{ env.BUILD_CPU }} \
         --build-memory ${{ env.BUILD_MEMORY }} \
-        --builder ${{ env.BUILDER }}
+        --builder ${{ env.BUILDER }} \
+        --config-file-patterns ${{ env.CFG_FILE_PATTERNS }}
 
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
@@ -666,7 +668,8 @@ jobs:
         --build-env ${{ env.BUILD_ENV }}  \
         --build-cpu ${{ env.BUILD_CPU }} \
         --build-memory ${{ env.BUILD_MEMORY }} \
-        --builder ${{ env.BUILDER }}
+        --builder ${{ env.BUILDER }} \
+        --config-file-patterns ${{ env.CFG_FILE_PATTERNS }}
 
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
@@ -802,7 +805,8 @@ jobs:
         --build-env ${{ env.BUILD_ENV }}  \
         --build-cpu ${{ env.BUILD_CPU }} \
         --build-memory ${{ env.BUILD_MEMORY }} \
-        --builder ${{ env.BUILDER }}      
+        --builder ${{ env.BUILDER }} \
+        --config-file-patterns ${{ env.CFG_FILE_PATTERNS }}
 
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
