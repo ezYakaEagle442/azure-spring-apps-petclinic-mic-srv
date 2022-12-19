@@ -52,11 +52,11 @@ env:
   # SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT / https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#all-configurable-properties
   # -Dspring.cloud.azure.keyvault.secret.property-sources[0].endpoint=https://kv-petcliasa21.vault.azure.net 
   # -Dspring.cloud.azure.keyvault.secret.endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[0].endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[1].endpoint=https://kv-petcliasa21.vault.azure.net -Dspring.cloud.azure.keyvault.secret.property-sources[2].endpoint=https://kv-petcliasa21.vault.azure.net 
-  DEPLOYMENT_JVM_OPTIONS: -Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud
+  DEPLOYMENT_JVM_OPTIONS: -Xms1024m -Xmx2048m -Dspring.profiles.active=mysql,key-vault,cloud
   
   DEPLOYMENT_VERSION: 2.6.13
   DEPLOYMENT_CPU: 500m
-  DEPLOYMENT_MEMORY: 1Gi
+  DEPLOYMENT_MEMORY: 2Gi
   DEPLOYMENT_INSTANCE_COUNT: 1
 
   # https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal
@@ -68,7 +68,7 @@ env:
   BUILD_CPU: 1 # CPU resource quantity. Should be 500m or number of CPU cores. Default: 1.
   BUILD_MEMORY: 2Gi # Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Default: 2Gi.
   BUILDER: default # default or java-builder
-  CFG_FILE_PATTERNS: application # Config file patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '""' to clear existing configurations.
+  CFG_FILE_PATTERNS: application # Config file  patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '""' to clear existing configurations.
 
   DEPLOYMENT_DISABLE_PROBE: false
   DEPLOYMENT_ENABLE_STARTUP_PROBE: true
