@@ -812,6 +812,16 @@ resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-11-01-pre
   ]
 }
 
+/*
+resource buildResult 'Microsoft.AppPlatform/Spring/buildServices/builds/results@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'default'
+  parent: build
+  dependsOn: [
+    azureSpringApps
+  ]
+}
+*/
+
 resource appAccelerators 'Microsoft.AppPlatform/Spring/applicationAccelerators@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
  name: 'default'
  parent: azureSpringApps
