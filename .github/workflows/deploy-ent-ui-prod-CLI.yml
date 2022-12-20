@@ -312,7 +312,6 @@ jobs:
             --cpu ${{ env.DEPLOYMENT_CPU }} \
             --memory ${{ env.DEPLOYMENT_MEMORY }} \
             --version ${{ env.DEPLOYMENT_VERSION }} \
-            --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }} \
             --skip-clone-settings            
         else
             echo "There are existing deployment(s) for ${{ env.API_GATEWAY }}"
@@ -348,7 +347,6 @@ jobs:
                 --cpu ${{ env.DEPLOYMENT_CPU }} \
                 --memory ${{ env.DEPLOYMENT_MEMORY }} \
                 --version ${{ env.DEPLOYMENT_VERSION }} \
-                --runtime-version ${{ env.DEPLOYMENT_RUNTIME_VERSION }} \
                 --skip-clone-settings
               else
                 echo "ERROR Input param DEPLOYMENT_CREATE_NEW is set to false, no new Deployment will be created"
