@@ -328,6 +328,7 @@ resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@20
             // Non-default values include properties for the specified profile and properties for the default profile.
             patterns: [
               'application'
+              'application/mysql' // https://github.com/MicrosoftDocs/azure-docs/issues/102826#issuecomment-1361369675
             ]
             //searchPaths: [
             //  '/'
