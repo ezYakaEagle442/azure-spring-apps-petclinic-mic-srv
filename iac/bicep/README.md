@@ -1,5 +1,18 @@
 # Azure Spring Apps
 
+
+FYI, if you want to check the services available per locations :
+```sh
+az provider show -n  Microsoft.AppPlatform --query  "resourceTypes[?resourceType == 'Spring']".locations | jq '.[0]' | jq 'length'
+
+az provider show -n  Microsoft.ContainerService --query  "resourceTypes[?resourceType == 'managedClusters']".locations | jq '.[0]' | jq 'length'
+az provider show -n  Microsoft.RedHatOpenShift --query  "resourceTypes[?resourceType == 'OpenShiftClusters']".locations | jq '.[0]' | jq 'length’
+
+az provider show -n  Microsoft.App --query  "resourceTypes[?resourceType == 'managedEnvironments']".locations | jq '.[0]' | jq 'length’
+az provider show -n  Microsoft.App --query  "resourceTypes[?resourceType == 'connectedEnvironments']".locations | jq '.[0]' | jq 'length'
+
+```
+
 ## Enterprise Tier
 
 Read the [pre-req doc](https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-standard#prerequisites)
@@ -29,11 +42,13 @@ Read [https://lnx.azurewebsites.net/directory-roles-for-azure-ad-service-princip
 
 This is not possible using the Azure CLI or Portal though. You have to use the Azure AD Graph API, easiest way to do this is using [https://graphexplorer.azurewebsites.net](https://graphexplorer.azurewebsites.net) :
 
-
 GET
 https://graph.windows.net/free-media.eu/directoryRoles?api-version=1.6
 (you need to change free-media.eu to your tenant name, ex for MS FTE: https://graph.windows.net/microsoft.com/directoryRoles)
 
+Workround see [https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-directory-readers-role-tutorial?view=azuresql](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-directory-readers-role-tutorial?view=azuresql) : 
+
+create a Group 'ASA-Directory-Readers' having 'Directory Readers' role ,then add the SP to that group. (to be tested)
 
 ```sh
 SPN_APP_NAME="gha_asa_run"
