@@ -154,7 +154,6 @@ resource adminserverapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' e
   parent: azureSpringApps
 }
 
-
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/apps/deployments?pivots=deployment-language-bicep
 resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-11-01-preview' = {
   name: 'default'
@@ -229,7 +228,10 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
       version: deploymentVersion
       type: 'Jar' // Jar, Container or Source https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/apps/deployments?pivots=deployment-language-bicep#usersourceinfo
       jvmOptions: '-Xms512m -Xmx1024m -Dspring.profiles.active=mysql,key-vault,cloud'
-      relativePath: 'https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar' // 'spring-petclinic-admin-server/target/petclinic-customers-service-2.6.6.jar' // should be a link to a BLOB storage
+      // https://learn.microsoft.com/en-us/rest/api/azurespringapps/apps/get-resource-upload-url?tabs=HTTP#code-try-0
+      // should be a link to a BLOB storage
+      // https://github.com/Azure/bicep/issues/9515
+      relativePath: 'https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar' // 'spring-petclinic-admin-server/target/petclinic-customers-service-2.6.6.jar' 
       runtimeVersion: 'Java_11'
     }
   }
