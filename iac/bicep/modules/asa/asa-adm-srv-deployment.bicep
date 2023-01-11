@@ -237,6 +237,28 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
   }
 }
 
+/*
+JWT=$(curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' \
+https://login.microsoftonline.com/<tenantid>/oauth2/v2.0/token \
+-d 'client_id=<clientid>' \
+-d 'scope=https://management.core.windows.net/.default' \
+-d 'grant_type=client_credentials' \
+-d 'client_secret=<clientsecret>' | jq -r .access_token)
+
+RESPONSE=$(curl -X POST "https://management.azure.com/subscriptions/<subscriptionid>/resourceGroups/<resourceGroupName>/providers/Microsoft.AppPlatform/Spring/<asaServiceName>/apps/<appName>/getResourceUploadUrl?api-version=2022-12-01" \
+-H "Content-Length: 0" \
+-H "Authorization: Bearer $JWT" -H "Content-type: application/json")
+
+uploadUrl=$(echo $RESPONSE | jq -r .uploadUrl)
+relativePath=$(echo $RESPONSE | jq -r .relativePath)
+
+jarFilePath=<local jar file path>
+azcopy copy "$jarFilePath" "$uploadUrl"
+
+echo $relativePath
+*/
+
+
 resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
   name: 'vets-service'
   parent: azureSpringApps
