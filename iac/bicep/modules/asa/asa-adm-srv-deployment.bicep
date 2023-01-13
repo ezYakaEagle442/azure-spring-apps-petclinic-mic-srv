@@ -231,7 +231,7 @@ resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments
       // https://learn.microsoft.com/en-us/rest/api/azurespringapps/apps/get-resource-upload-url?tabs=HTTP#code-try-0
       // should be a link to a BLOB storage
       // https://github.com/Azure/bicep/issues/9515
-      relativePath: 'https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar' // 'spring-petclinic-admin-server/target/petclinic-customers-service-2.6.6.jar' 
+      relativePath:  '<default>' // 'https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar' // 'spring-petclinic-admin-server/target/petclinic-customers-service-2.6.6.jar' 
       runtimeVersion: 'Java_11'
     }
   }
@@ -256,6 +256,28 @@ jarFilePath=<local jar file path>
 azcopy copy "$jarFilePath" "$uploadUrl"
 
 echo $relativePath
+
+param utcValue string = utcNow()
+
+resource getUploadUrl 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'get-upload-url'
+  location: location
+  kind: 'AzureCLI'
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      // replace the ??xxx?? placeholder below with your identity properties
+      '${resourceId('??your-identity-group??', 'Microsoft.ManagedIdentity/userAssignedIdentities', '??your identity name??')}': {}
+    }
+  }
+  properties: {
+    forceUpdateTag: utcValue
+    azCliVersion: '2.40.0'
+    timeout: 'PT30M'
+    scriptContent: 'az rest --method post --url ${apiGatewayApp.id}/getResourceUploadUrl?api-version=2022-11-01-preview'
+    retentionInterval: 'P1D'
+  }
+}
 */
 
 
