@@ -388,6 +388,40 @@ Note:
 - the GH Hosted Runner / [Ubuntu latest image has already Azure CLI installed](https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#cli-tools)
 
 
+To avoid to hit the error below : 
+```console
+"The subscription is not registered to use namespace 'Microsoft.KeyVault'. See https://aka.ms/rps-not-found for how to register subscriptions.\",\r\n    \"details\": [\r\n      ***\r\n        \"code\": \"MissingSubscriptionRegistration\"
+```
+
+Read the [docs](https://learn.microsoft.com/en-us/azure/azure-resource-manager/troubleshooting/error-register-resource-provider?tabs=azure-cli)
+Just run :
+```sh
+az provider list --output table
+az provider list --query "[?registrationState=='Registered']" --output table
+az provider list --query "[?namespace=='Microsoft.KeyVault']" --output table
+
+az provider register --namespace Microsoft.KeyVault
+az provider register --namespace Microsoft.OperationalInsights 
+az provider register --namespace Microsoft.DBforMySQL
+az provider register --namespace Microsoft.DBforPostgreSQL
+az provider register --namespace Microsoft.Compute 
+az provider register --namespace Microsoft.AppConfiguration       
+az provider register --namespace Microsoft.AppPlatform
+az provider register --namespace Microsoft.EventHub  
+az provider register --namespace Microsoft.Kubernetes 
+az provider register --namespace Microsoft.KubernetesConfiguration  
+az provider register --namespace Microsoft.Kusto  
+az provider register --namespace Microsoft.ManagedIdentity
+az provider register --namespace Microsoft.Monitor 
+az provider register --namespace Microsoft.Network  
+az provider register --namespace Microsoft.RedHatOpenShift 
+az provider register --namespace Microsoft.ServiceBus
+az provider register --namespace Microsoft.Storage
+az provider register --namespace Microsoft.Subscription
+
+```
+
+
 ## Deploy the petclinic microservices Apps with IaC
 
 Workflow Design
