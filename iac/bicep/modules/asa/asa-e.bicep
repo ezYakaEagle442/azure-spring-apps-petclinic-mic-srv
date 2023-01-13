@@ -659,7 +659,7 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
     appResourceId: vetsserviceapp.id
     protocol: 'HTTP'
     filters: [
-      'StripPrefix=0'
+      'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
     ]
     predicates: [
       '/api/vet/**'
@@ -689,7 +689,7 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
     appResourceId: visitsservicerapp.id
     protocol: 'HTTP'
     filters: [
-      'StripPrefix=0'
+      'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
       'RateLimit=2,5s' // limit all users to two requests every 5 seconds
     ]
     predicates: [
@@ -719,7 +719,7 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
     appResourceId: customersserviceapp.id
     protocol: 'HTTP'
     filters: [
-      'StripPrefix=0'
+      'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
       'RateLimit=2,5s' // limit all users to two requests every 5 seconds
     ]
     predicates: [

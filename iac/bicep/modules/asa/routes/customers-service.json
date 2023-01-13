@@ -6,7 +6,7 @@
       ],
       "ssoEnabled": false,
       "filters": [
-        "StripPrefix=0"
+        "StripPrefix=2"
       ],
       "tags": [
         "customers-service"
