@@ -32,6 +32,7 @@ env:
   # the specific secret value. For example, do not use a blob of JSON, XML, or YAML (or similar) to encapsulate a secret value, 
   # as this significantly reduces the probability the secrets will be properly redacted. Instead, create individual secrets for each sensitive value.
 
+  SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
   SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT: ${{ secrets.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}
   SPRING_CLOUD_AZURE_TENANT_ID: ${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }}
 
