@@ -3,6 +3,8 @@
 
 FYI, if you want to check the services available per locations :
 ```sh
+az provider list --output table
+
 az provider show -n  Microsoft.AppPlatform --query  "resourceTypes[?resourceType == 'Spring']".locations | jq '.[0]' | jq 'length'
 
 az provider show -n  Microsoft.ContainerService --query  "resourceTypes[?resourceType == 'managedClusters']".locations | jq '.[0]' | jq 'length'
