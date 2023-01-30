@@ -137,7 +137,7 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     routingPreference: {
       publishInternetEndpoints: true
       publishMicrosoftEndpoints: true
-      routingChoice: 'InternetRouting'
+      routingChoice: 'MicrosoftRouting'
     }
     sasPolicy: {
       expirationAction: 'Log'
