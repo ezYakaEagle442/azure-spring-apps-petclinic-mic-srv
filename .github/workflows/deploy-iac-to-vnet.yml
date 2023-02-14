@@ -120,7 +120,7 @@ jobs:
             -p appName=${{ env.APP_NAME }} \
             -p kvName=${{ env.KV_NAME }} \
             -p secretName="VM-ADMIN-USER-NAME" \
-            -p secretValue=${{ secrets.VM_ADMIN_USER_NAME }} \
+            -p secretValue=${{ env.VM_ADMIN_USER_NAME }} \
             -p secretExpiryDate=${{ env.SECRET_EXPIRY_DATE }}
       shell: bash
 
