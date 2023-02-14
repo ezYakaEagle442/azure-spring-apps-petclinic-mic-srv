@@ -128,5 +128,6 @@ jobs:
       
   call-db-init-workflow:
     name: Load Data to DB
+    needs: [call-pre-req-workflow]
     uses: ./.github/workflows/sql-load.yml
     secrets: inherit
