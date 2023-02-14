@@ -69,20 +69,20 @@ jobs:
       shell: bash
 
     - name: Login with GHA Runner SP
-      uses: azure/login@v1.4.6 # fails https://github.com/marketplace/actions/azure-login
+      uses: azure/login@v1 # fails https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ env.credentials }} # ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Checkout
-      uses: actions/checkout@v3.1.0 # https://github.com/actions/checkout
+      uses: actions/checkout@v3 # https://github.com/actions/checkout
 
     - name: Deploy Azure Key Vault      
       # uses: azure/CLI@v1.0.6 # https://github.com/marketplace/actions/azure-cli-action
       # with:
         #azcliversion: ${{ env.AZ_CLI_VERSION }}
         # inlineScript: |
-      shell: bash
       run: |
+
           pwd
           ls -al
           # /home/runner/work/asa-java-petclinic-mic-srv/asa-java-petclinic-mic-srv/.
@@ -91,9 +91,10 @@ jobs:
             -p appName=${{ env.APP_NAME }} \
             -p kvName=${{ env.KV_NAME }} \
             -p location=${{ env.LOCATION }}
+      shell: bash
 
-    # Allow GH Runner to access KV
-    # When Public access is disabled on KV, you need to add a network rule in the KV Firewall
+      # Allow GH Runner to access KV
+      # When Public access is disabled on KV, you need to add a network rule in the KV Firewall
     - name: Authorize local IP to access the Azure Key Vault
       run: |
           az keyvault network-rule add --ip-address $LOCAL_IP --name ${{ env.KV_NAME }} --only-show-errors
@@ -148,15 +149,16 @@ jobs:
       shell: bash
 
     - name: Login with GHA Runner SP
-      uses: azure/login@v1.4.6 # fails https://github.com/marketplace/actions/azure-login
+      uses: azure/login@v1 # fails https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }} # ${{ env.credentials }}
         
     - name: Checkout
-      uses: actions/checkout@v3.1.0 # https://github.com/actions/checkout
+      uses: actions/checkout@v3 # https://github.com/actions/checkout
 
     - name: Deploy the pre-req
       run: |
+
           # --debug # --what-if to test like a dry-run
           
           az deployment group create --name asa-petclinic-pre-req -f iac/bicep/pre-req.bicep -g ${{ env.RG_APP }} \
@@ -166,7 +168,20 @@ jobs:
             -p kvRGName=${{ env.RG_KV }} \
             -p ghRunnerSpnPrincipalId=${{ env.SPN_ID }} \
             -p deployToVNet=${{ env.DEPLOY_TO_VNET }}
-              
+
+          vetsServicePrincipalId=$(az deployment group show --name asa-identities -g ${{ env.RG_APP }} --query properties.outputs.vetsServicePrincipalId.value -o tsv)
+          visitsServicePrincipalId=$(az deployment group show --name asa-identities -g ${{ env.RG_APP }} --query properties.outputs.visitsServicePrincipalId.value -o tsv)
+          configServerPrincipalId=$(az deployment group show --name asa-identities -g ${{ env.RG_APP }} --query properties.outputs.configServerPrincipalId.value -o tsv)
+          customersServicePrincipalId=$(az deployment group show --name asa-identities -g ${{ env.RG_APP }} --query properties.outputs.customersServicePrincipalId.value -o tsv)
+                    
+          az deployment group create --name kv-role-assignments -f iac/bicep/modules/kv/kvRoleAssignments.bicep -g ${{ env.RG_KV }} \
+            -p kvName=${{ env.KV_NAME }} \
+            -p configServerIdentityId=$configServerPrincipalId \
+            -p vetsIdentityId=$vetsServicePrincipalId \
+            -p visitsIdentityId=$visitsServicePrincipalId \
+            -p customersIdentityId=$customersServicePrincipalId \
+            -p kvRoleType=KeyVaultSecretsUser
+            
       shell: bash
 
     - name: Azure Logout security hardening
