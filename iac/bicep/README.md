@@ -30,7 +30,6 @@ az term accept \
 
 [https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise#create-and-configure-an-application-registration-with-azure-active-directory](https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise#create-and-configure-an-application-registration-with-azure-active-directory)
 
-
 The steps below will be implemented in the [workflow](./.github/workflows/deploy-iac-enterprise-tier.yml)
 az ad sp list --filter will fails with "ERROR: Insufficient privileges to complete the operation"
 
@@ -129,7 +128,7 @@ To use [Pipelines with GitHub Actions](https://docs.microsoft.com/en-us/azure/az
 tenantId=$(az account show --query tenantId -o tsv)
 azureSpringAppsObjectId="$(az ad sp list --filter "displayName eq 'Azure Spring Cloud Resource Provider'" --query "[?appDisplayName=='Azure Spring Cloud Resource Provider']" --query "[?appOwnerTenantId=='$tenantId'].id" -o tsv | head -1)"
 
-# This query returns 1 and only 1 Id: d2531223-68f9-459e-b225-5592f90d145e
+# This query returns 1 and only 1 Id:
 azureSpringAppsRpObjectId="$(az ad sp list --filter "displayName eq 'Azure Spring Cloud Resource Provider'" --query "[?appDisplayName=='Azure Spring Cloud Resource Provider'].id" -o tsv | head -1)"
 
 az ad sp list --filter "displayname eq 'Azure Spring Cloud Resource Provider'" --query "[?appDisplayName=='Azure Spring Cloud Resource Provider'].id" -o tsv |

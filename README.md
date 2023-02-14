@@ -10,10 +10,10 @@ urlFragment: "spring-petclinic-microservices"
 
 # Deploy Spring Boot apps using Azure Spring Apps and MySQL 
 
-[![IaC Deployment Status](https://github.com/ezYakaEagle442//azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac-pre-req.yml/badge.svg)](https://github.com/ezYakaEagle442//azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac-pre-req.yml)
+[![IaC Deployment Status](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac-pre-req.yml/badge.svg)](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac-pre-req.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-[![IaC Deployment Status](https://github.com/ezYakaEagle442//azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac.yml/badge.svg)](https://github.com/ezYakaEagle442//azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac.yml)
+[![IaC Deployment Status](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac.yml/badge.svg)](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/deploy-iac.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 [![Build Status](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/maven-build.yml/badge.svg)](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/actions/workflows/maven-build.yml)
@@ -95,9 +95,10 @@ In addition, you will need the following:
 |
 
 Note -  The [`jq` utility](https://stedolan.github.io/jq/download/). On Windows, download [this Windows port of JQ](https://github.com/stedolan/jq/releases) and add the following to the `~/.bashrc` file: 
-           ```bash
-           alias jq=<JQ Download location>/jq-win64.exe
-           ```
+
+```bash
+ alias jq=<JQ Download location>/jq-win64.exe
+```
 
 Note - The Bash shell. While Azure CLI should behave identically on all environments, shell  semantics vary. Therefore, only bash can be used with the commands in this repo. 
 To complete these repo steps on Windows, use Git Bash that accompanies the Windows distribution of 
@@ -155,8 +156,8 @@ TODO: add ASA Maven Plugin [https://github.com/microsoft/azure-maven-plugins/wik
 <span style="color:red">**/!\ IMPORTANT WARNING: projects must be built with -Denv=cloud EXCEPT for api-gateway**</span>
 
 ```bash
-    cd azure-spring-apps-petclinic-mic-srv
-    mvn clean package -DskipTests -Denv=cloud
+  cd azure-spring-apps-petclinic-mic-srv
+  mvn clean package -DskipTests -Denv=cloud
 ```
 This will take a few minutes.
 
@@ -222,22 +223,13 @@ You have to specify all [KV secrets](./iac/bicep/modules/kv/kv_sec_key.bicep#L25
 - SPRING-DATASOURCE-PASSWORD
 - SPRING-CLOUD-AZURE-KEY-VAULT-ENDPOINT
 - SPRING-CLOUD-AZURE-TENANT-ID
-- VM-ADMIN-USER-NAME
 - VM-ADMIN-PASSWORD
 
 dash '-' are not supported in GH secrets, so the secrets must be named in GH with underscore '_'.
 Also the '&' character in the SPRING_DATASOURCE_URL must be escaped with '\&'
 
-Add the App secrets used by the Spring Config to your GH repo settings / Actions / secrets / Actions secrets / New Repository secrets / Add , ex: [https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/settings/secrets/actions](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/settings/secrets/actions):
-
-Secret Name	| Secret Value example
--------------:|:-------:
 SPRING_DATASOURCE_URL | jdbc:mysql://petcliasa777.mysql.database.azure.com:3306/petclinic?useSSL=true\&requireSSL=true\&enabledTLSProtocols=TLSv1.2\&verifyServerCertificate=true
-SPRING_DATASOURCE_PASSWORD | PUT YOUR PASSWORD HERE
-SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT | https://kv-petclinic777.vault.azure.net/
-SPRING_CLOUD_AZURE_TENANT_ID | PUT YOUR AZURE TENANT ID HERE
-VM_ADMIN_USER_NAME | PUT YOUR AZURE Windows client VM JumpOff Admin User Name HERE
-VM_ADMIN_PASSWORD | PUT YOUR PASSWORD HERE
+
 
 ```bash
 LOCATION="westeurope"
@@ -262,7 +254,16 @@ SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 TENANT_ID=$(az account show --query tenantId -o tsv)
 ```
 
-Add your AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID to your GH repo secrets / Actions secrets / Repository secrets
+
+Add the App secrets used by the Spring Config to your GH repo settings / Actions / secrets / Actions secrets / New Repository secrets / Add , ex: [https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/settings/secrets/actions](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/settings/secrets/actions):
+
+Secret Name	| Secret Value example
+-------------:|:-------:
+SPRING_DATASOURCE_PASSWORD | PUT YOUR PASSWORD HERE
+SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT | https://kv-petclinic777.vault.azure.net/
+SPRING_CLOUD_AZURE_TENANT_ID | PUT YOUR AZURE TENANT ID HERE
+VM_ADMIN_PASSWORD | PUT YOUR PASSWORD HERE
+AZURE_SUBSCRIPTION_ID | PUT YOUR SUB. ID HERE
 
 Read [https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-cli%2Cwindows#create-a-service-principal-and-add-it-as-a-github-secret)
 
@@ -273,47 +274,48 @@ In the GitHub Action Runner, to allow the Service Principal used to access the K
 az ad sp create-for-rbac --name $SPN_APP_NAME
 ```
 
+Note the password below and save it to SPN_PWD :
+SPN_PWD="there is a password here"
+
 ```console
 {
-  "clientId": "<GUID>",
-  "clientSecret": "<GUID>",
-  "subscriptionId": "<GUID>",
-  "tenantId": "<GUID>",
-  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
-  "resourceManagerEndpointUrl": "https://management.azure.com/",
-  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
-  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
-  "galleryEndpointUrl": "https://gallery.azure.com/",
-  "managementEndpointUrl": "https://management.core.windows.net/"
+  "appId": "42424242-4242-4242-87dd-42424242424",
+  "displayName": "gha_yourfoo_runner",
+  "password": "there is a password here",
+  "tenant": "42424242-4242-4242-87dd-42424242424"
 }
+
 ```
 
 Troubleshoot:
 If you hit _["Error: : No subscriptions found for ***."](https://learn.microsoft.com/en-us/answers/questions/738782/no-subscription-found-for-function-during-azure-cl.html)_ , this is related to an IAM privilege in the subscription.
 
 ```sh
-#APP_ID=$(az ad sp list --all --query "[?appDisplayName=='${SPN_APP_NAME}'].{appId:appId}" --output tsv)
-APP_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${SPN_APP_NAME}'].{id:appId}" --output tsv)
+SPN_APP_ID=$(az ad sp list --all --query "[?appDisplayName=='${SPN_APP_NAME}'].{appId:appId}" --output tsv)
+# use the one that works
+SPN_APP_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${SPN_APP_NAME}'].{id:appId}" --output tsv)
+
+TENANT_ID=$(az ad sp list --all  --query "[?appDisplayName=='${SPN_APP_NAME}'].{t:appOwnerOrganizationId}" --output tsv)
+# use the one that works
 TENANT_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${SPN_APP_NAME}'].{t:appOwnerOrganizationId}" --output tsv)
 
 # /!\ In Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account"
 # /!\ The SPN Id is NOT the App Registration Object ID, but the Enterprise Registration Object ID"
-SPN_ID=$(az ad sp show --id $APP_ID --query id -o tsv)
+SPN_ID=$(az ad sp show --id $SPN_APP_ID --query id -o tsv)
 
 # the assignee is an appId
-az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_KV} --role contributor
+az role assignment create --assignee $SPN_APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_KV} --role contributor
 
 # "Key Vault Secrets User"
-az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_KV} --role 4633458b-17de-408a-b874-0445c86b69e6
+az role assignment create --assignee $SPN_APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_KV} --role 4633458b-17de-408a-b874-0445c86b69e6
 
 
 # https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal#prerequisites
 # /!\ To assign Azure roles, you must have: requires to have Microsoft.Authorization/roleAssignments/write and Microsoft.Authorization/roleAssignments/delete permissions, 
 # such as User Access Administrator or Owner.
-az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_KV} --role Owner
-az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_APP} --role Owner
-
-az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_APP} --role contributor
+az role assignment create --assignee $SPN_APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_KV} --role Owner
+az role assignment create --assignee $SPN_APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_APP} --role Owner
+az role assignment create --assignee $SPN_APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_APP} --role contributor
 ```
 
 <span style="color:red">**RBAC Permission model is set on KV, the [pre-req](https://learn.microsoft.com/en-us/azure/key-vault/general/rbac-guide?tabs=azure-cli#prerequisites) requires to have Microsoft.Authorization/roleAssignments/write and Microsoft.Authorization/roleAssignments/delete permissions, such as User Access Administrator or Owner.
@@ -331,12 +333,26 @@ Read :
 
 Paste in your JSON object for your service principal with the name **AZURE_CREDENTIALS** as secrets to your GH repo secrets / Actions secrets / Repository secrets.
 
+{
+  "clientId": "<GUID>",
+  "clientSecret": "<GUID>",
+  "subscriptionId": "<GUID>",
+  "tenantId": "<GUID>",
+  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+  "resourceManagerEndpointUrl": "https://management.azure.com/",
+  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+  "galleryEndpointUrl": "https://gallery.azure.com/",
+  "managementEndpointUrl": "https://management.core.windows.net/"
+}
+
+
 You can test your connection with CLI :
 ```sh
-az login --service-principal -u $APP_ID -p $SPN_PWD --tenant $TENANT_ID
+az login --service-principal -u $SPN_APP_ID -p $SPN_PWD --tenant $TENANT_ID
 ```
 
-Add SUBSCRIPTION_ID, TENANT_ID, APP_ID, SPN_ID, and SPN_PWD as secrets to your GH repo secrets / Actions secrets / Repository secrets
+Add SUBSCRIPTION_ID, TENANT_ID, SPN_APP_ID, SPN_ID, and SPN_PWD as secrets to your GH repo secrets / Actions secrets / Repository secrets
 
 <span style="color:red">**Be aware that at this stage KV is not created yet, it must exist first to set-policy**
 [enableRbasauthorization is true in KV](./iac/bicep/modules/kv/kv.bicep#L61), the key vault will use RBAC for authorization of data actions, and the [access policies specified in vault properties](https://docs.microsoft.com/en-us/azure/templates/microsoft.keyvault/vaults/accesspolicies?tabs=bicep) will be ignored</span>
@@ -344,7 +360,7 @@ Add SUBSCRIPTION_ID, TENANT_ID, APP_ID, SPN_ID, and SPN_PWD as secrets to your G
 If enableRbasauthorization was set to false, you would have to follow the here under step to add access policy for the Service Principal.
 ```sh
 KV_NAME="kv-petcliasa42"
-az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn $APP_ID
+az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn $SPN_APP_ID
 ```
 
 See the GitHub Workflows :
@@ -505,7 +521,7 @@ spring:
               endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
               credential:
                 managed-identity-enabled: true
-                client-id: ${XXXX_SVC_APP_IDENTITY_CLIENT_ID}
+                client-id: ${XXXX_SVC_SPN_APP_IDENTITY_CLIENT_ID}
 ---
 ```
 
@@ -549,29 +565,10 @@ If you face any issue, see the [troubleshoot section](#key-vault-troubleshoot-wi
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### Deploy Spring Boot applications and set environment variables
 
-
 ```bash
-    az spring app show --name ${API_GATEWAY} | grep url
+  az spring app show --name ${API_GATEWAY} | grep url
 ```
 
 Navigate to the URL provided by the previous command to open the Pet Clinic application.
@@ -848,7 +845,7 @@ In the Config used by the Config-server if you declare as many property-sources 
               endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
               credential:
                 managed-identity-enabled: true
-                client-id: ${VETS_SVC_APP_IDENTITY_CLIENT_ID}
+                client-id: ${VETS_SVC_SPN_APP_IDENTITY_CLIENT_ID}
               #  client-secret: ${AZURE_CLIENT_SECRET} for SPN not for MI
               # profile:
               #  tenant-id: ${SPRING_CLOUD_AZURE_TENANT_ID}
@@ -856,18 +853,18 @@ In the Config used by the Config-server if you declare as many property-sources 
               endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
               credential:
                 managed-identity-enabled: true
-                client-id: ${VISITS_SVC_APP_IDENTITY_CLIENT_ID}
+                client-id: ${VISITS_SVC_SPN_APP_IDENTITY_CLIENT_ID}
             - name: kv-cfg-customers # KV Config for each App Customers-Service
               endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
               credential:
                 managed-identity-enabled: true
-                client-id: ${CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID}
+                client-id: ${CUSTOMERS_SVC_SPN_APP_IDENTITY_CLIENT_ID}
 
 As a consequence this initially failed as each App uses the above Config and tried to fetch KV secrets from other App property-sources. which failed because it was not allowed as  it was assigned only 1/4 Identity.
 
 The solution is to remove all the above config from the Config repo and to add it instead in each App in \src\main\resources\application.yaml. 
 
-Ex for the vets-service, 1 & only 1 property-source is declared using 1 client-id only ${VETS_SVC_APP_IDENTITY_CLIENT_ID} :
+Ex for the vets-service, 1 & only 1 property-source is declared using 1 client-id only ${VETS_SVC_SPN_APP_IDENTITY_CLIENT_ID} :
 ```code
 spring:
   cloud:
@@ -887,7 +884,7 @@ spring:
               endpoint: ${SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT}
               credential:
                 managed-identity-enabled: true
-                client-id: ${VETS_SVC_APP_IDENTITY_CLIENT_ID}
+                client-id: ${VETS_SVC_SPN_APP_IDENTITY_CLIENT_ID}
               #  client-secret: ${AZURE_CLIENT_SECRET} for SPN not for MI
               # profile:
               #  tenant-id: ${SPRING_CLOUD_AZURE_TENANT_ID}
