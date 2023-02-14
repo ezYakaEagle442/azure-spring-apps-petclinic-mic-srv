@@ -17,6 +17,7 @@
 // You can only use this function within an expression for the default value of a parameter.
 @maxLength(20)
 // to get a unique name each time ==> param appName string = 'demo${uniqueString(resourceGroup().id, deployment().name)}'
+// uniqueString Creates a deterministic hash string based on the values provided as parameters. The returned value is 13 characters long
 param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
 
 param location string = resourceGroup().location
@@ -124,9 +125,11 @@ module roleAssignments './modules/asa/roleAssignments.bicep' = {
 }
 */
 
+
 module storage './modules/asa/storage.bicep' = {
   name: 'storage'
   params: {
+    appName: appName
     blobContainerName: blobContainerName
     azureBlobServiceName: azureBlobServiceName
     azureStorageName: azureStorageName
