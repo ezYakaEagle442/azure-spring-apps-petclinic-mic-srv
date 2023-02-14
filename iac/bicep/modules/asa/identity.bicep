@@ -4,7 +4,7 @@
 param location string = resourceGroup().location
 
 @description('A UNIQUE name')
-@maxLength(20)
+@maxLength(23)
 param appName string = 'petcliasa${uniqueString(deployment().name)}'
 
 @description('The Identity Tags. See https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources?tabs=bicep#apply-an-object')

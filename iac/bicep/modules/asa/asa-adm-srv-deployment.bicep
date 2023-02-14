@@ -1,6 +1,6 @@
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring?tabs=bicep
 @description('A UNIQUE name')
-@maxLength(20)
+@maxLength(23)
 param appName string = 'petcliasa${uniqueString(deployment().name)}'
 
 param deploymentVersion string = '2.6.13'

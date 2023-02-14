@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 @description('A UNIQUE name')
-@maxLength(20)
+@maxLength(23)
 param appName string = 'petcliasa${uniqueString(deployment().location)}'
 
 param location string = resourceGroup().location

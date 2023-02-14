@@ -65,31 +65,3 @@ resource AzureSpringAppsRpRoleAssignment 'Microsoft.Authorization/roleAssignment
     principalType: 'ServicePrincipal'
   }
 }
-
-// You need Key Vault Administrator permission to be able to see the Keys/Secrets/Certificates in the Azure Portal
-resource kvSecretsUserRoleAssignmentCustomersService 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(kv.id, kvRoleType , subscription().subscriptionId)
-  properties: {
-    roleDefinitionId: role[kvRoleType]
-    principalId: asaCustomersServicePrincipalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource kvSecretsUserRoleAssignmentVetsService 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(kv.id, kvRoleType , subscription().subscriptionId)
-  properties: {
-    roleDefinitionId: role[kvRoleType]
-    principalId: asaVetsServicePrincipalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource kvSecretsUserRoleAssignmentVisitsService 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(kv.id, kvRoleType , subscription().subscriptionId)
-  properties: {
-    roleDefinitionId: role[kvRoleType]
-    principalId: asaVisitsServicePrincipalId
-    principalType: 'ServicePrincipal'
-  }
-}

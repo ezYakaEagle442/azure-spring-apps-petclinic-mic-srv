@@ -1,7 +1,7 @@
 // See https://github.com/Azure/azure-quickstart-templates/blob/master/quickstarts/microsoft.compute/vm-simple-windows/main.bicep
 
 @description('A UNIQUE name')
-@maxLength(20)
+@maxLength(23)
 param appName string = 'petcliasa${uniqueString(deployment().name)}'
 
 @description('The location of the Azure resources.')

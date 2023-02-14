@@ -5,7 +5,7 @@ az deployment group create --name asa-petclinic-storage -f iac/bicep/modules/asa
             
 */
 @description('A UNIQUE name')
-@maxLength(20)
+@maxLength(23)
 param appName string = 'petcliasa${uniqueString(deployment().name)}'
 
 @description('The location of the Azure resources.')
