@@ -41,9 +41,10 @@ env:
   PRJ_PREFIX: asa-spring-petclinic
 
   # ==== Identities ====:
-  CUSTOMERS_SVC_APP_ID_NAME: id-asa-petclinic-customers-service-dev-westeurope-101 # customize this
-  VETS_SVC_APP_ID_NAME: id-asa-petclinic-vets-service-dev-westeurope-101 # customize this
-  VISITS_SVC_APP_ID_NAME: id-asa-petclinic-visits-service-dev-westeurope-101 # customize this
+
+  CUSTOMERS_SVC_APP_ID_NAME: id-asa-petcliasa-petclinic-customers-service-dev-westeurope-101 # customize this, MUST BE: 'id-asa-${appName}-petclinic-customers-service-dev-${location}-101'
+  VETS_SVC_APP_ID_NAME: id-asa-petcliasa-petclinic-vets-service-dev-westeurope-101 # customize this, MUST BE: 'id-asa-${appName}-petclinic-vets-service-dev-${location}-101'
+  VISITS_SVC_APP_ID_NAME: id-asa-petcliasa-petclinic-visits-service-dev-westeurope-101 # customize this, MUST BE: 'id-asa-${appName}-petclinic-visits-service-dev-${location}-101'
 
   # ==== Azure Spring Apps / Apps Deployment params ====:
 
@@ -151,7 +152,7 @@ jobs:
     steps:
 
     - name: Azure Login
-      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      uses: azure/login@v1 # https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -160,6 +161,7 @@ jobs:
     - name: Set Base environment variables
       id: set-var
       run: |
+
         echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
 
         GH_WORKSPACE=${{ github.workspace }} # "/github/workspace"
@@ -266,6 +268,7 @@ jobs:
 
     - name: Display environment variables
       run: |
+
         echo "Checking GITHUB_ENV"
 
         echo "LOCAL_IP=$LOCAL_IP"
@@ -370,7 +373,8 @@ jobs:
       shell: bash
 
     - name: Check Artifacts
-      run: | 
+      run: |
+
         echo "github.workspace = ${{ github.workspace }}"
         pwd
         ls -al
@@ -435,7 +439,8 @@ jobs:
     #    cache: maven
 
     - name: Deploy Vets-Service
-      run: | 
+      run: |
+
         az config set extension.use_dynamic_install=yes_without_prompt
         
         echo "****************************************************************************************"
@@ -720,7 +725,8 @@ jobs:
         az spring app update --name ${{ env.VISITS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --assign-endpoint true
 
     - name: Deploy Customers-service
-      run: | 
+      run: |
+      
         echo "****************************************************************************************"
         echo "*                                                                                      *"
         echo "*                                                                                      *"

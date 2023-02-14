@@ -116,6 +116,7 @@ jobs:
             -p mySQLServerName=${{ env.MYSQL_SERVER_NAME }} \
             -p mySQLadministratorLogin=${{ env.MYSQL_ADM_USR }} \
             -p gitConfigURI=${{ env.GIT_CFG_URI }}   
+
       shell: bash
 
     # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login

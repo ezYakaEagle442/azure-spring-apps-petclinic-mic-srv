@@ -121,7 +121,7 @@ jobs:
     steps:
 
     - name: Azure Login
-      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      uses: azure/login@v1 # https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -130,6 +130,7 @@ jobs:
     - name: Set Base environment variables
       id: set-var
       run: |
+
         echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
 
         GH_WORKSPACE=${{ github.workspace }} # "/github/workspace"
@@ -165,6 +166,7 @@ jobs:
 
     - name: Display environment variables
       run: |
+
         echo "Checking GITHUB_ENV"
 
         echo "LOCAL_IP=$LOCAL_IP"
@@ -188,13 +190,13 @@ jobs:
 
     - name: Download Artifacts from Azure BLOB Storage
       id: blob_download
-      run: | 
+      run: |
+
         # https://learn.microsoft.com/en-us/azure/storage/blobs/blob-cli
 
         # Runner will be blocked by network rules of storage account. Must Allow its IP
         echo "/!\ In Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account"
         echo "/!\ The SPN Id is NOT the App Registration Object ID, but the Enterprise Registration Object ID"
-
 
         pwd
         ls -al
@@ -220,7 +222,8 @@ jobs:
       shell: bash
 
     - name: Check Artifacts
-      run: | 
+      run: |
+
         echo "github.workspace = ${{ github.workspace }}"
         pwd
         ls -al

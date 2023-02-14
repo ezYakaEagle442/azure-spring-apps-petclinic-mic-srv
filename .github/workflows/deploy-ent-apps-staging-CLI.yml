@@ -10,7 +10,8 @@ name: Deploy to ASA ENTERPRISE Tier STAGING Deployments with CLI
 ###################################################################################################################
 
 env:
-  AZ_CLI_VERSION: 2.42.0
+  AZ_CLI_VERSION: 2.44.1
+  APP_NAME: petcliasa
   AZURE_SPRING_APPS_SERVICE: asa-petcliasa # customize this
   KEYVAULT: kv-petcliasa21 # customize this
   RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
@@ -434,7 +435,8 @@ jobs:
     #    cache: maven
 
     - name: Deploy Vets-Service
-      run: | 
+      run: |
+
         az config set extension.use_dynamic_install=yes_without_prompt
         
         echo "****************************************************************************************"
@@ -582,7 +584,7 @@ jobs:
         az spring app update --name ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --assign-endpoint true
 
     - name: Deploy Visits-Service
-      run: | 
+      run: |
 
         echo "****************************************************************************************"
         echo "*                                                                                      *"
@@ -719,7 +721,8 @@ jobs:
         az spring app update --name ${{ env.VISITS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --assign-endpoint true
 
     - name: Deploy Customers-service
-      run: | 
+      run: |
+      
         echo "****************************************************************************************"
         echo "*                                                                                      *"
         echo "*                                                                                      *"
