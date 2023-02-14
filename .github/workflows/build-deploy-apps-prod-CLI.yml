@@ -10,7 +10,7 @@ name: Deploy to ASA PRODUCTION Deployments with CLI
 ###################################################################################################################
 
 env:
-  AZ_CLI_VERSION: 2.44.1
+  AZ_CLI_VERSION: 2.45.0
   APP_NAME: petcliasa
   AZURE_SPRING_APPS_SERVICE: asa-petcliasa # customize this
   KEYVAULT: kv-petcliasa21 # customize this
