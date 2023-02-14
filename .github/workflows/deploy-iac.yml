@@ -110,9 +110,6 @@ jobs:
             -p publicNetworkAccess=enabled \
             -p kvSkuName=standard \
             -p deployToVNet=${{ env.DEPLOY_TO_VNET }} \
-            -p clientIPAddress="10.0.0.0" \
-            -p startIpAddress="10.0.0.0" \
-            -p endIpAddress="10.0.0.255" \
             -p mySQLServerName=${{ env.MYSQL_SERVER_NAME }} \
             -p mySQLadministratorLogin=${{ env.MYSQL_ADM_USR }} \
             -p gitConfigURI=${{ env.GIT_CFG_URI }}   

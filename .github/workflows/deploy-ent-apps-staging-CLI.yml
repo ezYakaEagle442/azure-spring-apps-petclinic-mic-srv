@@ -151,7 +151,7 @@ jobs:
     steps:
 
     - name: Azure Login
-      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      uses: azure/login@v1 # https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -160,6 +160,7 @@ jobs:
     - name: Set Base environment variables
       id: set-var
       run: |
+
         echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
 
         GH_WORKSPACE=${{ github.workspace }} # "/github/workspace"
@@ -266,8 +267,8 @@ jobs:
 
     - name: Display environment variables
       run: |
-        echo "Checking GITHUB_ENV"
 
+        echo "Checking GITHUB_ENV"
         echo "LOCAL_IP=$LOCAL_IP"
 
         echo "API_GATEWAY_JAR_ARTIFACT=$API_GATEWAY_JAR_ARTIFACT"
@@ -294,9 +295,9 @@ jobs:
         echo "VETS_SERVICE_DEPLOYMENT=$VETS_SERVICE_DEPLOYMENT"
         echo "VISITS_SERVICE_DEPLOYMENT=$VISITS_SERVICE_DEPLOYMENT"
 
-        echo  "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID"
-        echo  "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"
-        echo  "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"
+        echo "VETS_SVC_APP_IDENTITY_CLIENT_ID=$VETS_SVC_APP_IDENTITY_CLIENT_ID"
+        echo "VISITS_SVC_APP_IDENTITY_CLIENT_ID=$VISITS_SVC_APP_IDENTITY_CLIENT_ID"
+        echo "CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID=$CUSTOMERS_SVC_APP_IDENTITY_CLIENT_ID"
 
         echo "ADMIN_SERVER_PACKAGE_PATH=$ADMIN_SERVER_PACKAGE_PATH"
         echo "DISCOVERY_SERVER_PACKAGE_PATH=$DISCOVERY_SERVER_PACKAGE_PATH"
@@ -320,7 +321,8 @@ jobs:
 
     - name: Download Artifacts from Azure BLOB Storage
       id: blob_download
-      run: | 
+      run: |
+
         # https://learn.microsoft.com/en-us/azure/storage/blobs/blob-cli
 
         # Runner will be blocked by network rules of storage account. Must Allow its IP
@@ -370,7 +372,8 @@ jobs:
       shell: bash
 
     - name: Check Artifacts
-      run: | 
+      run: |
+
         echo "github.workspace = ${{ github.workspace }}"
         pwd
         ls -al
@@ -722,7 +725,7 @@ jobs:
 
     - name: Deploy Customers-service
       run: |
-      
+
         echo "****************************************************************************************"
         echo "*                                                                                      *"
         echo "*                                                                                      *"

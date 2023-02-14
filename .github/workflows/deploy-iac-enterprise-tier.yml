@@ -84,12 +84,12 @@ jobs:
             
     steps:
     - name: Login with GHA Runner SP
-      uses: azure/login@v1.4.6 # fails https://github.com/marketplace/actions/azure-login
+      uses: azure/login@v1 # fails https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }} # ${{ env.credentials }}
 
     - name: Checkout
-      uses: actions/checkout@v3.1.0 # https://github.com/actions/checkout
+      uses: actions/checkout@v3 # https://github.com/actions/checkout
 
     - name: Create Azure Spring Apps
       run: |
@@ -124,9 +124,6 @@ jobs:
             -p publicNetworkAccess=enabled \
             -p kvSkuName=standard \
             -p deployToVNet=${{ env.DEPLOY_TO_VNET }} \
-            -p clientIPAddress="10.0.0.0" \
-            -p startIpAddress="10.0.0.0" \
-            -p endIpAddress="10.0.0.255" \
             -p mySQLServerName=${{ env.MYSQL_SERVER_NAME }} \
             -p mySQLadministratorLogin=${{ env.MYSQL_ADM_USR }} \
             -p gitConfigURI=${{ env.GIT_CFG_URI }} \
