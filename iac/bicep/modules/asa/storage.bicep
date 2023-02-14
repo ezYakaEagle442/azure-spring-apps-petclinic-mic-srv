@@ -117,12 +117,16 @@ resource azurestorage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
         }        
       ]
       */
+
+      /* ASA instance is not created yet
       resourceAccessRules: [
         {
           resourceId: azureSpringApps.id
           tenantId: tenantId
         }
       ]
+      */
+
       /*
       virtualNetworkRules: [
         {
@@ -156,7 +160,7 @@ output azurestorageHttpEndpoint string = azurestorage.properties.primaryEndpoint
 output azurestorageFileEndpoint string = azurestorage.properties.primaryEndpoints.file
 
 
-resource azureblobservice 'Microsoft.Storage/storageAccounts/blobServices@2022-05-01' = {
+resource azureblobservice 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
   name: azureBlobServiceName
   parent: azurestorage
   properties: {
