@@ -270,19 +270,22 @@ Read [https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azur
 
 In the GitHub Action Runner, to allow the Service Principal used to access the Key Vault, execute the command below:
 ```sh
-# SPN_PWD=$(az ad sp create-for-rbac --name $SPN_APP_NAME --skip-assignment --query password --output tsv)
-az ad sp create-for-rbac --name $SPN_APP_NAME
+#SPN_PWD=$(az ad sp create-for-rbac --name $SPN_APP_NAME --skip-assignment --query password --output tsv)
+az ad sp create-for-rbac --name $SPN_APP_NAME --sdk-auth
 ```
-
-Note the password below and save it to SPN_PWD :
-SPN_PWD="there is a password here"
 
 ```console
 {
-  "appId": "42424242-4242-4242-87dd-42424242424",
-  "displayName": "gha_yourfoo_runner",
-  "password": "there is a password here",
-  "tenant": "42424242-4242-4242-87dd-42424242424"
+  "clientId": "<GUID>",
+  "clientSecret": "<GUID>",
+  "subscriptionId": "<GUID>",
+  "tenantId": "<GUID>",
+  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+  "resourceManagerEndpointUrl": "https://management.azure.com/",
+  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+  "galleryEndpointUrl": "https://gallery.azure.com/",
+  "managementEndpointUrl": "https://management.core.windows.net/"
 }
 
 ```
