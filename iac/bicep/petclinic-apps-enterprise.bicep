@@ -17,9 +17,9 @@
 // You can only use this function within an expression for the default value of a parameter.
 @maxLength(20)
 // to get a unique name each time ==> param appName string = 'demo${uniqueString(resourceGroup().id, deployment().name)}'
-param appName string = 'petclinic${uniqueString(resourceGroup().id)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
 
-param location string = 'westeurope'
+param location string = resourceGroup().location
 // param rgName string = 'rg-${appName}'
 
 @maxLength(24)
@@ -129,9 +129,6 @@ param mySQLServerName string = 'petcliasa'
 @description('The MySQL administrator Login')
 param mySQLadministratorLogin  string = 'mys_adm'
 
-@description('Allow client workstation to MySQL for local Dev/Test only')
-param clientIPAddress string
-
 @description('Should a MySQL Firewall be set to allow client workstation for local Dev/Test only')
 param setFwRuleClient bool = false
 
@@ -214,10 +211,6 @@ module mysqlPub './modules/mysql/mysql.bicep' = {
   params: {
     appName: appName
     location: location
-    setFwRuleClient: setFwRuleClient
-    clientIPAddress: clientIPAddress
-    startIpAddress: startIpAddress
-    endIpAddress: endIpAddress
     serverName: mySQLServerName
     administratorLogin: mySQLadministratorLogin
     administratorLoginPassword: kv.getSecret('SPRING-DATASOURCE-PASSWORD') 

@@ -1,6 +1,6 @@
 // https://learn.microsoft.com/en-us/graph/api/resources/federatedidentitycredentials-overview?view=graph-rest-1.0
 
-param location string
+param location string = resourceGroup().location
 param tags object
 param githubRepoNameWithOwner string
 param githubDefaultBranchName string

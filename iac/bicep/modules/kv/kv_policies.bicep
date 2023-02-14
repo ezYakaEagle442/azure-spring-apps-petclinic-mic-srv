@@ -1,6 +1,6 @@
 @description('A UNIQUE name')
 @maxLength(20)
-param appName string = 'iacdemo${uniqueString(resourceGroup().id)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
 
 @maxLength(24)
 @description('The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters.')

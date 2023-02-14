@@ -10,7 +10,7 @@
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring?tabs=bicep
 @description('A UNIQUE name')
 @maxLength(20)
-param appName string = '101-${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(deployment().name)}'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
@@ -151,24 +151,21 @@ param kvRGName string
 var kvURL = 'https://${kvName}.vault.azure.net'
 
 @description('The config-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param configServerAppIdentityName string = 'id-asa-petclinic-config-server-dev-westeurope-101'
+param configServerAppIdentityName string = 'id-asa-${appName}-petclinic-config-server-dev-${location}-101'
 
 @description('The api-gateway Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param apiGatewayAppIdentityName string = 'id-asa-petclinic-api-gateway-dev-westeurope-101'
+param apiGatewayAppIdentityName string = 'id-asa-${appName}-petclinic-api-gateway-dev-${location}-101'
 
 @description('The customers-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param customersServiceAppIdentityName string = 'id-asa-petclinic-customers-service-dev-westeurope-101'
+param customersServiceAppIdentityName string = 'id-asa-${appName}-petclinic-customers-service-dev-${location}-101'
 
 @description('The vets-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param vetsServiceAppIdentityName string = 'id-asa-petclinic-vets-service-dev-westeurope-101'
+param vetsServiceAppIdentityName string = 'id-asa-${appName}-petclinic-vets-service-dev-${location}-101'
 
 @description('The visits-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param visitsServiceAppIdentityName string = 'id-asa-petclinic-visits-service-dev-westeurope-101'
+param visitsServiceAppIdentityName string = 'id-asa-${appName}-petclinic-visits-service-dev-${location}-101'
 
-@description('The discovery-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param discoveryServerAppIdentityName string = 'id-asa-petclinic-discovery-server-dev-westeurope-101'
-
-resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+resource kvRG 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: kvRGName
   scope: subscription()
 }
@@ -179,7 +176,7 @@ resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 }
 // pre-req: https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-azure-cli#prerequisites
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-11-01-preview' = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-12-01' = {
   name: azureSpringAppsInstanceName
   location: location
   sku: {
@@ -259,7 +256,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-enterprise
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-application-insights?pivots=sc-enterprise-tier
-resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   // name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' default (for Build Service ) /default (Builder) /default (Build Pack binding name)
   name: '${azureSpringApps.name}/default/default/default' 
   properties: {
@@ -276,7 +273,7 @@ resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildSe
   ]
 }
 
-resource azureSpringAppsJavaBuilderAppInsightsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource azureSpringAppsJavaBuilderAppInsightsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   // name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' default (for Build Service ) /default (Builder) /default (Build Pack binding name)
   name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' 
   properties: {
@@ -312,7 +309,7 @@ resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities
 
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/configurationservices?pivots=deployment-language-bicep
-resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: applicationConfigurationServiceName
   parent: azureSpringApps
   properties: {
@@ -341,7 +338,7 @@ resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@20
   }
 }
 
-resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
+resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
   name: 'customers-service'
   location: location
   parent: azureSpringApps
@@ -381,7 +378,7 @@ resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-previ
 }
 output customersServiceIdentity string = customersserviceapp.identity.userAssignedIdentities['${customersServicedentity.id}'].principalId
 
-resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
+resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
   name: 'vets-service'
   location: location
   parent: azureSpringApps
@@ -421,7 +418,7 @@ resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' =
 }
 output vetsServiceIdentity string = vetsserviceapp.identity.userAssignedIdentities['${vetsServiceAppIdentity.id}'].principalId
 
-resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
+resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
   name: 'visits-service'
   location: location
   parent: azureSpringApps
@@ -463,7 +460,7 @@ output visitsServiceIdentity string = visitsservicerapp.identity.userAssignedIde
 
 
 // https://github.com/MicrosoftDocs/azure-docs/issues/102825
-resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
+resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
   name: 'api-gateway'
   location: location
   parent: azureSpringApps
@@ -567,7 +564,7 @@ az spring service-registry bind \
 
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-apps-enterprise#activate-service-registration-and-discovery
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/serviceregistries?pivots=deployment-language-bicep
-resource serviceRegistry 'Microsoft.AppPlatform/Spring/serviceRegistries@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource serviceRegistry 'Microsoft.AppPlatform/Spring/serviceRegistries@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: serviceRegistryName
   parent: azureSpringApps
 
@@ -581,7 +578,7 @@ output serviceRegistryId string = serviceRegistry.id
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-use-enterprise-api-portal
 // az spring api-portal  update  --help
-resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: apiPortalName
   parent: azureSpringApps
   sku: {
@@ -606,7 +603,7 @@ output apiPortalUrl string = apiPortal.properties.url
 output gatewayIds array = apiPortal.properties.gatewayIds
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways?pivots=deployment-language-bicep
-resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: gatewayName
   parent: azureSpringApps
   sku: {
@@ -652,7 +649,7 @@ output gatewayId string = gateway.id
 output gatewayUrl string = gateway.properties.url
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways/routeconfigs?pivots=deployment-language-bicep
-resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: 'vets-service-gateway-route-config'
   parent: gateway
   properties: {
@@ -682,7 +679,7 @@ output VetsGatewayRouteConfigRoutes array = VetsGatewayRouteConfig.properties.ro
 output VetsGatewayRouteConfigIsSsoEnabled bool = VetsGatewayRouteConfig.properties.routes[0].ssoEnabled
 output VetsGatewayRouteConfigPredicates array = VetsGatewayRouteConfig.properties.predicates
 
-resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: 'visits-service-gateway-route-config'
   parent: gateway
   properties: {
@@ -712,7 +709,7 @@ output VisitsGatewayRouteConfigRoutes array = VisitsGatewayRouteConfig.propertie
 output VisitsGatewayRouteConfigIsSsoEnabled bool = VisitsGatewayRouteConfig.properties.routes[0].ssoEnabled
 output VisitsGatewayRouteConfigPredicates array = VisitsGatewayRouteConfig.properties.predicates
 
-resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: 'customers-service-gateway-route-config'
   parent: gateway
   properties: {
@@ -746,13 +743,13 @@ output CustomersGatewayRouteConfigPredicates array = CustomersGatewayRouteConfig
 
 // https://github.com/Azure/azure-rest-api-specs/issues/18286
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
-resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-11-01-preview' existing = if (azureSpringAppsTier=='Enterprise') {
+resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-12-01' existing = if (azureSpringAppsTier=='Enterprise') {
   //scope: resourceGroup('my RG')
   name: '${azureSpringAppsInstanceName}/${buildServiceName}' 
 }
 
 // /!\ should add ' existing' = if (azureSpringAppsTier=='Enterprise') {
-resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   // '{your-service-name}/default/default'  //{your-service-name}/{build-service-name}/{agenpool-name}
   name: '${azureSpringAppsInstanceName}/${buildServiceName}/${buildAgentPoolName}' // default/default as buildServiceName / agentpoolName
   properties: {
@@ -769,7 +766,7 @@ resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2
 // /!\ If you're using the tanzu-buildpacks/java-azure buildpack, we recommend that you set the BP_JVM_VERSION environment variable in the build-env argument.
 // az spring build-service builder create --help
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal#default-builder-and-tanzu-buildpacks
-resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: builderName
   parent: buildService
   properties: {
@@ -797,7 +794,7 @@ resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-11-01
 
 // https://github.com/Azure/Azure-Spring-Apps/issues/28
 // 
-resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: buildName
   parent: buildService
   properties: {

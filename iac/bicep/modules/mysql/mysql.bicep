@@ -1,7 +1,7 @@
 
 @description('A UNIQUE name')
 @maxLength(20)
-param appName string = 'iacdemo${uniqueString(resourceGroup().id)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
 
 @description('The location of the MySQL DB.')
 param location string = resourceGroup().location
@@ -19,21 +19,29 @@ param serverName string
 @description('Azure Spring Apps Outbound Public IPs as an Array')
 param azureSpringAppsOutboundPubIP array
 
-@description('Should a MySQL Firewall be set to allow client workstation for local Dev/Test only')
-param setFwRuleClient bool = false
+// https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/how-to-deploy-on-azure-free-account
+@description('Azure database for MySQL SKU')
+@allowed([
+  'Standard_D4s_v3'
+  'Standard_D2s_v3'
+  'Standard_B1ms'
+])
+param databaseSkuName string = 'Standard_B1ms' //  'GP_Gen5_2' for single server
 
-@description('Allow client workstation for local Dev/Test only')
-param clientIPAddress string
+@description('Azure database for PostgreSQL pricing tier')
+@allowed([
+  'Burstable'
+  'GeneralPurpose'
+  'MemoryOptimized'
+])
+param databaseSkuTier string = 'Burstable'
 
-@description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
-param startIpAddress string
-
-@description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
-param endIpAddress string
-
-var databaseSkuName = 'Standard_B1ms' //  'GP_Gen5_2' for single server
-var databaseSkuTier = 'Burstable' // 'GeneralPurpose'
-var mySqlVersion = '5.7' // https://docs.microsoft.com/en-us/azure/mysql/concepts-supported-versions
+@description('PostgreSQL version see https://learn.microsoft.com/en-us/azure/mysql/concepts-version-policy')
+@allowed([
+  '8.0'
+  '5.7'
+])
+param mySqlVersion string = '5.7' // https://docs.microsoft.com/en-us/azure/mysql/concepts-supported-versions
 
 resource mysqlserver 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' = {
   name: serverName
@@ -74,15 +82,6 @@ resource fwRuleAzureSpringApps 'Microsoft.DBforMySQL/flexibleServers/firewallRul
 }
 */
 
-// Allow client workstation with IP 'clientIPAddress' for local Dev/Test only
-resource fwRuleClientIPAddress 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = if (setFwRuleClient)  {
-  name: 'client-ip-address'
-  parent: mysqlserver
-  properties: {
-    startIpAddress: clientIPAddress
-    endIpAddress: clientIPAddress
-  }
-}
 
  // Allow Azure Spring Apps
  resource fwRuleAllowAzureSpringAppsIP1 'Microsoft.DBforMySQL/flexibleServers/firewallRules@2021-12-01-preview' = {

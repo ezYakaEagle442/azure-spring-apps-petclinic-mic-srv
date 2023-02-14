@@ -1,4 +1,4 @@
-param location string = 'westeurope'
+param location string = resourceGroup().location
 
 param vnetName string = 'vnet-azure-spring-apps'
 param vnetCidr string = '10.42.0.0/21 '
@@ -18,7 +18,7 @@ var appSubnet = {
   cidr: appSubnetCidr
 }
 
-resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2022-07-01' = {
   name: vnetName
   location: location
   properties: {

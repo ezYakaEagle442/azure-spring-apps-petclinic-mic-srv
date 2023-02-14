@@ -8,7 +8,7 @@ Microsoft.KeyVault/locations/deletedVaults/purge/action
 
 @description('A UNIQUE name')
 @maxLength(20)
-param appName string = 'iacdemo${uniqueString(resourceGroup().id)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
 
 @maxLength(24)
 @description('The name of the KV, must be UNIQUE.  A vault name must be between 3-24 alphanumeric characters.')
@@ -31,7 +31,7 @@ param secretValue string
 // https://learn.microsoft.com/en-us/azure/key-vault/secrets/secrets-best-practices#secrets-rotation
 // Because secrets are sensitive to leakage or exposure, it's important to rotate them often, at least every 60 days. 
 @description('Expiry date in seconds since 1970-01-01T00:00:00Z. Ex: 1672444800 ==> 31/12/2022')
-param secretExpiryDate int = 1672444800
+param secretExpiryDate int = 1703980800 // 31/12/2023
 
 resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: kvName

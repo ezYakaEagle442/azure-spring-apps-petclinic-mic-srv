@@ -1,9 +1,9 @@
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring?tabs=bicep
 @description('A UNIQUE name')
 @maxLength(20)
-param appName string = '101-${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(deployment().name)}'
 
-param deploymentVersion string = '2.6.6'
+param deploymentVersion string = '2.6.13'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
@@ -71,22 +71,19 @@ param kvRGName string
 var kvURL = 'https://${kvName}.vault.azure.net/'
 
 @description('The config-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param configServerAppIdentityName string = 'id-asa-petclinic-config-server-dev-westeurope-101'
+param configServerAppIdentityName string = 'id-asa-${appName}-petclinic-config-server-dev-${location}-101'
 
 @description('The api-gateway Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param apiGatewayAppIdentityName string = 'id-asa-petclinic-api-gateway-dev-westeurope-101'
+param apiGatewayAppIdentityName string = 'id-asa-${appName}-petclinic-api-gateway-dev-${location}-101'
 
 @description('The customers-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param customersServiceAppIdentityName string = 'id-asa-petclinic-customers-service-dev-westeurope-101'
+param customersServiceAppIdentityName string = 'id-asa-${appName}-petclinic-customers-service-dev-${location}-101'
 
 @description('The vets-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param vetsServiceAppIdentityName string = 'id-asa-petclinic-vets-service-dev-westeurope-101'
+param vetsServiceAppIdentityName string = 'id-asa-${appName}-petclinic-vets-service-dev-${location}-101'
 
 @description('The visits-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param visitsServiceAppIdentityName string = 'id-asa-petclinic-visits-service-dev-westeurope-101'
-
-@description('The discovery-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param discoveryServerAppIdentityName string = 'id-asa-petclinic-discovery-server-dev-westeurope-101'
+param visitsServiceAppIdentityName string = 'id-asa-${appName}-petclinic-visits-service-dev-${location}-101'
 
 resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: kvRGName
@@ -140,7 +137,7 @@ resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities
   name: visitsServiceAppIdentityName
 }
 
-resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2022-11-01-preview' existing = {
+resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2022-12-01' existing = {
   name: configServerName
 }
 
@@ -155,7 +152,7 @@ resource adminserverapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' e
 }
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/apps/deployments?pivots=deployment-language-bicep
-resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-11-01-preview' = {
+resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-12-01' = {
   name: 'default'
   parent: adminserverapp
   sku: {
@@ -281,18 +278,18 @@ resource getUploadUrl 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
 */
 
 
-resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
+resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
   name: 'vets-service'
   parent: azureSpringApps
 
 }
 
-resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
+resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
   name: 'visits-service'
   parent: azureSpringApps
 }
 
-resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
+resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
   name: 'api-gateway'
   parent: azureSpringApps
 }

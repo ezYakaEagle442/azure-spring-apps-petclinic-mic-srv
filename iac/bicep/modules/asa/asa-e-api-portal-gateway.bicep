@@ -10,7 +10,7 @@
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring?tabs=bicep
 @description('A UNIQUE name')
 @maxLength(20)
-param appName string = '101-${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(deployment().name)}'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
@@ -67,7 +67,7 @@ param gatewayName string = 'default'
 
 // pre-req: https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-azure-cli#prerequisites
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-11-01-preview' existing = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-12-01' existing = {
   name: azureSpringAppsInstanceName
 }
 
@@ -75,7 +75,7 @@ resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-11-01-preview' exist
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-use-enterprise-api-portal
 // az spring api-portal  update  --help
-resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: apiPortalName
   parent: azureSpringApps
   sku: {
@@ -120,7 +120,7 @@ resource gatewayCustomdomain 'Microsoft.AppPlatform/Spring/gateways/domains@2022
 */
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways?pivots=deployment-language-bicep
-resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: gatewayName
   parent: azureSpringApps
   sku: {

@@ -17,9 +17,9 @@
 // You can only use this function within an expression for the default value of a parameter.
 @maxLength(20)
 // to get a unique name each time ==> param appName string = 'demo${uniqueString(resourceGroup().id, deployment().name)}'
-param appName string = 'petclinic${uniqueString(resourceGroup().id)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
 
-param location string = 'westeurope'
+param location string = resourceGroup().location
 // param rgName string = 'rg-${appName}'
 
 @description('The Azure Spring Apps Resource Provider ID')
@@ -92,18 +92,6 @@ param appInsightsName string = 'appi-${appName}'
 
 @description('The Azure Spring Apps instance name')
 param azureSpringAppsInstanceName string = 'asa-${appName}'
-
-@description('Should a MySQL Firewall be set to allow client workstation for local Dev/Test only')
-param setFwRuleClient bool = false
-
-@description('Allow client workstation IP adress for local Dev/Test only, requires setFwRuleClient=true')
-param clientIPAddress string
-
-@description('Allow Azure Spring Apps subnet to access MySQL DB')
-param startIpAddress string
-
-@description('Allow Azure Spring Apps subnet to access MySQL DB')
-param endIpAddress string
 
 resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: kvRGName

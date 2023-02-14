@@ -3,13 +3,17 @@
 @description('The Identity location')
 param location string = resourceGroup().location
 
+@description('A UNIQUE name')
+@maxLength(20)
+param appName string = 'petcliasa${uniqueString(deployment().name)}'
+
 @description('The Identity Tags. See https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources?tabs=bicep#apply-an-object')
 param tags object = {
-  'Environment': 'Dev'
-  'Dept': 'IT'
-  'Scope': 'EU'
-  'CostCenter': '442'
-  'Owner': 'Petclinic'
+  Environment: 'Dev'
+  Dept: 'IT'
+  Scope: 'EU'
+  CostCenter: '442'
+  Owner: 'Petclinic'
 }
 
 ///////////////////////////////////
@@ -19,19 +23,19 @@ param tags object = {
 // ex: id-appcn-keda-prod-eastus2-001
 
 @description('The config-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param configServerAppIdentityName string = 'id-asa-petclinic-config-server-dev-westeurope-101'
+param configServerAppIdentityName string = 'id-asa-${appName}-petclinic-config-server-dev-${location}-101'
 
 @description('The api-gateway Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param apiGatewayAppIdentityName string = 'id-asa-petclinic-api-gateway-dev-westeurope-101'
+param apiGatewayAppIdentityName string = 'id-asa-${appName}-petclinic-api-gateway-dev-${location}-101'
 
 @description('The customers-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param customersServiceAppIdentityName string = 'id-asa-petclinic-customers-service-dev-westeurope-101'
+param customersServiceAppIdentityName string = 'id-asa-${appName}-petclinic-customers-service-dev-${location}-101'
 
 @description('The vets-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param vetsServiceAppIdentityName string = 'id-asa-petclinic-vets-service-dev-westeurope-101'
+param vetsServiceAppIdentityName string = 'id-asa-${appName}-petclinic-vets-service-dev-${location}-101'
 
 @description('The visits-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param visitsServiceAppIdentityName string = 'id-asa-petclinic-visits-service-dev-westeurope-101'
+param visitsServiceAppIdentityName string = 'id-asa-${appName}-petclinic-visits-service-dev-${location}-101'
 
 ///////////////////////////////////
 // New resources

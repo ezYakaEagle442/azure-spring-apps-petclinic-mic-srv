@@ -1,7 +1,7 @@
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring?tabs=bicep
 @description('A UNIQUE name')
 @maxLength(20)
-param appName string = '101-${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(deployment().name)}'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
@@ -90,24 +90,21 @@ param kvRGName string
 var kvURL = 'https://${kvName}.vault.azure.net'
 
 @description('The config-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param configServerAppIdentityName string = 'id-asa-petclinic-config-server-dev-westeurope-101'
+param configServerAppIdentityName string = 'id-asa-${appName}-petclinic-config-server-dev-${location}-101'
 
 @description('The api-gateway Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param apiGatewayAppIdentityName string = 'id-asa-petclinic-api-gateway-dev-westeurope-101'
+param apiGatewayAppIdentityName string = 'id-asa-${appName}-petclinic-api-gateway-dev-${location}-101'
 
 @description('The customers-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param customersServiceAppIdentityName string = 'id-asa-petclinic-customers-service-dev-westeurope-101'
+param customersServiceAppIdentityName string = 'id-asa-${appName}-petclinic-customers-service-dev-${location}-101'
 
 @description('The vets-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param vetsServiceAppIdentityName string = 'id-asa-petclinic-vets-service-dev-westeurope-101'
+param vetsServiceAppIdentityName string = 'id-asa-${appName}-petclinic-vets-service-dev-${location}-101'
 
 @description('The visits-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param visitsServiceAppIdentityName string = 'id-asa-petclinic-visits-service-dev-westeurope-101'
+param visitsServiceAppIdentityName string = 'id-asa-${appName}-petclinic-visits-service-dev-${location}-101'
 
-@description('The discovery-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param discoveryServerAppIdentityName string = 'id-asa-petclinic-discovery-server-dev-westeurope-101'
-
-resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+resource kvRG 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: kvRGName
   scope: subscription()
 }
@@ -118,7 +115,7 @@ resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 }
 // pre-req: https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-azure-cli#prerequisites
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-09-01-preview' = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-12-01' = {
   name: azureSpringAppsInstanceName
   location: location
   sku: {
@@ -198,7 +195,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/monitoringsettings?pivots=deployment-language-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-application-insights?pivots=sc-standard-tier
-resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-11-01-preview' = {
+resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/monitoringSettings@2022-12-01' = {
   name: monitoringSettingsName
   parent: azureSpringApps
   properties: {
@@ -245,7 +242,7 @@ resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers
   }
 }
 
-resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
+resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
   name: 'customers-service'
   location: location
   parent: azureSpringApps
@@ -274,7 +271,7 @@ resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-previ
 }
 output customersServiceIdentity string = customersserviceapp.identity.userAssignedIdentities['${customersServicedentity.id}'].principalId
 
-resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
+resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
   name: 'vets-service'
   location: location
   parent: azureSpringApps
@@ -303,7 +300,7 @@ resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' =
 }
 output vetsServiceIdentity string = vetsserviceapp.identity.userAssignedIdentities['${vetsServiceAppIdentity.id}'].principalId
 
-resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
+resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
   name: 'visits-service'
   location: location
   parent: azureSpringApps
@@ -333,7 +330,7 @@ resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview
 output visitsServiceIdentity string = visitsservicerapp.identity.userAssignedIdentities['${visitsServiceIdentity.id}'].principalId
 
 
-resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' = {
+resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
   name: 'api-gateway'
   location: location
   parent: azureSpringApps

@@ -98,6 +98,23 @@ TENANT_ID=$(cat sso.json | jq -r '.tenant')
 SSO_APPLICATION_ISSUER_URI="https://login.microsoftonline.com/${TENANT_ID}/discovery/v2.0/keys"
 echo $SSO_APPLICATION_ISSUER_URI
 
+
+# https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise#create-and-configure-an-application-registration-with-azure-active-directory
+APPLICATION_ID=$(cat ad.json | jq -r '.appId')
+
+GATEWAY_URL=$(az spring gateway show \
+    --resource-group <resource-group-name> \
+    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
+
+PORTAL_URL=$(az spring api-portal show \
+    --resource-group <resource-group-name> \
+    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
+
+az ad app update \
+    --id ${APPLICATION_ID} \
+    --web-redirect-uris "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
+
+
 ```
 
 

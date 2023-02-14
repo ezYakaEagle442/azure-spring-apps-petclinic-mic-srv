@@ -2,9 +2,9 @@ targetScope = 'subscription'
 
 @description('A UNIQUE name')
 @maxLength(20)
-param appName string = '101-${uniqueString(deployment().location)}'
+param appName string = 'petcliasa${uniqueString(deployment().location)}'
 
-param location string = deployment().location
+param location string = resourceGroup().location
 param rgName string  = 'rg-${appName}'
 
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {

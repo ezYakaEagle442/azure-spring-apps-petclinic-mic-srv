@@ -17,9 +17,9 @@
 // You can only use this function within an expression for the default value of a parameter.
 @maxLength(20)
 // to get a unique name each time ==> param appName string = 'demo${uniqueString(resourceGroup().id, deployment().name)}'
-param appName string = 'petclinic${uniqueString(resourceGroup().id)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
 
-param location string = 'westeurope'
+param location string = resourceGroup().location
 // param rgName string = 'rg-${appName}'
 
 @maxLength(24)
@@ -53,7 +53,6 @@ param deployToVNet bool = false
 param logAnalyticsWorkspaceName string = 'log-${appName}'
 
 param appInsightsName string = 'appi-${appName}'
-
 
 @description('The Azure Spring Apps instance name')
 param azureSpringAppsInstanceName string = 'asa-${appName}'
@@ -108,6 +107,7 @@ module identities './modules/asa/identity.bicep' = {
 
 
 // https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/scope-extension-resources
+/* 
 module roleAssignments './modules/asa/roleAssignments.bicep' = {
   name: 'role-assignments'
   params: {
@@ -122,6 +122,7 @@ module roleAssignments './modules/asa/roleAssignments.bicep' = {
     identities
   ] 
 }
+*/
 
 module storage './modules/asa/storage.bicep' = {
   name: 'storage'

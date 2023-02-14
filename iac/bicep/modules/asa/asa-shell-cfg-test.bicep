@@ -1,7 +1,7 @@
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring?tabs=bicep
 @description('A UNIQUE name')
 @maxLength(20)
-param appName string = '101-${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(deployment().name)}'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
@@ -40,7 +40,7 @@ param monitoringSettingsName string = 'default'
 param serviceRegistryName string = 'default' // The resource name 'Azure Spring Apps Service Registry' is not valid
 
 
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-11-01-preview' existing = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-12-01' existing = {
   name: azureSpringAppsInstanceName
 }
 
@@ -48,18 +48,18 @@ output azureSpringAppsResourceId string = azureSpringApps.id
 output azureSpringAppsFQDN string = azureSpringApps.properties.fqdn
 output azureSpringAppsOutboundPubIP string = azureSpringApps.properties.networkProfile.outboundIPs.publicIPs[0]
 
-resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2022-11-01-preview' existing = {
+resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2022-12-01' existing = {
   name: configServerName
 }
 
-resource shellcfgtestapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
+resource shellcfgtestapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
   name: 'shell-cfg-test'
   parent: azureSpringApps
 }
 
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/apps/deployments?pivots=deployment-language-bicep
-resource shellcfgtestappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-11-01-preview' = {
+resource shellcfgtestappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-12-01' = {
   name: 'default'
   parent: shellcfgtestapp
   sku: {

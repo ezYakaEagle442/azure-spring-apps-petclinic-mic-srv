@@ -20,7 +20,7 @@ az deployment group create --name asa-gh-self-hosted-runner -f iac/bicep/gh/gh-s
 */
 @description('A UNIQUE name')
 @maxLength(20)
-param appName string = '101-${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(deployment().name)}'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location

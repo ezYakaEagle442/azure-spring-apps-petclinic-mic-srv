@@ -6,7 +6,7 @@ az deployment group create --name asa-petclinic-storage -f iac/bicep/modules/asa
 */
 @description('A UNIQUE name')
 @maxLength(20)
-param appName string = '101-${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(deployment().name)}'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
@@ -45,7 +45,7 @@ param tags object = {
 }
 
 @description('The Azure Strorage Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
-param storageIdentityName string = 'id-asa-petclinic-strorage-dev-westeurope-101'
+param storageIdentityName string = 'id-asa-${appName}-petclinic-strorage-dev-${location}-101'
 
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.managedidentity/userassignedidentities?pivots=deployment-language-bicep
@@ -57,12 +57,12 @@ resource storageIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-
 output storageIdentityId string = storageIdentity.id
 output storageIdentityPrincipalId string = storageIdentity.properties.principalId
 
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-09-01-preview' existing = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-12-01' existing = {
   name: azureSpringAppsInstanceName
 }
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.storage/storageaccounts?pivots=deployment-language-bicep
-resource azurestorage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
+resource azurestorage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: azureStorageName
   location: location
   tags: tags
@@ -188,7 +188,7 @@ resource azureblobservice 'Microsoft.Storage/storageAccounts/blobServices@2022-0
 }
 output azureblobserviceId string = azureblobservice.id
 
-resource blobcontainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-05-01' = {
+resource blobcontainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
   name: blobContainerName
   parent: azureblobservice
   properties: {
