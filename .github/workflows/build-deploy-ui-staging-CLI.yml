@@ -10,7 +10,8 @@ name: Deploy UI to ASA STAGING Deployments with CLI
 ###################################################################################################################
 
 env:
-  AZ_CLI_VERSION: 2.42.0
+  AZ_CLI_VERSION: 2.44.1
+  APP_NAME: petcliasa
   AZURE_SPRING_APPS_SERVICE: asa-petcliasa # customize this
   KEYVAULT: kv-petcliasa21 # customize this
   RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.

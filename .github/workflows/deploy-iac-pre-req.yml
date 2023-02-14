@@ -49,7 +49,7 @@ env:
 
   # ==== Versions ====
   DEPLOYMENT_VERSION: 2.6.13
-  AZ_CLI_VERSION: 2.42.0
+  AZ_CLI_VERSION: 2.44.1
   JAVA_VERSION: 11
 
 on:
