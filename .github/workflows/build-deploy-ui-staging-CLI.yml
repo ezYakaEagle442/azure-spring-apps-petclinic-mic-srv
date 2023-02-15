@@ -120,6 +120,19 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    - name: Authorize local IP access to the Azure BLOB Storage 
+      if: ${{ always() }}
+      run: |
+
+        LOCAL_IP=$(curl whatismyip.akamai.com)
+        echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
+        echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
+        az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }}  --only-show-errors
+        sleep 45
+        az version
+
+      shell: bash
+      
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
     # /!\ IMPORTANT:  The step that creates or updates the environment variable does not have access to the new value, but all subsequent steps in a job will have access.
     - name: Set Base environment variables
@@ -171,19 +184,6 @@ jobs:
 
         echo "API_GATEWAY_STAGING_DEPLOYMENT=$API_GATEWAY_STAGING_DEPLOYMENT"
         echo "API_GATEWAY_PRODUCTION_DEPLOYMENT=$API_GATEWAY_PRODUCTION_DEPLOYMENT"
-      shell: bash
-
-    - name: Authorize local IP access to the Azure BLOB Storage 
-      if: ${{ always() }}
-      run: |
-
-        LOCAL_IP=$(curl whatismyip.akamai.com)
-        echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
-        echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
-        az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }}  --only-show-errors
-        sleep 45
-        az version
-
       shell: bash
 
     - name: Download Artifacts from Azure BLOB Storage
