@@ -14,7 +14,7 @@ param administratorLogin string = 'mys_adm'
 param administratorLoginPassword string
 
 @description('The MySQL DB Server name.')
-param serverName string
+param serverName string = appName
 
 @description('Azure Spring Apps Outbound Public IPs as an Array')
 param azureSpringAppsOutboundPubIP array
