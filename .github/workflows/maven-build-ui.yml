@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up JDK 11
       uses: actions/setup-java@v2
       with:
@@ -106,7 +106,7 @@ jobs:
         echo "API_GATEWAY_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.API_GATEWAY }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
 
     - name: Azure Login
-      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      uses: azure/login@v1 # https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -125,7 +125,8 @@ jobs:
 
     - name: Upload Artifacts to Azure BLOB Storage
       id: blob_upload
-      run: | 
+      run: |
+
         # https://learn.microsoft.com/en-us/azure/storage/blobs/blob-cli
 
         # Runner will be blocked by network rules of storage account. Must Allow its IP
@@ -160,6 +161,7 @@ jobs:
     # https://maven.apache.org/plugins/maven-deploy-plugin/deploy-mojo.html#altDeploymentRepository
     - name:  Publish the package
       run: |
+
         mkdir -p ~/.m2
         echo "<settings><servers><server><id>github-asc</id><username>$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $1}')</username><password>\${env.GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
         REPO="github-asa::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}"

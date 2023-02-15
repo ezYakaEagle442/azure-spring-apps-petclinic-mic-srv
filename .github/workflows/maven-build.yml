@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up JDK 11
       uses: actions/setup-java@v2
       with:
@@ -82,7 +82,8 @@ jobs:
         cache: maven
     - name: Build with Maven
       id: mvn_build
-      run: | 
+      run: |
+
         pwd
         ls -al
         
@@ -113,13 +114,14 @@ jobs:
         echo "VISITS_SERVICE_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.VISITS_SERVICE }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
 
     - name: Azure Login
-      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      uses: azure/login@v1 # https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Authorize local IP access to the Azure BLOB Storage 
       if: ${{ always() }}
       run: |
+
         LOCAL_IP=$(curl whatismyip.akamai.com)
         echo "LOCAL_IP=$(curl whatismyip.akamai.com)" >> $GITHUB_ENV
 
@@ -132,11 +134,14 @@ jobs:
         echo "VETS_SERVICE_JAR=spring-petclinic-${{ env.VETS_SERVICE }}/target/$VETS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "VISITS_SERVICE_JAR=spring-petclinic-${{ env.VISITS_SERVICE }}/target/$VISITS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
 
+        az version
+
       shell: bash
 
     - name: Upload Artifacts to Azure BLOB Storage
       id: blob_upload
-      run: | 
+      run: |
+
         # https://learn.microsoft.com/en-us/azure/storage/blobs/blob-cli
          az config set extension.use_dynamic_install=yes_without_prompt
 
@@ -176,6 +181,7 @@ jobs:
     # https://maven.apache.org/plugins/maven-deploy-plugin/deploy-mojo.html#altDeploymentRepository
     - name:  Publish the package
       run: |
+
         mkdir -p ~/.m2
         echo "<settings><servers><server><id>github-asc</id><username>$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $1}')</username><password>\${env.GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
         REPO="github-asa::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}"
