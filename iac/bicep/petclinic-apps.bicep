@@ -106,7 +106,7 @@ param serviceRegistryName string = 'default' // The resource name 'Azure Spring 
 param gitConfigURI string
 
 @description('The MySQL server name')
-param mySQLServerName string = 'petcliasa'
+param mySQLServerName string = appName
 
 @description('The MySQL administrator Login')
 param mySQLadministratorLogin  string = 'mys_adm'
