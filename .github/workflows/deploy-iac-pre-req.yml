@@ -18,6 +18,12 @@ env:
 
   VM_ADMIN_USER_NAME: adm_asa
 
+  # ==== Azure storage to store Artifacts , values must be consistent with the ones in storage.bicep ====:
+  AZ_STORAGE_NAME : staasapetcliasa # customize this
+  AZ_BLOB_CONTAINER_NAME: petcliasa-blob # customize this
+  # AZ_BLOB_SVC_NAME: default # MUST NOT BE MODIFIED
+
+
   # ==== Secrets ====
   # /!\ In Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account"
   # /!\ The SPN Id is NOT the App Registration Object ID, but the Enterprise Registration Object ID"
@@ -166,6 +172,8 @@ jobs:
             -p location=${{ env.LOCATION }} \
             -p kvName=${{ env.KV_NAME }} \
             -p kvRGName=${{ env.RG_KV }} \
+            -p azureStorageName=${{ env.AZ_STORAGE_NAME }} \
+            -p blobContainerName=${{ env.AZ_BLOB_CONTAINER_NAME }} \
             -p ghRunnerSpnPrincipalId=${{ env.SPN_ID }} \
             -p deployToVNet=${{ env.DEPLOY_TO_VNET }}
 

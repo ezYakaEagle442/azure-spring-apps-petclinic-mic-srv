@@ -18,7 +18,7 @@ param azureSpringAppsInstanceName string = 'asa-${appName}'
 param tenantId string = subscription().tenantId
 
 @description('The Storage Account name')
-param azureStorageName string = 'stasa${appName}'
+param azureStorageName string = 'staasa${appName}'
 
 @description('The BLOB Storage service name')
 param azureBlobServiceName string = 'default' // '${appName}-blob-svc'

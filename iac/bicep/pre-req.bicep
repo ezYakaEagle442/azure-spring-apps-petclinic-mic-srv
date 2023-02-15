@@ -59,7 +59,7 @@ param appInsightsName string = 'appi-${appName}'
 param azureSpringAppsInstanceName string = 'asa-${appName}'
 
 @description('The Storage Account name')
-param azureStorageName string = 'stasa${appName}'
+param azureStorageName string = 'staasa${appName}'
 
 @description('The BLOB Storage service name')
 param azureBlobServiceName string = 'default'
