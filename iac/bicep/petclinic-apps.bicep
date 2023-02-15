@@ -111,30 +111,6 @@ param mySQLServerName string = 'petcliasa'
 @description('The MySQL administrator Login')
 param mySQLadministratorLogin  string = 'mys_adm'
 
-@description('Allow client workstation to MySQL for local Dev/Test only')
-param clientIPAddress string
-
-@description('Should a MySQL Firewall be set to allow client workstation for local Dev/Test only')
-param setFwRuleClient bool = false
-
-@description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
-param startIpAddress string = '10.42.1.0'
-
-@description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
-param endIpAddress string = '10.42.1.15'
-
-/*
-module rg 'rg.bicep' = {
-  name: 'rg-bicep-${appName}'
-  scope: subscription()
-  params: {
-    rgName: rgName
-    location: location
-  }
-}
-*/
-
-
 module azurespringapps './modules/asa/asa.bicep' = if (azureSpringAppsTier=='Standard') {
   name: 'asa-pub'
   // scope: resourceGroup(rg.name)
