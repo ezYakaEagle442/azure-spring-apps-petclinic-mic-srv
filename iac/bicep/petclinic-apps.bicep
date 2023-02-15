@@ -154,6 +154,7 @@ module kvsetiprules './modules/kv/kv.bicep' = {
   name: 'kv-set-iprules'
   scope: kvRG
   params: {
+    appName: appName
     kvName: kvName
     location: location
     ipRules: ipRules
