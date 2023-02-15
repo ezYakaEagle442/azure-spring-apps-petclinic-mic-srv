@@ -38,12 +38,12 @@ jobs:
       shell: bash
 
     - name: Azure Login
-      uses: azure/login@v1.4.6 # https://github.com/marketplace/actions/azure-login
+      uses: azure/login@v1 # https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ env.credentials }}
 
     - name: Delete Azure Resource Groups
-      uses: azure/CLI@v1.0.6 # https://github.com/marketplace/actions/azure-cli-action
+      uses: azure/CLI@v1 # https://github.com/marketplace/actions/azure-cli-action
       with:
         azcliversion: ${{ env.AZ_CLI_VERSION }}
         inlineScript: |

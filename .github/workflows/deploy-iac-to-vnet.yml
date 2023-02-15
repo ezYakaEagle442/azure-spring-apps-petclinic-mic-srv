@@ -62,15 +62,15 @@ jobs:
       shell: bash
 
     - name: Login with GHA Runner SP
-      uses: azure/login@v1.4.6 # fails https://github.com/marketplace/actions/azure-login
+      uses: azure/login@v1 # fails https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ env.credentials }} # ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Checkout
-      uses: actions/checkout@v3.0.2 # https://github.com/actions/checkout
+      uses: actions/checkout@v3 # https://github.com/actions/checkout
 
     - name: Deploy Azure Key Vault      
-      # uses: azure/CLI@v1.0.6 # https://github.com/marketplace/actions/azure-cli-action
+      # uses: azure/CLI@v1 # https://github.com/marketplace/actions/azure-cli-action
       # with:
         #azcliversion: ${{ env.AZ_CLI_VERSION }}
         # inlineScript: |

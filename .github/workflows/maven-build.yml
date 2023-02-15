@@ -128,7 +128,7 @@ jobs:
         echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
         az config set extension.use_dynamic_install=yes_without_prompt
         az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }} --only-show-errors
-        sleep 30        
+        sleep 45   
 
         echo "CUSTOMERS_SERVICE_JAR=spring-petclinic-${{ env.CUSTOMERS_SERVICE }}/target/$CUSTOMERS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV
         echo "VETS_SERVICE_JAR=spring-petclinic-${{ env.VETS_SERVICE }}/target/$VETS_SERVICE_JAR_ARTIFACT" >> $GITHUB_ENV

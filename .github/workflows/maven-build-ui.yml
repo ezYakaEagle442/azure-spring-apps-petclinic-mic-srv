@@ -119,7 +119,7 @@ jobs:
 
         echo "About to ADD network-rule to ALLOW $LOCAL_IP to Azure BLOB Storage ${{ env.AZ_STORAGE_NAME }}"
         az storage account network-rule add --ip-address $LOCAL_IP --account-name  ${{ env.AZ_STORAGE_NAME }}  --action "Allow" -g ${{ env.RG_APP }}  --only-show-errors
-        sleep 30
+        sleep 45
 
         echo "API_GATEWAY_JAR=spring-petclinic-${{ env.API_GATEWAY }}/target/$API_GATEWAY_JAR_ARTIFACT" >> $GITHUB_ENV
 
