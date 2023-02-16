@@ -19,7 +19,7 @@ param location string = resourceGroup().location
 param tenantId string = subscription().tenantId
 
 @description('The Azure Spring Apps instance name')
-param azureSpringAppsInstanceName string = 'asa-${appName}'
+param azureSpringAppsInstanceName string = 'asae-${appName}'
 
 @description('The Azure Spring Apps SKU name. Check it out at https://learn.microsoft.com/en-us/rest/api/azureSpringApps/skus/list#code-try-0')
 @allowed([

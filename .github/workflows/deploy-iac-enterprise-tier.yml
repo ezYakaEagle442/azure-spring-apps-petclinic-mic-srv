@@ -5,7 +5,7 @@ name: Deploy ASA Enterprise Tier
 
 env:
   APP_NAME: petcliasa
-  ASA_INSTANCE_NAME: asa-petcliasa
+  ASA_INSTANCE_NAME: asa-petcliasae
 
   LOCATION: westeurope
   RG_KV: rg-iac-kv21 # RG where to deploy KV

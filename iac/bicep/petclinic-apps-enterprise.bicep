@@ -60,7 +60,7 @@ param appInsightsName string = 'appi-${appName}'
 param appInsightsDiagnosticSettingsName string = 'dgs-${appName}-send-logs-and-metrics-to-log-analytics'
 
 @description('The Azure Spring Apps instance name')
-param azureSpringAppsInstanceName string = 'asa-${appName}'
+param azureSpringAppsInstanceName string = 'asae-${appName}'
 
 // Check SKU REST API : https://docs.microsoft.com/en-us/rest/api/azureSpringApps/skus/list#code-try-0
 @description('The Azure Spring Apps SKU Capacity, ie Max App instances')
