@@ -41,11 +41,20 @@ Giving the GH Runner SP the 'Owner' role is not enough. You have the give it the
 
 Read [https://lnx.azurewebsites.net/directory-roles-for-azure-ad-service-principal/](https://lnx.azurewebsites.net/directory-roles-for-azure-ad-service-principal/)
 
-This is not possible using the Azure CLI or Portal though. You have to use the Azure AD Graph API, easiest way to do this is using [https://graphexplorer.azurewebsites.net](https://graphexplorer.azurewebsites.net) :
+This is not possible using the Azure CLI or Portal though. 
+You have to use the [Azure AD Graph API](https://learn.microsoft.com/en-us/graph/graph-explorer/graph-explorer-overview), to understand how to get an Access Token to call the API read [https://learn.microsoft.com/en-us/graph/auth/auth-concepts](https://learn.microsoft.com/en-us/graph/auth/auth-concepts) and [https://learn.microsoft.com/en-us/graph/auth-v2-service#token-request](https://learn.microsoft.com/en-us/graph/auth-v2-service#token-request).
+
+You can get the Full Directory Permissions Reference [here](https://learn.microsoft.com/en-us/graph/permissions-reference#directory-permissions)
+
+The easiest way to do this is using [https://graphexplorer.azurewebsites.net](https://graphexplorer.azurewebsites.net) :
 
 GET
 https://graph.windows.net/free-media.eu/directoryRoles?api-version=1.6
 (you need to change free-media.eu to your tenant name, ex for MS FTE: https://graph.windows.net/microsoft.com/directoryRoles)
+
+other ex: 
+https://graph.windows.net/EnvZzzz424242.onmicrosoft.com/$metadata#directoryObjects/Microsoft.DirectoryServices.DirectoryRole  
+https://graph.windows.net/EnvZzzz424242.onmicrosoft.com/directoryRoles
 
 Workround see [https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-directory-readers-role-tutorial?view=azuresql](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-directory-readers-role-tutorial?view=azuresql) : 
 
@@ -54,16 +63,74 @@ create a Group 'ASA-Directory-Readers' having 'Directory Readers' role ,then add
 ```sh
 SPN_APP_NAME="gha_asa_run"
 
-APP_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${SPN_APP_NAME}'].{id:appId}" --output tsv)
+SPN_APP_ID=$(az ad sp list --all --query "[?appDisplayName=='${SPN_APP_NAME}'].{appId:appId}" --output tsv)
+# use the one that works
+SPN_APP_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${SPN_APP_NAME}'].{id:appId}" --output tsv)
+
+TENANT_ID=$(az ad sp list --all --query "[?appDisplayName=='${SPN_APP_NAME}'].{t:appOwnerOrganizationId}" --output tsv)
+# use the one that works
 TENANT_ID=$(az ad sp list --show-mine --query "[?appDisplayName=='${SPN_APP_NAME}'].{t:appOwnerOrganizationId}" --output tsv)
 
 # /!\ In Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account"
 # /!\ The SPN Id is NOT the App Registration Object ID, but the Enterprise Registration Object ID"
-SPN_ID=$(az ad sp show --id $APP_ID --query id -o tsv)
+SPN_ID=$(az ad sp show --id $SPN_APP_ID --query id -o tsv)
+
+
+# Giving the GH Runner SP the 'Owner' role is not enough to run 'az ad sp list --filter'. You have the give it the 'Directory Readers' role
+# https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference  
+
+
+AAD_DIR_READERS="Directory Readers"
+az ad group create --display-name "$AAD_DIR_READERS" --mail-nickname aadreadersgroup --description "Directory Readers for Azure Spring Apps - Enetrprise SSO Config"
+aad_dir_readers_group_object_id=$(az ad group show -g "$AAD_DIR_READERS" --query id -o tsv)
+echo "aad_dir_readers_group_object_id" : $aad_dir_readers_group_object_id
+
+# The object ID of the User, or service principal.
+USR_ID=$(az account show --query user.name -o tsv)
+USR_SPN_ID=$(az ad user show --id ${USR_ID} --query id -o tsv)
+az ad group member add --member-id $USR_SPN_ID -g $aad_dir_readers_group_object_id
+az ad group member add --member-id $SPN_ID -g $aad_dir_readers_group_object_id
+
 
 # Directory Readers: 88d8e3e3-8f55-4a1e-953a-9b9898b8876b
-# az role assignment create --assignee $APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_APP} --role 88d8e3e3-8f55-4a1e-953a-9b9898b8876b 
+directoryReadersRoleTemplateId=88d8e3e3-8f55-4a1e-953a-9b9898b8876b
 
+#az role assignment create --assignee $SPN_APP_ID --scope /subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RG_APP} --role 88d8e3e3-8f55-4a1e-953a-9b9898b8876b 
+
+# https://learn.microsoft.com/en-us/graph/permissions-reference#directory-permissions
+# Directory.Read.All	Delegated	06da0dbc-49e2-44d2-8312-53f166ab848a
+# https://learn.microsoft.com/en-us/troubleshoot/azure/active-directory/verify-first-party-apps-sign-in#application-ids-of-commonly-used-microsoft-applications
+az ad app permission add --api 00000003-0000-0000-c000-000000000000  --api-permissions 06da0dbc-49e2-44d2-8312-53f166ab848a=Scope --id $SPN_APP_ID
+```
+
+```console
+Invoking `az ad app permission grant --id <GUID of you $SPN_APP_ID 42424242424242424242442> --api 00000003-0000-0000-c000-000000000000 --scope`
+```
+
+```sh
+az ad app permission grant --id ${SPN_APP_ID} --api 00000003-0000-0000-c000-000000000000 --scope --id ${SPN_APP_ID}
+az ad app permission admin-consent --id ${SPN_APP_ID}
+
+SPN_PWD=XXX424242xxx # set the Secret of you SPN
+
+# https://learn.microsoft.com/en-us/graph/auth-v2-service#token-request
+# https://github.com/microsoftgraph/microsoft-graph-docs/issues/20272
+access_token=$(curl -X POST -d \
+"client_id=${SPN_APP_ID}%2F\.default&client_secret=${SPN_PWD} \
+&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default&grant_type=client_credentials" \
+https://login.microsoftonline.com/{$TENANT_ID}/oauth2/v2.0/token \
+| jq -r .access_token) 
+
+set -euo pipefail
+#access_token=$(az account get-access-token --query accessToken -o tsv)
+
+# https://learn.microsoft.com/en-us/graph/use-the-api#version
+# https://developer.microsoft.com/en-us/graph/graph-explorer
+curl -X GET -H "Authorization: Bearer $access_token" -H "Accept:application/json" -H "Content-Type: application/json" \
+https://graph.microsoft.com/v1.0/EnvZzzz424242.onmicrosoft.com/directoryRoles
+
+
+az ad sp list --filter "displayName eq '$SPN_APP_NAME'" --query "[?appDisplayName=='$SPN_APP_NAME'].{id:appId}" -o tsv
 
 ```
 
@@ -72,50 +139,58 @@ SPN_ID=$(az ad sp show --id $APP_ID --query id -o tsv)
 SSO_APP_NAME="asa-sso-petclinic"
 
 # Use the following command to create an application registration with AAD
-az ad app create --display-name ${SSO_APP_NAME} > ad.json
+az ad app create --display-name ${SSO_APP_NAME} > aad_sso_app.json
 
 # Use the following command to retrieve the application ID and collect the client secret:
-SSO_APPLICATION_ID=$(cat ad.json | jq -r '.appId')
-az ad app credential reset --id ${SSO_APPLICATION_ID} --append > sso.json
+SSO_APPLICATION_ID=$(cat aad_sso_app.json | jq -r '.appId')
+az ad app credential reset --id ${SSO_APPLICATION_ID} --append > aad_sso_app_creds.json
 
 # Use the following command to assign a Service Principal to the application registration:
 az ad sp create --id ${SSO_APPLICATION_ID}
 
-# retrieve the application's Client ID. 
-SSO_APPLICATION_CLIENT_ID=$(cat sso.json | jq -r '.appId')
+# retrieve the application's Client ID.
+SSO_APPLICATION_CLIENT_ID=$(cat aad_sso_app_creds.json | jq -r '.appId')
 
 # retrieve the application's Client Secret. 
-SSO_APPLICATION_CLIENT_PWD=$(cat sso.json | jq -r '.password')
+SSO_APPLICATION_CLIENT_PWD=$(cat aad_sso_app_creds.json | jq -r '.password')
 
 # retrieve the Issuer URI
-TENANT_ID=$(cat sso.json | jq -r '.tenant')
+TENANT_ID=$(cat aad_sso_app_creds.json | jq -r '.tenant')
 SSO_APPLICATION_ISSUER_URI="https://login.microsoftonline.com/${TENANT_ID}/v2.0"
 echo $SSO_APPLICATION_ISSUER_URI
 
 # Retrieve the JWK URI from the output of the following command. The Identity Service application will use the public JSON Web Keys (JWK) to verify JSON Web Tokens (JWT) issued by Active Directory.
-TENANT_ID=$(cat sso.json | jq -r '.tenant')
-SSO_APPLICATION_ISSUER_URI="https://login.microsoftonline.com/${TENANT_ID}/discovery/v2.0/keys"
-echo $SSO_APPLICATION_ISSUER_URI
-
+SSO_APPLICATION_JWK_SET_URI="https://login.microsoftonline.com/${TENANT_ID}/discovery/v2.0/keys"
+echo $SSO_APPLICATION_JWK_SET_URI
 
 # https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise#create-and-configure-an-application-registration-with-azure-active-directory
-APPLICATION_ID=$(cat ad.json | jq -r '.appId')
+APPLICATION_ID=$(cat aad_sso_app.json | jq -r '.appId')
+echo "APPLICATION_ID=$APPLICATION_ID"
 
-GATEWAY_URL=$(az spring gateway show \
-    --resource-group <resource-group-name> \
-    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
+APPLICATION_ID=$(az ad sp list --filter "displayName eq '${SSO_APP_NAME}'" --query "[?appDisplayName=='${SSO_APP_NAME}'].{id:appId}" -o tsv)
+echo "APPLICATION_ID=$APPLICATION_ID"
 
-PORTAL_URL=$(az spring api-portal show \
-    --resource-group <resource-group-name> \
-    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
+#GATEWAY_URL=$(az spring gateway show \
+#    --resource-group <resource-group-name> \
+#    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
 
-az ad app update \
-    --id ${APPLICATION_ID} \
-    --web-redirect-uris "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
+#PORTAL_URL=$(az spring api-portal show \
+#    --resource-group <resource-group-name> \
+#    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
 
+#az ad app update \
+#    --id ${APPLICATION_ID} \
+#    --web-redirect-uris "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
 
 ```
+Add the App secrets  to your GH repo settings / Actions / secrets / Actions secrets / New Repository secrets / Add , ex: [https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/settings/secrets/actions](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/settings/secrets/actions):
 
+Secret Name	| Secret Value example
+-------------:|:-------:
+API_PORTAL_SSO_CLIENT_ID | PUT HERE THE VALUE OF $SSO_APPLICATION_ID 
+API_PORTAL_SSO_CLIENT_SECRET | SSO_APPLICATION_CLIENT_PWD
+SSO_APPLICATION_ISSUER_URI |  PUT HERE THE VALUE OF $SSO_APPLICATION_ISSUER_URI 
+SSO_APPLICATION_JWK_SET_URI |  |  PUT HERE THE VALUE OF $SSO_APPLICATION_JWK_SET_URI
 
 ## Standard Tier
 
