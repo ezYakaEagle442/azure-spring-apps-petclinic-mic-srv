@@ -692,7 +692,13 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
         uri: 'http://visits-service'
         order: 103
         ssoEnabled: apiPortalSsoEnabled
-
+        filters: [
+          'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+        ]
+        predicates: [
+          '/api/visit/**'
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds
+        ]  
       }
     ]
   }
@@ -701,7 +707,7 @@ output VisitsGatewayRouteConfigId string = VisitsGatewayRouteConfig.id
 output VisitsGatewayRouteConfigAppResourceId string = VisitsGatewayRouteConfig.properties.appResourceId
 output VisitsGatewayRouteConfigRoutes array = VisitsGatewayRouteConfig.properties.routes
 output VisitsGatewayRouteConfigIsSsoEnabled bool = VisitsGatewayRouteConfig.properties.routes[0].ssoEnabled
-output VisitsGatewayRouteConfigPredicates array = VisitsGatewayRouteConfig.properties.predicates
+output VisitsGatewayRouteConfigPredicates array = VisitsGatewayRouteConfig.properties.routes[0].predicates
 
 resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: 'customers-service-gateway-route-config'
@@ -709,13 +715,6 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
   properties: {
     appResourceId: customersserviceapp.id
     protocol: 'HTTP'
-    filters: [
-      'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
-      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
-    ]
-    predicates: [
-      '/api/customer/**'
-    ]
     routes: [
       {
         description: 'customers-service'
@@ -728,7 +727,7 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
           'RateLimit=2,5s' // limit all users to two requests every 5 seconds
         ]
         predicates: [
-          '/api/visit/**'
+          '/api/customer/**'
         ]
       }
     ]
