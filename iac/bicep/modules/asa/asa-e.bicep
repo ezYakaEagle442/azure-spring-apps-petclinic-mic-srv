@@ -655,13 +655,6 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
   properties: {
     appResourceId: vetsserviceapp.id
     protocol: 'HTTP'
-    filters: [
-      'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
-    ]
-    predicates: [
-      '/api/vet/**'
-      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
-    ]
     routes: [
       {
         title: 'vets-service'
@@ -669,6 +662,13 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
         uri: 'http://vets-service'
         order: 102
         ssoEnabled: apiPortalSsoEnabled
+        filters: [
+          'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+        ]
+        predicates: [
+          '/api/vet/**'
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds
+        ]        
       }
     ]
   }
@@ -677,7 +677,7 @@ output VetsGatewayRouteConfigId string = VetsGatewayRouteConfig.id
 output VetsGatewayRouteConfigAppResourceId string = VetsGatewayRouteConfig.properties.appResourceId
 output VetsGatewayRouteConfigRoutes array = VetsGatewayRouteConfig.properties.routes
 output VetsGatewayRouteConfigIsSsoEnabled bool = VetsGatewayRouteConfig.properties.routes[0].ssoEnabled
-output VetsGatewayRouteConfigPredicates array = VetsGatewayRouteConfig.properties.predicates
+output VetsGatewayRouteConfigPredicates array = VetsGatewayRouteConfig.properties.routes[0].predicates
 
 resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: 'visits-service-gateway-route-config'
@@ -685,13 +685,6 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
   properties: {
     appResourceId: visitsservicerapp.id
     protocol: 'HTTP'
-    filters: [
-      'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
-      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
-    ]
-    predicates: [
-      '/api/visit/**'
-    ]
     routes: [
       {
         title: 'visits-service' 
@@ -699,6 +692,7 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
         uri: 'http://visits-service'
         order: 103
         ssoEnabled: apiPortalSsoEnabled
+
       }
     ]
   }
@@ -729,7 +723,13 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
         uri: 'http://customers-service'
         order: 101
         ssoEnabled: apiPortalSsoEnabled
-
+        filters: [
+          'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds
+        ]
+        predicates: [
+          '/api/visit/**'
+        ]
       }
     ]
   }
@@ -738,7 +738,7 @@ output CustomersGatewayRouteConfigId string = CustomersGatewayRouteConfig.id
 output CustomersGatewayRouteConfigAppResourceId string = CustomersGatewayRouteConfig.properties.appResourceId
 output CustomersGatewayRouteConfigRoutes array = CustomersGatewayRouteConfig.properties.routes
 output CustomersGatewayRouteConfigIsSsoEnabled bool = CustomersGatewayRouteConfig.properties.routes[0].ssoEnabled
-output CustomersGatewayRouteConfigPredicates array = CustomersGatewayRouteConfig.properties.predicates
+output CustomersGatewayRouteConfigPredicates array = CustomersGatewayRouteConfig.properties.routes[0].predicates
 
 
 // https://github.com/Azure/azure-rest-api-specs/issues/18286
@@ -746,6 +746,7 @@ output CustomersGatewayRouteConfigPredicates array = CustomersGatewayRouteConfig
 resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-12-01' existing = if (azureSpringAppsTier=='Enterprise') {
   //scope: resourceGroup('my RG')
   name: '${azureSpringAppsInstanceName}/${buildServiceName}' 
+  // parent: azureSpringApps
 }
 
 // /!\ should add ' existing' = if (azureSpringAppsTier=='Enterprise') {
