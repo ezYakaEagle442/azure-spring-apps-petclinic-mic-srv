@@ -15,11 +15,6 @@ env:
   ASA_TIER: Enterprise
 
   SSO_APP_NAME: asa-sso-petclinic
-  SSO_APPLICATION_ID: ${{ secrets.SSO_APPLICATION_ID }}
-
-  API_PORTAL_SSO_CLIENT_ID: ${{ secrets.API_PORTAL_SSO_CLIENT_ID }}
-  API_PORTAL_SSO_CLIENT_SECRET: ${{ secrets.API_PORTAL_SSO_CLIENT_SECRET }}
-  SSO_APPLICATION_ISSUER_URI: ${{ secrets.SSO_APPLICATION_ISSUER_URI }}
   API_PORTAL_SSO_ENABLED: false
 
   MYSQL_SERVER_NAME: petcliasa
@@ -53,6 +48,10 @@ env:
   SPRING_CLOUD_AZURE_TENANT_ID: ${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }}
   
   VM_ADMIN_PASSWORD: ${{ secrets.VM_ADMIN_PASSWORD }}
+
+  API_PORTAL_SSO_CLIENT_ID: ${{ secrets.API_PORTAL_SSO_CLIENT_ID }}
+  API_PORTAL_SSO_CLIENT_SECRET: ${{ secrets.API_PORTAL_SSO_CLIENT_SECRET }}
+  SSO_APPLICATION_ISSUER_URI: ${{ secrets.SSO_APPLICATION_ISSUER_URI }}
 
   # https://learn.microsoft.com/en-us/azure/key-vault/secrets/secrets-best-practices#secrets-rotation
   # Because secrets are sensitive to leakage or exposure, it's important to rotate them often, at least every 60 days. 
@@ -148,6 +147,18 @@ jobs:
             echo "https://${PORTAL_URL}/oauth2-redirect.html"
             echo "https://${PORTAL_URL}/login/oauth2/code/sso"
 
+            az deployment group create --name asa-petclinic-apps -f iac/bicep/modules/asa/asa-e-api-portal-gateway.bicep -g ${{ env.RG_APP }} \
+              -p appName=${{ env.APP_NAME }} \
+              -p azureSpringAppsSkuName=${{ env.ASA_SKU }} \
+              -p azureSpringAppsTier=${{ env.ASA_TIER }} \
+              -p location=${{ env.LOCATION }} \
+              -p apiPortalSsoClientId=${{ env.API_PORTAL_SSO_CLIENT_ID }} \
+              -p apiPortalSsoClientSecret=${{ env.API_PORTAL_SSO_CLIENT_SECRET }} \
+              -p apiPortalSsoIssuerUri=${{ env.SSO_APPLICATION_ISSUER_URI }} \
+              -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }}
+
+              echo "SSO configured on API Portal + Gateway"
+
             # Get the APPLICATION_ID
             # Giving the GH Runner SP the 'Owner' role is not enough to run 'az ad sp list --filter'. You have the give it the 'Directory Readers' role
             # https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference  
@@ -169,20 +180,16 @@ jobs:
             echo "Check https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference"
 
             # https://github.com/MicrosoftDocs/azure-docs/issues/102889
-            echo "az ad app update --id ${{ env.SSO_APPLICATION_ID }} "
+            echo "az ad app update --id ${{ env.API_PORTAL_SSO_CLIENT_ID }} "
             echo "--web-redirect-uris \"https://${GATEWAY_URL}/login/oauth2/code/sso\" \"https://${PORTAL_URL}/oauth2-redirect.html\" \"https://${PORTAL_URL}/login/oauth2/code/sso\" "
-          
-            az deployment group create --name asa-petclinic-apps -f iac/bicep/modules/asa/asa-e-api-portal-gateway.bicep -g ${{ env.RG_APP }} \
-              -p appName=${{ env.APP_NAME }} \
-              -p azureSpringAppsSkuName=${{ env.ASA_SKU }} \
-              -p azureSpringAppsTier=${{ env.ASA_TIER }} \
-              -p location=${{ env.LOCATION }} \
-              -p apiPortalSsoClientId=${{ env.API_PORTAL_SSO_CLIENT_ID }} \
-              -p apiPortalSsoClientSecret=${{ env.API_PORTAL_SSO_CLIENT_SECRET }} \
-              -p apiPortalSsoIssuerUri=${{ env.SSO_APPLICATION_ISSUER_URI }} \
-              -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }}
 
-              echo "SSO configured on API Portal + Gateway"
+            echo "About to Update App ${{ env.SSO_APP_NAME }} ..."
+            # https://github.com/MicrosoftDocs/azure-docs/issues/102889
+            az ad app update \
+              --id ${{ env.API_PORTAL_SSO_CLIENT_ID }} \
+              --web-redirect-uris "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
+          
+          echo "App updated"
 
       shell: bash
 
