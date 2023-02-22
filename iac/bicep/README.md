@@ -170,6 +170,15 @@ echo "APPLICATION_ID=$APPLICATION_ID"
 APPLICATION_ID=$(az ad sp list --filter "displayName eq '${SSO_APP_NAME}'" --query "[?appDisplayName=='${SSO_APP_NAME}'].{id:appId}" -o tsv)
 echo "APPLICATION_ID=$APPLICATION_ID"
 
+# add the GitHub Runner App as one Owner of the AAD SSO app 
+az ad app owner list --id ${APPLICATION_ID} -o table
+
+az ad app show --id $SPN_APP_ID 
+az ad app owner add --id ${APPLICATION_ID} --owner-object-id $SPN_ID
+
+az ad app owner list --id ${APPLICATION_ID} -o table
+
+
 #GATEWAY_URL=$(az spring gateway show \
 #    --resource-group <resource-group-name> \
 #    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
