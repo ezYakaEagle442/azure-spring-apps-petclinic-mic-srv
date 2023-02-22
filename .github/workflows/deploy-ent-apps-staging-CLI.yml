@@ -41,9 +41,10 @@ env:
   PRJ_PREFIX: asa-spring-petclinic
 
   # ==== Identities ====:
-  CUSTOMERS_SVC_APP_ID_NAME: id-asa-petclinic-customers-service-dev-westeurope-101 # customize this
-  VETS_SVC_APP_ID_NAME: id-asa-petclinic-vets-service-dev-westeurope-101 # customize this
-  VISITS_SVC_APP_ID_NAME: id-asa-petclinic-visits-service-dev-westeurope-101 # customize this
+
+  CUSTOMERS_SVC_APP_ID_NAME: id-asa-petcliasa-petclinic-customers-service-dev-westeurope-101 # customize this, MUST BE: 'id-asa-${appName}-petclinic-customers-service-dev-${location}-101'
+  VETS_SVC_APP_ID_NAME: id-asa-petcliasa-petclinic-vets-service-dev-westeurope-101 # customize this, MUST BE: 'id-asa-${appName}-petclinic-vets-service-dev-${location}-101'
+  VISITS_SVC_APP_ID_NAME: id-asa-petcliasa-petclinic-visits-service-dev-westeurope-101 # customize this, MUST BE: 'id-asa-${appName}-petclinic-visits-service-dev-${location}-101'
 
   # ==== Azure Spring Apps / Apps Deployment params ====:
 
