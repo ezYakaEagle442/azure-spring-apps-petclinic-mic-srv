@@ -153,7 +153,7 @@ jobs:
             echo "gatewayUrl=" $gatewayUrl
             echo "gatewayApiserverUrl=" $gatewayApiserverUrl
 
-            az deployment group create --name /asa-e-api-portal-gateway -f iac/bicep/modules/asa/asa-e-api-portal-gateway.bicep -g ${{ env.RG_APP }} \
+            az deployment group create --name asa-e-api-portal-gateway -f iac/bicep/modules/asa/asa-e-api-portal-gateway.bicep -g ${{ env.RG_APP }} \
               -p appName=${{ env.APP_NAME }} \
               -p azureSpringAppsSkuName=${{ env.ASA_SKU }} \
               -p azureSpringAppsTier=${{ env.ASA_TIER }} \
