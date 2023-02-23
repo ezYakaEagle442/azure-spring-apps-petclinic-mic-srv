@@ -793,7 +793,7 @@ resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-12-01
 }
 
 // https://github.com/Azure/Azure-Spring-Apps/issues/28
-// 
+/* 
 resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: buildName
   parent: buildService
@@ -809,6 +809,7 @@ resource build 'Microsoft.AppPlatform/Spring/buildServices/builds@2022-12-01' = 
     azureSpringApps
   ]
 }
+*/
 
 /*
 resource buildResult 'Microsoft.AppPlatform/Spring/buildServices/builds/results@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
