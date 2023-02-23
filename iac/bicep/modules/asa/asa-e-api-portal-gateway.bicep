@@ -65,6 +65,9 @@ param apiPortalSsoEnabled bool = false
 ])
 param gatewayName string = 'default'
 
+@description('The Spring Cloud Gateway server URL which is unknow the first time you run Bicep')
+param gatewayServerUrl string = 'asae-XXXX-gateway-424242.svc.azuremicroservices.io/'
+
 // pre-req: https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-azure-cli#prerequisites
 resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-12-01' existing = {
@@ -150,7 +153,7 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureS
       title: 'Spring Cloud Gateway for Petclinic' // Title describing the context of the APIs available on the Gateway instance (default: Spring Cloud Gateway for K8S)
       description: '' // description of the APIs available on the Gateway instance (default: Generated OpenAPI 3 document that describes the API routes configured for '[Gateway instance name]' Spring Cloud Gateway instance deployed under '[namespace]' namespace.)
       version: '1.0.0' // Version of APIs available on this Gateway instance (default: unspecified)
-      serverUrl: '/api' // Base URL that API consumers will use to access APIs on the Gateway instance.
+      serverUrl: gatewayServerUrl // ex: https://asae-petcliasa-gateway-424242.svc.azuremicroservices.io/ ==> Base URL that API consumers will use to access APIs on the Gateway instance.
       documentation: '' // Location of additional documentation for the APIs available on the Gateway instance
     }
     /* Spring Cloud Gateway APM feature is not enabled
@@ -174,118 +177,3 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureS
 }
 output gatewayId string = gateway.id
 output gatewayUrl string = gateway.properties.url
-
-/*
-// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways/routeconfigs?pivots=deployment-language-bicep
-resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: 'vets-service-gateway-route-config'
-  parent: gateway
-  properties: {
-    appResourceId: vetsserviceapp.id
-    protocol: 'HTTP'
-    filters: [
-      'StripPrefix=0'
-      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
-    ]
-    predicates: [
-      '/api/vet/**'
-    ]
-    routes: [
-      {
-        title: 'vets-service'
-        description: 'vets-service'
-        uri: 'http://vets-service'
-        order: 2
-        ssoEnabled: apiPortalSsoEnabled
-      }
-    ]
-  }
-}
-output VetsGatewayRouteConfigId string = VetsGatewayRouteConfig.id
-output VetsGatewayRouteConfigAppResourceId string = VetsGatewayRouteConfig.properties.appResourceId
-output VetsGatewayRouteConfigRoutes array = VetsGatewayRouteConfig.properties.routes
-output VetsGatewayRouteConfigIsSsoEnabled bool = VetsGatewayRouteConfig.properties.ssoEnabled
-output VetsGatewayRouteConfigPredicates array = VetsGatewayRouteConfig.properties.predicates
-
-resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: 'visits-service-gateway-route-config'
-  parent: gateway
-  properties: {
-    appResourceId: visitsservicerapp.id
-    protocol: 'HTTP'
-    filters: [
-      'StripPrefix=0'
-      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
-    ]
-    predicates: [
-      '/api/visit/**'
-    ]
-    routes: [
-      {
-        title: 'visits-service' 
-        description: 'visits-service'
-        uri: 'http://visits-service'
-        order: 3
-        ssoEnabled: apiPortalSsoEnabled
-      }
-    ]
-  }
-}
-output VisitsGatewayRouteConfigId string = VisitsGatewayRouteConfig.id
-output VisitsGatewayRouteConfigAppResourceId string = VisitsGatewayRouteConfig.properties.appResourceId
-output VisitsGatewayRouteConfigRoutes array = VisitsGatewayRouteConfig.properties.routes
-output VisitsGatewayRouteConfigIsSsoEnabled bool = VisitsGatewayRouteConfig.properties.ssoEnabled
-output VisitsGatewayRouteConfigPredicates array = VisitsGatewayRouteConfig.properties.predicates
-
-resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
-  name: 'customers-service-gateway-route-config'
-  parent: gateway
-  properties: {
-    appResourceId: customersserviceapp.id
-    protocol: 'HTTP'
-    filters: [
-      'StripPrefix=0'
-      'RateLimit=2,5s' // limit all users to two requests every 5 seconds
-    ]
-    predicates: [
-      '/api/customer/**'
-    ]
-    routes: [
-      {
-        description: 'customers-service'
-        title: 'customers-service'
-        uri: 'http://customers-service'
-        order: 1
-        ssoEnabled: apiPortalSsoEnabled
-
-      }
-    ]
-  }
-}
-output CustomersGatewayRouteConfigId string = CustomersGatewayRouteConfig.id
-output CustomersGatewayRouteConfigAppResourceId string = CustomersGatewayRouteConfig.properties.appResourceId
-output CustomersGatewayRouteConfigRoutes array = CustomersGatewayRouteConfig.properties.routes
-output CustomersGatewayRouteConfigIsSsoEnabled bool = CustomersGatewayRouteConfig.properties.ssoEnabled
-output CustomersGatewayRouteConfigPredicates array = CustomersGatewayRouteConfig.properties.predicates
-
-resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
-  name: 'customers-service'
-  parent: azureSpringApps
-}
-
-resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
-  name: 'vets-service'
-  parent: azureSpringApps 
-}
-
-resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
-  name: 'visits-service'
-  parent: azureSpringApps
-}
-
-// https://github.com/MicrosoftDocs/azure-docs/issues/102825
-resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
-  name: 'api-gateway'
-  parent: azureSpringApps  
-}
-*/

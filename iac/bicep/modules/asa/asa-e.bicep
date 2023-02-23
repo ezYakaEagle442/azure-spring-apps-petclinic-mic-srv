@@ -101,6 +101,9 @@ param apiPortalSsoEnabled bool = false
 ])
 param gatewayName string = 'default'
 
+@description('The Spring Cloud Gateway server URL which is unknow the first time you run Bicep')
+param gatewayServerUrl string = 'asae-XXXX-gateway-424242.svc.azuremicroservices.io/'
+
 @description('The Azure Spring Apps Application Configuration Service Git URI (The repo must be public).')
 param gitConfigURI string
 
@@ -623,7 +626,7 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureS
       title: 'Spring Cloud Gateway for Petclinic' // Title describing the context of the APIs available on the Gateway instance (default: Spring Cloud Gateway for K8S)
       description: '' // description of the APIs available on the Gateway instance (default: Generated OpenAPI 3 document that describes the API routes configured for '[Gateway instance name]' Spring Cloud Gateway instance deployed under '[namespace]' namespace.)
       version: '1.0.0' // Version of APIs available on this Gateway instance (default: unspecified)
-      serverUrl: '/api' // Base URL that API consumers will use to access APIs on the Gateway instance.
+      serverUrl: gatewayServerUrl // Base URL that API consumers will use to access APIs on the Gateway instance.
       documentation: '' // Location of additional documentation for the APIs available on the Gateway instance
     }
     /* Spring Cloud Gateway APM feature is not enabled
@@ -647,6 +650,7 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureS
 }
 output gatewayId string = gateway.id
 output gatewayUrl string = gateway.properties.url
+output gatewayApiserverUrl string = gateway.properties.apiMetadataProperties.serverUrl
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways/routeconfigs?pivots=deployment-language-bicep
 resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
@@ -666,7 +670,7 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
           'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
         ]
         predicates: [
-          '/api/vet/**'
+          'Path=/api/vet/**'
           'RateLimit=2,5s' // limit all users to two requests every 5 seconds
         ]        
       }
@@ -696,7 +700,7 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
           'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
         ]
         predicates: [
-          '/api/visit/**'
+          'Path=/api/visit/**'
           'RateLimit=2,5s' // limit all users to two requests every 5 seconds
         ]  
       }
@@ -727,7 +731,7 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
           'RateLimit=2,5s' // limit all users to two requests every 5 seconds
         ]
         predicates: [
-          '/api/customer/**'
+          'Path=/api/customer/**'
         ]
       }
     ]
