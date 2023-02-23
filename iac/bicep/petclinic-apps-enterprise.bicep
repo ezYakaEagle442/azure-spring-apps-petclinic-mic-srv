@@ -151,7 +151,7 @@ module rg 'rg.bicep' = {
 
 
 module azurespringapps './modules/asa/asa-e.bicep' = if (azureSpringAppsTier=='Enterprise') {
-  name: 'asa-pub'
+  name: 'asa-e-pub'
   // scope: resourceGroup(rg.name)
   params: {
     appName: appName
@@ -177,6 +177,9 @@ module azurespringapps './modules/asa/asa-e.bicep' = if (azureSpringAppsTier=='E
     apiPortalSsoEnabled: apiPortalSsoEnabled
   }
 }
+
+output gatewayUrl string = azurespringapps.outputs.gatewayUrl
+output gatewayApiserverUrl string = azurespringapps.outputs.gatewayApiserverUrl
 
 resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: kvRGName
