@@ -147,6 +147,12 @@ jobs:
             echo "https://${PORTAL_URL}/oauth2-redirect.html"
             echo "https://${PORTAL_URL}/login/oauth2/code/sso"
 
+            gatewayUrl=$(az deployment group show --name asa-petclinic-apps -g ${{ env.RG_APP }} --query properties.outputs.gatewayUrl.value -o tsv)
+            gatewayApiserverUrl=$(az deployment group show --name asa-petclinic-apps -g ${{ env.RG_APP }} --query properties.outputs.gatewayApiserverUrl.value -o tsv)
+
+            echo "gatewayUrl=" $gatewayUrl
+            echo "gatewayApiserverUrl=" $gatewayApiserverUrl
+
             az deployment group create --name asa-petclinic-apps -f iac/bicep/modules/asa/asa-e-api-portal-gateway.bicep -g ${{ env.RG_APP }} \
               -p appName=${{ env.APP_NAME }} \
               -p azureSpringAppsSkuName=${{ env.ASA_SKU }} \
@@ -155,7 +161,8 @@ jobs:
               -p apiPortalSsoClientId=${{ env.API_PORTAL_SSO_CLIENT_ID }} \
               -p apiPortalSsoClientSecret=${{ env.API_PORTAL_SSO_CLIENT_SECRET }} \
               -p apiPortalSsoIssuerUri=${{ env.SSO_APPLICATION_ISSUER_URI }} \
-              -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }}
+              -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }} \
+              -p gatewayServerUrl=$gatewayApiserverUrl
 
               echo "SSO configured on API Portal + Gateway"
 
@@ -183,13 +190,12 @@ jobs:
             echo "az ad app update --id ${{ env.API_PORTAL_SSO_CLIENT_ID }} "
             echo "--web-redirect-uris \"https://${GATEWAY_URL}/login/oauth2/code/sso\" \"https://${PORTAL_URL}/oauth2-redirect.html\" \"https://${PORTAL_URL}/login/oauth2/code/sso\" "
 
-            echo "About to Update App ${{ env.SSO_APP_NAME }} ..."
+            #echo "About to Update App ${{ env.SSO_APP_NAME }} ..."
             # https://github.com/MicrosoftDocs/azure-docs/issues/102889
-            az ad app update \
-              --id ${{ env.API_PORTAL_SSO_CLIENT_ID }} \
-              --web-redirect-uris "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
-          
-          echo "App updated"
+            #az ad app update \
+            #  --id ${{ env.API_PORTAL_SSO_CLIENT_ID }} \
+            #  --web-redirect-uris "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
+            #echo "App updated"
 
       shell: bash
 
