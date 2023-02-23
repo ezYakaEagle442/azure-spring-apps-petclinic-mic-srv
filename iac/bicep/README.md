@@ -194,18 +194,17 @@ Invoking `az ad app permission grant --id <GUID of you $SPN_APP_ID 4242424242424
 az ad app permission grant --id ${SPN_APP_ID} --api 00000003-0000-0000-c000-000000000000 --scope --id ${SSO_APPLICATION_CLIENT_ID}
 az ad app permission admin-consent --id ${SPN_APP_ID}
 
+GATEWAY_URL=$(az spring gateway show \
+    --resource-group <resource-group-name> \
+    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
 
-#GATEWAY_URL=$(az spring gateway show \
-#    --resource-group <resource-group-name> \
-#    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
+PORTAL_URL=$(az spring api-portal show \
+    --resource-group <resource-group-name> \
+    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
 
-#PORTAL_URL=$(az spring api-portal show \
-#    --resource-group <resource-group-name> \
-#    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
-
-#az ad app update \
-#    --id ${APPLICATION_ID} \
-#    --web-redirect-uris "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
+az ad app update \
+    --id ${APPLICATION_ID} \
+    --web-redirect-uris "https://${GATEWAY_URL}/login/oauth2/code/sso" "https://${PORTAL_URL}/oauth2-redirect.html" "https://${PORTAL_URL}/login/oauth2/code/sso"
 
 ```
 Add the App secrets  to your GH repo settings / Actions / secrets / Actions secrets / New Repository secrets / Add , ex: [https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/settings/secrets/actions](https://github.com/ezYakaEagle442/azure-spring-apps-petclinic-mic-srv/settings/secrets/actions):
