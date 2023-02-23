@@ -648,6 +648,7 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureS
     }
   }
 }
+
 output gatewayId string = gateway.id
 output gatewayUrl string = gateway.properties.url
 output gatewayApiserverUrl string = gateway.properties.apiMetadataProperties.serverUrl
