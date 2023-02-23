@@ -179,6 +179,22 @@ az ad app owner add --id ${APPLICATION_ID} --owner-object-id $SPN_ID
 az ad app owner list --id ${APPLICATION_ID} -o table
 
 
+# https://learn.microsoft.com/en-us/graph/permissions-reference#directory-permissions
+# Application.ReadWrite.All	Delegated	bdfbf15f-ee85-4955-8675-146e8e5296b5
+#                           Application 1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9	
+# https://learn.microsoft.com/en-us/troubleshoot/azure/active-directory/verify-first-party-apps-sign-in#application-ids-of-commonly-used-microsoft-applications
+az ad app permission add --api 00000003-0000-0000-c000-000000000000  --api-permissions bdfbf15f-ee85-4955-8675-146e8e5296b5=Scope --id $SPN_APP_ID
+```
+
+```console
+Invoking `az ad app permission grant --id <GUID of you $SPN_APP_ID 42424242424242424242442> --api 00000003-0000-0000-c000-000000000000 --scope`
+```
+
+```sh
+az ad app permission grant --id ${SPN_APP_ID} --api 00000003-0000-0000-c000-000000000000 --scope --id ${SSO_APPLICATION_CLIENT_ID}
+az ad app permission admin-consent --id ${SPN_APP_ID}
+
+
 #GATEWAY_URL=$(az spring gateway show \
 #    --resource-group <resource-group-name> \
 #    --service <Azure-Spring-Apps-service-instance-name> | jq -r '.properties.url')
