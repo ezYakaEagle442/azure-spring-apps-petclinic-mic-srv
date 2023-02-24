@@ -310,7 +310,6 @@ resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities
   name: visitsServiceAppIdentityName
 }
 
-
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/configurationservices?pivots=deployment-language-bicep
 resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: applicationConfigurationServiceName
@@ -626,7 +625,7 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureS
       title: 'Spring Cloud Gateway for Petclinic' // Title describing the context of the APIs available on the Gateway instance (default: Spring Cloud Gateway for K8S)
       description: '' // description of the APIs available on the Gateway instance (default: Generated OpenAPI 3 document that describes the API routes configured for '[Gateway instance name]' Spring Cloud Gateway instance deployed under '[namespace]' namespace.)
       version: '1.0.0' // Version of APIs available on this Gateway instance (default: unspecified)
-      serverUrl: gatewayServerUrl // Base URL that API consumers will use to access APIs on the Gateway instance.
+      // serverUrl: gatewayServerUrl // Base URL that API consumers will use to access APIs on the Gateway instance.
       documentation: '' // Location of additional documentation for the APIs available on the Gateway instance
     }
     /* Spring Cloud Gateway APM feature is not enabled
@@ -833,6 +832,34 @@ resource buildResult 'Microsoft.AppPlatform/Spring/buildServices/builds/results@
 }
 */
 
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring/devtoolportals?pivots=deployment-language-bicep
+resource devToolPortals 'Microsoft.AppPlatform/Spring/DevToolPortals@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'default'
+  parent: azureSpringApps
+  properties: {
+    public: true
+    features: {
+      applicationAccelerator: {
+        state: 'Enabled'
+      }
+      applicationLiveView: {
+        state: 'Enabled'
+      }
+    }
+    /*
+    ssoProperties: {
+      clientId: apiPortalSsoClientId
+      clientSecret: apiPortalSsoClientSecret
+      metadataUrl: 'string'
+      scopes: [
+        'string'
+      ]
+    }
+    */
+  }
+}
+
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring/applicationaccelerators?pivots=deployment-language-bicep
 resource appAccelerators 'Microsoft.AppPlatform/Spring/applicationAccelerators@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
  name: 'default'
  parent: azureSpringApps
@@ -849,14 +876,18 @@ output appAcceleratorsComponents array = appAccelerators.properties.components
 // Node Express ? or asa-node-express ?
 // Spring Cloud Serverless ? or asa-spring-cloud-serverless ? 
 // C# Weather Forecast ? or asa-weatherforecast-csharp ?
-resource predefinedAccelerators 'Microsoft.AppPlatform/Spring/applicationAccelerators/predefinedAccelerators@2022-11-01-preview' existing  = if (azureSpringAppsTier=='Enterprise') {
+
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring/applicationaccelerators/predefinedaccelerators?pivots=deployment-language-bicep
+resource predefinedAcceleratorACME 'Microsoft.AppPlatform/Spring/applicationAccelerators/predefinedAccelerators@2022-11-01-preview' existing  = if (azureSpringAppsTier=='Enterprise') {
   name: 'asa-acme-fitness-store'
   parent: appAccelerators
 }
-output predefinedAcceleratorsId string = predefinedAccelerators.id
-output predefinedAcceleratorsName string = predefinedAccelerators.name
-output predefinedAcceleratorsDisplayName string = predefinedAccelerators.properties.displayName
+output predefinedAcceleratorsId string = predefinedAcceleratorACME.id
+output predefinedAcceleratorsName string = predefinedAcceleratorACME.name
+output predefinedAcceleratorsDisplayName string = predefinedAcceleratorACME.properties.displayName
 
+
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring/applicationliveviews?pivots=deployment-language-bicep
 resource appLiveViews 'Microsoft.AppPlatform/Spring/applicationLiveViews@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'default'
   parent: azureSpringApps
