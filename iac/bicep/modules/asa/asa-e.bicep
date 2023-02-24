@@ -669,10 +669,11 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
         ssoEnabled: apiPortalSsoEnabled
         filters: [
           'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-set-request-rate-limits-enterprise
         ]
         predicates: [
           'Path=/api/vet/**'
-          'RateLimit=2,5s' // limit all users to two requests every 5 seconds
+          'Path=/api/vet/vets'
         ]        
       }
     ]
@@ -699,10 +700,11 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
         ssoEnabled: apiPortalSsoEnabled
         filters: [
           'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://docs.vmware.com/en/VMware-Spring-Cloud-Gateway-for-Kubernetes/1.2/scg-k8s/GUID-route-filters.html#ratelimit-limiting-user-requests-filter
         ]
         predicates: [
           'Path=/api/visit/**'
-          'RateLimit=2,5s' // limit all users to two requests every 5 seconds
+          'Path=/api/visit/owners/{ownerId}/pets/{petId}/visits'
         ]  
       }
     ]
@@ -729,10 +731,15 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
         ssoEnabled: apiPortalSsoEnabled
         filters: [
           'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
-          'RateLimit=2,5s' // limit all users to two requests every 5 seconds
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://docs.vmware.com/en/VMware-Spring-Cloud-Gateway-for-Kubernetes/1.2/scg-k8s/GUID-route-filters.html#ratelimit-limiting-user-requests-filter
         ]
         predicates: [
           'Path=/api/customer/**'
+          'Path=/api/customer/petTypes'
+          'Path=/api/customer/owners'
+          'Path=/api/customer/owners/{ownerId}'
+          'Path=/api/customer/owners/{ownerId}/pets'
+          'Path=/api/customer/owners/{ownerId}/pets/{petId}'
         ]
       }
     ]
