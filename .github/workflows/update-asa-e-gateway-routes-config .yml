@@ -1,0 +1,164 @@
+name: Update Gateway & Routes Config for ASA Enterprise Tier
+
+env:
+  APP_NAME: petcliasa
+  ASA_INSTANCE_NAME: asae-petcliasa
+
+  LOCATION: westeurope
+  RG_KV: rg-iac-kv21 # RG where to deploy KV
+  RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
+  
+  ASA_SKU: E0
+  ASA_TIER: Enterprise
+
+  SSO_APP_NAME: asa-sso-petclinic
+  API_PORTAL_SSO_ENABLED: false
+
+  MYSQL_SERVER_NAME: petcliasa
+  MYSQL_ADM_USR: mys_adm
+  MYSQL_TIME_ZONE: Europe/Paris
+  MYSQL_CHARACTER_SET: utf8
+  MYSQL_PORT: 3306
+
+  DEPLOY_TO_VNET: false
+
+  KV_NAME: kv-petcliasa21 # The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters
+  SET_KV_ACCESS_POLICIES: false # let it to false
+
+  GIT_CFG_URI: https://github.com/ezYakaEagle442/spring-petclinic-microservices-config
+  GIT_CFG_LABEL: main
+
+  # https://github.com/Azure/actions-workflow-samples/blob/master/assets/create-secrets-for-GitHub-workflows.md#consume-secrets-in-your-workflow
+  # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-secrets
+
+  # ==== Secrets ====
+
+  # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+  # Never use structured data as a secret
+  # Structured data can cause secret redaction within logs to fail, because redaction largely relies on finding an exact match for 
+  # the specific secret value. For example, do not use a blob of JSON, XML, or YAML (or similar) to encapsulate a secret value, 
+  # as this significantly reduces the probability the secrets will be properly redacted. Instead, create individual secrets for each sensitive value.
+
+  MYSQL_ADM_PWD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+
+  SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT: ${{ secrets.SPRING_CLOUD_AZURE_KEY_VAULT_ENDPOINT }}
+  SPRING_CLOUD_AZURE_TENANT_ID: ${{ secrets.SPRING_CLOUD_AZURE_TENANT_ID }}
+  
+  VM_ADMIN_PASSWORD: ${{ secrets.VM_ADMIN_PASSWORD }}
+
+  API_PORTAL_SSO_CLIENT_ID: ${{ secrets.API_PORTAL_SSO_CLIENT_ID }}
+  API_PORTAL_SSO_CLIENT_SECRET: ${{ secrets.API_PORTAL_SSO_CLIENT_SECRET }}
+  SSO_APPLICATION_ISSUER_URI: ${{ secrets.SSO_APPLICATION_ISSUER_URI }}
+
+  # https://learn.microsoft.com/en-us/azure/key-vault/secrets/secrets-best-practices#secrets-rotation
+  # Because secrets are sensitive to leakage or exposure, it's important to rotate them often, at least every 60 days. 
+  # Expiry date in seconds since 1970-01-01T00:00:00Z. Ex: 1672444800 ==> 31/12/2022'
+  SECRET_EXPIRY_DATE: 1703980800 # ==> 31/12/2023
+
+  credentials: ${{ secrets.AZURE_CREDENTIALS }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  # ==== Versions ====
+  DEPLOYMENT_VERSION: 2.6.13
+  AZ_CLI_VERSION: 2.45.0
+  JAVA_VERSION: 11
+
+on:
+  workflow_dispatch:
+
+jobs:
+ 
+  update-api-route-config:
+    runs-on: ubuntu-latest
+            
+    steps:
+    - name: Login with GHA Runner SP
+      uses: azure/login@v1 # fails https://github.com/marketplace/actions/azure-login
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }} # ${{ env.credentials }}
+
+    - name: Checkout
+      uses: actions/checkout@v3 # https://github.com/actions/checkout
+
+    - name: Create Azure Spring Apps
+      run: |
+
+          az deployment group create --name asa-e-update -f iac/bicep/modules/asa/asa-e.bicep -g ${{ env.RG_APP }} \
+            -p appName=${{ env.APP_NAME }} \
+            -p azureSpringAppsSkuName=${{ env.ASA_SKU }} \
+            -p azureSpringAppsTier=${{ env.ASA_TIER }} \
+            -p location=${{ env.LOCATION }} \
+            -p kvName=${{ env.KV_NAME }} \
+            -p kvRGName=${{ env.RG_KV }} \
+            -p deployToVNet=${{ env.DEPLOY_TO_VNET }} \
+            -p gitConfigURI=${{ env.GIT_CFG_URI }} \
+            -p configServerLabel=${{ env.GIT_CFG_LABEL }} \
+            -p apiPortalSsoClientId=${{ env.API_PORTAL_SSO_CLIENT_ID }} \
+            -p apiPortalSsoClientSecret=${{ env.API_PORTAL_SSO_CLIENT_SECRET }} \
+            -p apiPortalSsoIssuerUri=${{ env.SSO_APPLICATION_ISSUER_URI }} \
+            -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }}
+
+            az config set extension.use_dynamic_install=yes_without_prompt
+
+            # https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise
+            GATEWAY_URL=$(az spring gateway show \
+                --resource-group ${{ env.RG_APP }} \
+                --service ${{ env.ASA_INSTANCE_NAME }} | jq -r '.properties.url')
+
+            PORTAL_URL=$(az spring api-portal show \
+                --resource-group ${{ env.RG_APP }} \
+                --service ${{ env.ASA_INSTANCE_NAME }} | jq -r '.properties.url')
+
+            echo "https://${GATEWAY_URL}/login/oauth2/code/sso"
+            echo "https://${PORTAL_URL}/oauth2-redirect.html"
+            echo "https://${PORTAL_URL}/login/oauth2/code/sso"
+
+            gatewayUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayUrl.value -o tsv)
+            gatewayApiserverUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayApiserverUrl.value -o tsv)
+
+            echo "gatewayUrl=" $gatewayUrl
+            echo "gatewayApiserverUrl=" $gatewayApiserverUrl
+
+            az deployment group create --name asa-e-api-portal-gateway -f iac/bicep/modules/asa/asa-e-api-portal-gateway.bicep -g ${{ env.RG_APP }} \
+              -p appName=${{ env.APP_NAME }} \
+              -p azureSpringAppsSkuName=${{ env.ASA_SKU }} \
+              -p azureSpringAppsTier=${{ env.ASA_TIER }} \
+              -p location=${{ env.LOCATION }} \
+              -p apiPortalSsoClientId=${{ env.API_PORTAL_SSO_CLIENT_ID }} \
+              -p apiPortalSsoClientSecret=${{ env.API_PORTAL_SSO_CLIENT_SECRET }} \
+              -p apiPortalSsoIssuerUri=${{ env.SSO_APPLICATION_ISSUER_URI }} \
+              -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }} \
+              -p gatewayServerUrl=$gatewayUrl
+
+              echo "SSO configured on API Portal + Gateway"
+
+            # https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference
+
+            echo "****************************************************************************************"
+            echo "*                                                                                      *"
+            echo "*                                                                                      *"
+            echo "* /!\ IMPORTANT WARNING: This command must be RUN outside the workflow                 *"
+            echo "*                                                                                      *"
+            echo "*                                                                                      *"
+            echo "*                                                                                      *"
+            echo "****************************************************************************************"
+
+            echo "Plan to Update App ${{ env.SSO_APP_NAME }} AFTER the Workflow deployment competion ..."
+            echo "Check https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference"
+
+            # https://github.com/MicrosoftDocs/azure-docs/issues/102889
+            echo "az ad app update --id ${{ env.API_PORTAL_SSO_CLIENT_ID }} "
+            echo "--web-redirect-uris \"https://${GATEWAY_URL}/login/oauth2/code/sso\" \"https://${PORTAL_URL}/oauth2-redirect.html\" \"https://${PORTAL_URL}/login/oauth2/code/sso\" "
+
+      shell: bash
+
+    # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
+    # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners
+    # if the runner is self-hosted which is not github provided it is recommended to manually logout at the end of the workflow as shown below.
+    - name: Azure Logout security hardening
+      run: |
+          az logout
+          az cache purge
+          az account clear
+      shell: bash
