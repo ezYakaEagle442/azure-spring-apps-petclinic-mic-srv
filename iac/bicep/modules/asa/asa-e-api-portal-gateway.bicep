@@ -177,3 +177,117 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureS
 }
 output gatewayId string = gateway.id
 output gatewayUrl string = gateway.properties.url
+
+resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
+  name: 'vets-service'
+  parent: azureSpringApps
+}
+
+resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
+  name: 'customers-service'
+  parent: azureSpringApps
+}
+
+resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
+  name: 'visits-service'
+  parent: azureSpringApps
+}
+
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways/routeconfigs?pivots=deployment-language-bicep
+resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'vets-service-gateway-route-config'
+  parent: gateway
+  properties: {
+    appResourceId: vetsserviceapp.id
+    protocol: 'HTTP'
+    routes: [
+      {
+        title: 'vets-service'
+        description: 'vets-service'
+        uri: 'http://vets-service'
+        order: 102
+        ssoEnabled: apiPortalSsoEnabled
+        filters: [
+          'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-set-request-rate-limits-enterprise
+        ]
+        predicates: [
+          'Path=/api/vet/**'
+          'Path=/api/vet/vets'
+        ]        
+      }
+    ]
+  }
+}
+output VetsGatewayRouteConfigId string = VetsGatewayRouteConfig.id
+output VetsGatewayRouteConfigAppResourceId string = VetsGatewayRouteConfig.properties.appResourceId
+output VetsGatewayRouteConfigRoutes array = VetsGatewayRouteConfig.properties.routes
+output VetsGatewayRouteConfigIsSsoEnabled bool = VetsGatewayRouteConfig.properties.routes[0].ssoEnabled
+output VetsGatewayRouteConfigPredicates array = VetsGatewayRouteConfig.properties.routes[0].predicates
+
+resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'visits-service-gateway-route-config'
+  parent: gateway
+  properties: {
+    appResourceId: visitsservicerapp.id
+    protocol: 'HTTP'
+    routes: [
+      {
+        title: 'visits-service' 
+        description: 'visits-service'
+        uri: 'http://visits-service'
+        order: 103
+        ssoEnabled: apiPortalSsoEnabled
+        filters: [
+          'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://docs.vmware.com/en/VMware-Spring-Cloud-Gateway-for-Kubernetes/1.2/scg-k8s/GUID-route-filters.html#ratelimit-limiting-user-requests-filter
+        ]
+        predicates: [
+          'Path=/api/visit/**'
+          'Path=/api/visit/owners/{ownerId}/pets/{petId}/visits'
+        ]  
+      }
+    ]
+  }
+}
+output VisitsGatewayRouteConfigId string = VisitsGatewayRouteConfig.id
+output VisitsGatewayRouteConfigAppResourceId string = VisitsGatewayRouteConfig.properties.appResourceId
+output VisitsGatewayRouteConfigRoutes array = VisitsGatewayRouteConfig.properties.routes
+output VisitsGatewayRouteConfigIsSsoEnabled bool = VisitsGatewayRouteConfig.properties.routes[0].ssoEnabled
+output VisitsGatewayRouteConfigPredicates array = VisitsGatewayRouteConfig.properties.routes[0].predicates
+
+resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+  name: 'customers-service-gateway-route-config'
+  parent: gateway
+  properties: {
+    appResourceId: customersserviceapp.id
+    protocol: 'HTTP'
+    routes: [
+      {
+        description: 'customers-service'
+        title: 'customers-service'
+        uri: 'http://customers-service'
+        order: 101
+        ssoEnabled: apiPortalSsoEnabled
+        filters: [
+          'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://docs.vmware.com/en/VMware-Spring-Cloud-Gateway-for-Kubernetes/1.2/scg-k8s/GUID-route-filters.html#ratelimit-limiting-user-requests-filter
+        ]
+        predicates: [
+          'Path=/api/customer/**'
+          'Path=/api/customer/petTypes'
+          'Path=/api/customer/owners'
+          'Path=/api/customer/owners/{ownerId}'
+          'Path=/api/customer/owners/{ownerId}/pets'
+          'Path=/api/customer/owners/{ownerId}/pets/{petId}'
+        ]
+      }
+    ]
+  }
+}
+output CustomersGatewayRouteConfigId string = CustomersGatewayRouteConfig.id
+output CustomersGatewayRouteConfigAppResourceId string = CustomersGatewayRouteConfig.properties.appResourceId
+output CustomersGatewayRouteConfigRoutes array = CustomersGatewayRouteConfig.properties.routes
+output CustomersGatewayRouteConfigIsSsoEnabled bool = CustomersGatewayRouteConfig.properties.routes[0].ssoEnabled
+output CustomersGatewayRouteConfigPredicates array = CustomersGatewayRouteConfig.properties.routes[0].predicates
+
