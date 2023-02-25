@@ -650,7 +650,7 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureS
 
 output gatewayId string = gateway.id
 output gatewayUrl string = gateway.properties.url
-output gatewayApiserverUrl string = gateway.properties.apiMetadataProperties.serverUrl
+// output gatewayApiserverUrl string = gateway.properties.apiMetadataProperties.serverUrl
 
 // https://github.com/Azure/azure-rest-api-specs/issues/18286
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924

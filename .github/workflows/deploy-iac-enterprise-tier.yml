@@ -148,10 +148,10 @@ jobs:
             echo "https://${PORTAL_URL}/login/oauth2/code/sso"
 
             gatewayUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayUrl.value -o tsv)
-            gatewayApiserverUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayApiserverUrl.value -o tsv)
+            # gatewayApiserverUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayApiserverUrl.value -o tsv)
 
             echo "gatewayUrl=" $gatewayUrl
-            echo "gatewayApiserverUrl=" $gatewayApiserverUrl
+            # echo "gatewayApiserverUrl=" $gatewayApiserverUrl
 
             az deployment group create --name asa-e-api-portal-gateway -f iac/bicep/modules/asa/asa-e-api-portal-gateway.bicep -g ${{ env.RG_APP }} \
               -p appName=${{ env.APP_NAME }} \
