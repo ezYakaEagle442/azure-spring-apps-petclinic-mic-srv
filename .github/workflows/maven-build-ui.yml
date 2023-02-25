@@ -24,6 +24,7 @@ env:
   # ==== APPS ====
   PRJ_PREFIX: asa-spring-petclinic
 
+  UI: ui
   API_GATEWAY: api-gateway
   ADMIN_SERVER: admin-server
   CUSTOMERS_SERVICE: customers-service
@@ -95,7 +96,7 @@ jobs:
         echo "*                                                                                      *"
         echo "****************************************************************************************"
 
-        mvn -B clean package --file pom.xml -DskipTests --projects spring-petclinic-api-gateway -rf :asa-spring-petclinic-api-gateway
+        mvn -B clean package --file pom.xml -DskipTests --projects spring-petclinic-api-gateway spring-petclinic-ui-asa-e -rf :asa-spring-petclinic-api-gateway spring-petclinic-ui-asa-e
         
         echo "github.workspace = ${{ github.workspace }}"
         pwd
@@ -104,6 +105,8 @@ jobs:
         ls -al spring-petclinic-api-gateway/target/*.jar
 
         echo "API_GATEWAY_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.API_GATEWAY }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
+        echo "UI_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.UI }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
+
 
     - name: Azure Login
       uses: azure/login@v1 # https://github.com/marketplace/actions/azure-login
@@ -122,6 +125,7 @@ jobs:
         sleep 45
 
         echo "API_GATEWAY_JAR=spring-petclinic-${{ env.API_GATEWAY }}/target/$API_GATEWAY_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "UI_JAR=${{ env.PRJ_PREFIX }}/target/$UI_JAR_ARTIFACT" >> $GITHUB_ENV
 
         az version
 
@@ -143,8 +147,10 @@ jobs:
         echo "AZ_BLOB_MAX_CONNECTIONS=${{ env.AZ_BLOB_MAX_CONNECTIONS }}"
 
         ls -al ${{ env.API_GATEWAY_JAR }}
+        ls -al ${{ env.UI_JAR }}
         # https://learn.microsoft.com/en-us/rest/api/storageservices/setting-timeouts-for-blob-service-operations
         az storage blob upload --name ${{ env.API_GATEWAY }} --file ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
+        az storage blob upload --name ${{ env.UI }} --file ${{ github.workspace }}/${{ env.UI_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
 
     - name: Disable local IP access to the Azure BLOB Storage 
       if: ${{ always() }}
