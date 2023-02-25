@@ -1,7 +1,7 @@
 package org.springframework.samples.petclinic.ui.boundary.web;
 
-import org.junit.jupiter.ui.Test;
-import org.junit.jupiter.ui.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -22,9 +22,9 @@ import java.net.ConnectException;
 import java.util.Collections;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = uiGatewayController.class)
+@WebFluxTest(controllers = UIController.class)
 @Import({ReactiveResilience4JAutoConfiguration.class, CircuitBreakerConfiguration.class})
-class uiGatewayControllerTest {
+class UIControllerTest {
 
     @MockBean
     private CustomersServiceClient customersServiceClient;

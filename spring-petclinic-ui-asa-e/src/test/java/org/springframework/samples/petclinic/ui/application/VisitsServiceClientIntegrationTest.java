@@ -2,9 +2,9 @@ package org.springframework.samples.petclinic.ui.application;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.ui.AfterEach;
-import org.junit.jupiter.ui.BeforeEach;
-import org.junit.jupiter.ui.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.samples.petclinic.ui.dto.Visits;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.function.Consumer;
 
-import static org.junit.jupiter.ui.Assertions.assertEquals;
-import static org.junit.jupiter.ui.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class VisitsServiceClientIntegrationTest {
 
