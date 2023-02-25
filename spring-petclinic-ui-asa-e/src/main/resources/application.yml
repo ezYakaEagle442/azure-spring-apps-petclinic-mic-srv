@@ -1,0 +1,42 @@
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    enabled-by-default: false
+    web:
+      base-path: "/actuator"
+      exposure: # https://docs.spring.io/spring-boot/docs/2.6.3/reference/html/actuator.html#actuator.endpoints.exposing
+        include: "health,info,startup,env,mappings,metrics" # "*"
+        exclude: "beans"    
+  endpoint:
+    health:
+      enabled: true
+      status:
+        http-mapping:
+          down: 503
+          fatal: 503
+          out-of-service: 503
+      group:
+        readiness:
+          include: "readinessState"
+        liveness:
+          include: "livenessState"
+        #startup:
+          #include: readinessProbe
+    startup: # https://docs.spring.io/spring-boot/docs/2.6.6/reference/html/actuator.html#actuator.endpoints.kubernetes-probes
+      enabled: true 
+    probes:
+        enabled: true      
+    info:
+      enabled: true
+    env:
+      enabled: true
+    mappings:
+      enabled: true            
+    # internal port will be taken care of by ASA so you don't need specify it
+    # probe port, on standard tier, it's 1025 while on enterprise tier, it should be 8080.
+    # server:
+    #  port: 1025
