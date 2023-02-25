@@ -135,7 +135,7 @@ module azurespringapps './modules/asa/asa.bicep' = if (azureSpringAppsTier=='Sta
   }
 }
 
-resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+resource kvRG 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: kvRGName
   scope: subscription()
 }
