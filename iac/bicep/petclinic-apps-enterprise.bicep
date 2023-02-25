@@ -178,10 +178,7 @@ module azurespringapps './modules/asa/asa-e.bicep' = if (azureSpringAppsTier=='E
   }
 }
 
-output gatewayUrl string = azurespringapps.outputs.gatewayUrl
-output gatewayApiserverUrl string = azurespringapps.outputs.gatewayApiserverUrl
-
-resource kvRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+resource kvRG 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: kvRGName
   scope: subscription()
 }
