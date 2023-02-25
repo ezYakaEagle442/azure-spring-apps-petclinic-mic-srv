@@ -733,6 +733,7 @@ resource buildResult 'Microsoft.AppPlatform/Spring/buildServices/builds/results@
 }
 */
 
+
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring/devtoolportals?pivots=deployment-language-bicep
 resource devToolPortals 'Microsoft.AppPlatform/Spring/DevToolPortals@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'default'
@@ -753,7 +754,9 @@ resource devToolPortals 'Microsoft.AppPlatform/Spring/DevToolPortals@2022-11-01-
       clientSecret: apiPortalSsoClientSecret
       metadataUrl: 'string'
       scopes: [
-        'string'
+        '???'
+        '???'
+        '???'
       ]
     }
     */
