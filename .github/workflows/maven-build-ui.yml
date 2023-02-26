@@ -110,7 +110,7 @@ jobs:
         envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.ts > spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.ts               
         envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.ts > spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.ts
 
-        echo "Checking Angular configuration ...""
+        echo "Checking Angular configuration ..."
         ls -al spring-petclinic-ui-asa-e/src/main/resources/static/environments
 
         cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.ts
