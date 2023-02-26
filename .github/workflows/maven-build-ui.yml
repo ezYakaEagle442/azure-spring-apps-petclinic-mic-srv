@@ -91,7 +91,11 @@ jobs:
 
         pwd
         ls -al
-        
+
+        az config set extension.use_dynamic_install=yes_without_prompt
+        az extension add --name spring
+        az extension update --name spring
+                
         GATEWAY_URL=$(az spring gateway show -g ${{ env.RG_APP }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} | jq -r '.properties.url')
         echo "gatewayUrl="$GATEWAY_URL
 
