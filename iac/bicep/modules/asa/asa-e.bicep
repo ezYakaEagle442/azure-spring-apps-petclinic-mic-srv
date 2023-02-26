@@ -515,7 +515,7 @@ resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
 output apiGatewayIdentity string = apigatewayapp.identity.userAssignedIdentities['${apiGatewayIdentity.id}'].principalId
 
 resource uiapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
-  name: 'ui'
+  name: 'ui-asa-e' // App name must be between 4 and 32 characters long
   location: location
   parent: azureSpringApps
   identity: {

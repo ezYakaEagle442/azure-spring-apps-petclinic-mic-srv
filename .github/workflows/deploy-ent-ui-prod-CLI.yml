@@ -29,7 +29,7 @@ env:
 
   # ==== APPS ====:
 
-  UI: ui
+  UI: ui-asa-e
   API_GATEWAY: api-gateway
   ADMIN_SERVER: admin-server
   CONFIG_SERVER: config-server

@@ -24,7 +24,7 @@ env:
   # ==== APPS ====
   PRJ_PREFIX: asa-spring-petclinic
 
-  UI: ui
+  UI: ui-asa-e
   API_GATEWAY: api-gateway
   ADMIN_SERVER: admin-server
   CUSTOMERS_SERVICE: customers-service
@@ -150,7 +150,7 @@ jobs:
 
         ls -al ${{ env.API_GATEWAY_JAR }}
         ls -al ${{ env.UI_JAR }}
-        
+
         # https://learn.microsoft.com/en-us/rest/api/storageservices/setting-timeouts-for-blob-service-operations
         az storage blob upload --name ${{ env.API_GATEWAY }} --file ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
         az storage blob upload --name ${{ env.UI }} --file ${{ github.workspace }}/${{ env.UI_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
