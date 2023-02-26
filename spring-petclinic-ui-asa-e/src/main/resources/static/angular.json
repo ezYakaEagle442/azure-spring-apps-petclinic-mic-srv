@@ -1,0 +1,28 @@
+{
+    "configurations": {
+        "development": {
+            "fileReplacements": [
+                {
+                "replace": "./environments/environment.ts",
+                "with": "./environments/environment.dev.ts"
+                }
+            ]
+        },
+        "production": {
+            "fileReplacements": [
+                {
+                "replace": "./environments/environment.ts",
+                "with": "./environments/environment.prod.ts"
+                }
+            ]
+        },
+        "staging": {
+        "fileReplacements": [
+            {
+            "replace": "./environments/environment.ts",
+            "with": "./environments/environment.staging.ts"
+            }
+        ]
+        }
+    }
+}

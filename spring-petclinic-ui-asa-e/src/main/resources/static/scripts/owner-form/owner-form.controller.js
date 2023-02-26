@@ -1,5 +1,7 @@
 'use strict';
 
+import { environment } from '../../environments/environment';
+
 angular.module('ownerForm')
     .controller('OwnerFormController', ["$http", '$state', '$stateParams', function ($http, $state, $stateParams) {
         var self = this;
@@ -9,7 +11,7 @@ angular.module('ownerForm')
         if (!ownerId) {
             self.owner = {};
         } else {
-            $http.get($SPRING_CLOUD_GATEWAY_URL+"/api/customer/owners/" + ownerId).then(function (resp) {
+            $http.get(environment.SPRING_CLOUD_GATEWAY_URL+"/api/customer/owners/" + ownerId).then(function (resp) {
                 self.owner = resp.data;
             });
         }
@@ -18,9 +20,9 @@ angular.module('ownerForm')
             var id = self.owner.id;
             var req;
             if (id) {
-                req = $http.put($SPRING_CLOUD_GATEWAY_URL+"/api/customer/owners/" + id, self.owner);
+                req = $http.put(environment.SPRING_CLOUD_GATEWAY_URL+"/api/customer/owners/" + id, self.owner);
             } else {
-                req = $http.post($SPRING_CLOUD_GATEWAY_URL+"/api/customer/owners", self.owner);
+                req = $http.post(environment.SPRING_CLOUD_GATEWAY_URL+"/api/customer/owners", self.owner);
             }
 
             req.then(function () {

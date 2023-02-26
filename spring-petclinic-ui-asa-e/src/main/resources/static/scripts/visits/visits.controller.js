@@ -1,10 +1,12 @@
 'use strict';
 
+import { environment } from '../../environments/environment';
+
 angular.module('visits')
     .controller('VisitsController', ['$http', '$state', '$stateParams', '$filter', function ($http, $state, $stateParams, $filter) {
         var self = this;
         var petId = $stateParams.petId || 0;
-        var url = $SPRING_CLOUD_GATEWAY_URL+"/api/visit/owners/" + ($stateParams.ownerId || 0) + "/pets/" + petId + "/visits";
+        var url = environment.SPRING_CLOUD_GATEWAY_URL+"/api/visit/owners/" + ($stateParams.ownerId || 0) + "/pets/" + petId + "/visits";
         self.date = new Date();
         self.desc = "";
 
