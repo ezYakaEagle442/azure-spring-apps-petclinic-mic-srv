@@ -546,8 +546,8 @@ jobs:
             fi
         fi
 
-        GATEWAY_URL=$(az spring gateway show -g ${{ env.RG_APP }} --service ${{ env.ASA_INSTANCE_NAME }} | jq -r '.properties.url')
-        PORTAL_URL=$(az spring api-portal show -g ${{ env.RG_APP }} --service ${{ env.ASA_INSTANCE_NAME }} | jq -r '.properties.url')
+        GATEWAY_URL=$(az spring gateway show -g ${{ env.RG_APP }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} | jq -r '.properties.url')
+        PORTAL_URL=$(az spring api-portal show -g ${{ env.RG_APP }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} | jq -r '.properties.url')
 
         # gatewayUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayUrl.value -o tsv)
         # gatewayApiserverUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayApiserverUrl.value -o tsv)
