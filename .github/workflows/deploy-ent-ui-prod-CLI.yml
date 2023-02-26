@@ -546,6 +546,14 @@ jobs:
             fi
         fi
 
+        GATEWAY_URL=$(az spring gateway show -g ${{ env.RG_APP }} --service ${{ env.ASA_INSTANCE_NAME }} | jq -r '.properties.url')
+        PORTAL_URL=$(az spring api-portal show -g ${{ env.RG_APP }} --service ${{ env.ASA_INSTANCE_NAME }} | jq -r '.properties.url')
+
+        # gatewayUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayUrl.value -o tsv)
+        # gatewayApiserverUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayApiserverUrl.value -o tsv)
+
+        echo "gatewayUrl=" $GATEWAY_URL
+
         echo "About to deploy App ..."
         az spring app deploy \
         --name ${{ env.UI }} \
@@ -553,6 +561,7 @@ jobs:
         --artifact-path ${{ env.UI_PACKAGE_PATH }} \
         --deployment $DEPLOYMENT_NAME \
         --disable-probe true \
+        --env SPRING_CLOUD_GATEWAY_URL=$GATEWAY_URL \
         --jvm-options="${{ env.DEPLOYMENT_JVM_OPTIONS }}" \
         --version ${{ env.DEPLOYMENT_VERSION }} \
         --build-env ${{ env.BUILD_ENV }}  \
