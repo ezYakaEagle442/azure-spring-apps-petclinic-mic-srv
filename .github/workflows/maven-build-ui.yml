@@ -96,7 +96,7 @@ jobs:
         echo "*                                                                                      *"
         echo "****************************************************************************************"
 
-        mvn -B clean package --file pom.xml -DskipTests --projects spring-petclinic-api-gateway spring-petclinic-ui-asa-e -rf :asa-spring-petclinic-api-gateway asa-spring-petclinic-ui
+        mvn -B clean package --file pom.xml -DskipTests --projects spring-petclinic-api-gateway,spring-petclinic-ui-asa-e -rf :asa-spring-petclinic-ui
         
         echo "github.workspace = ${{ github.workspace }}"
         pwd
