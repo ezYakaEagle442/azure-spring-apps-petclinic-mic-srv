@@ -104,7 +104,7 @@ jobs:
         GATEWAY_URL=$(az spring gateway show -g ${{ env.RG_APP }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} | jq -r '.properties.url')
         echo "gatewayUrl="$GATEWAY_URL
 
-        export SPRING_CLOUD_GATEWAY_URL=$GATEWAY_URL
+        export SPRING_CLOUD_GATEWAY_URL="https://$GATEWAY_URL"
         envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.ts > environment.ts
         envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.ts > environment.dev.ts
         envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.ts > environment.staging.ts               
@@ -119,11 +119,21 @@ jobs:
         ls -al spring-petclinic-ui-asa-e/src/main/resources/static/environments
 
         cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.ts
-        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.ts
-        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.ts  
-        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.ts
+        echo ""
 
+        echo ""
+        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.ts
+        echo ""
+
+        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.ts
+        echo ""
+
+        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.ts
+        echo ""
+
+        echo ""
         echo "Verified SPRING_CLOUD_GATEWAY_URL in Angular configuration"
+        echo ""
 
         echo "****************************************************************************************"
         echo "*                                                                                      *"
