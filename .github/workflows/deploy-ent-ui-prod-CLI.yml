@@ -488,9 +488,9 @@ jobs:
         echo "DEPLOYMENT_NAME="$DEPLOYMENT_NAME
 
         echo "Cheking if any deployment already exist for App ${{ env.UI }} ..."
-        apigw_deployment=$(az spring app deployment list --app ${{ env.UI }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }})
+        ui_deployment=$(az spring app deployment list --app ${{ env.UI }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }})
 
-        if [[ $(echo $apigw_deployment | jq -r 'length') -eq 0 ]]
+        if [[ $(echo $ui_deployment | jq -r 'length') -eq 0 ]]
         then
             echo "There is no existing deployment for ${{ env.UI }}"
             echo "About to create a new Deployment $DEPLOYMENT_NAME"
@@ -552,7 +552,7 @@ jobs:
         # gatewayUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayUrl.value -o tsv)
         # gatewayApiserverUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayApiserverUrl.value -o tsv)
 
-        echo "gatewayUrl=" $GATEWAY_URL
+        echo "gatewayUrl="$GATEWAY_URL
 
         echo "About to deploy App ..."
         az spring app deploy \
