@@ -28,6 +28,9 @@ param configServerAppIdentityName string = 'id-asa-${appName}-petclinic-config-s
 @description('The api-gateway Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
 param apiGatewayAppIdentityName string = 'id-asa-${appName}-petclinic-api-gateway-dev-${location}-101'
 
+@description('The UI for ASA-E Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
+param uiAppIdentityName string = 'id-asa-${appName}-petclinic-ui-dev-${location}-101'
+
 @description('The customers-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
 param customersServiceAppIdentityName string = 'id-asa-${appName}-petclinic-customers-service-dev-${location}-101'
 

@@ -159,6 +159,9 @@ param configServerAppIdentityName string = 'id-asa-${appName}-petclinic-config-s
 @description('The api-gateway Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
 param apiGatewayAppIdentityName string = 'id-asa-${appName}-petclinic-api-gateway-dev-${location}-101'
 
+@description('The UI for ASA-E Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
+param uiAppIdentityName string = 'id-asa-${appName}-petclinic-ui-dev-${location}-101'
+
 @description('The customers-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
 param customersServiceAppIdentityName string = 'id-asa-${appName}-petclinic-customers-service-dev-${location}-101'
 
@@ -294,8 +297,14 @@ resource azureSpringAppsJavaBuilderAppInsightsMonitoringSettings 'Microsoft.AppP
   ]
 }
 
+
+
 resource apiGatewayIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
   name: apiGatewayAppIdentityName
+}
+
+resource uiIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+  name: uiAppIdentityName
 }
 
 resource customersServicedentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
@@ -505,6 +514,49 @@ resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
 }
 output apiGatewayIdentity string = apigatewayapp.identity.userAssignedIdentities['${apiGatewayIdentity.id}'].principalId
 
+resource uiapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
+  name: 'ui'
+  location: location
+  parent: azureSpringApps
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${uiIdentity.id}': {}
+    }  
+  }
+  properties: {
+    addonConfigs: {
+      azureMonitor: {
+        enabled: true
+      }
+      applicationConfigurationService: {
+        resourceId: '${azureSpringApps.id}/configurationServices/${applicationConfigurationServiceName}'
+      }
+      serviceRegistry: {
+          resourceId: '${azureSpringApps.id}/serviceRegistries/${serviceRegistryName}'
+      }
+      buildService: {
+        resourceId: '${azureSpringApps.id}/buildServices/${buildServiceName}'
+      }    
+    }
+    httpsOnly: false
+    public: true
+    temporaryDisk: {
+      mountPath: '/tmp'
+      sizeInGB: 5
+    }
+  }
+  dependsOn: [
+    appconfigservice
+    serviceRegistry
+    buildService    
+    customersserviceapp
+    vetsserviceapp
+    visitsservicerapp
+  ]  
+}
+
+output uiIdentity string = uiapp.identity.userAssignedIdentities['${uiIdentity.id}'].principalId
 
 /*
 az spring app binding --help

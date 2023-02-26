@@ -28,6 +28,8 @@ env:
   AZ_BLOB_TIMEOUT: 600
 
   # ==== APPS ====:
+
+  UI: ui
   API_GATEWAY: api-gateway
   ADMIN_SERVER: admin-server
   CONFIG_SERVER: config-server
@@ -37,12 +39,6 @@ env:
   VISITS_SERVICE: visits-service
 
   PRJ_PREFIX: asa-spring-petclinic
-
-  # ==== Identities ====:
-
-  CUSTOMERS_SVC_APP_ID_NAME: id-asa-petcliasa-petclinic-customers-service-dev-westeurope-101 # customize this, MUST BE: 'id-asa-${appName}-petclinic-customers-service-dev-${location}-101'
-  VETS_SVC_APP_ID_NAME: id-asa-petcliasa-petclinic-vets-service-dev-westeurope-101 # customize this, MUST BE: 'id-asa-${appName}-petclinic-vets-service-dev-${location}-101'
-  VISITS_SVC_APP_ID_NAME: id-asa-petcliasa-petclinic-visits-service-dev-westeurope-101 # customize this, MUST BE: 'id-asa-${appName}-petclinic-visits-service-dev-${location}-101'
 
   # ==== Azure Spring Apps / Apps Deployment params ====:
 
@@ -158,6 +154,15 @@ jobs:
         echo "API_GATEWAY_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-ui" >> $GITHUB_ENV
         echo "API_GATEWAY_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-ui" >> $GITHUB_OUTPUT
 
+        echo "UI_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.UI }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
+        echo "UI_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.UI }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_OUTPUT
+
+        echo "UI_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-ui" >> $GITHUB_ENV
+        echo "UI_STAGING_DEPLOYMENT=${{ env.STAGING_DEPLOYMENT_NAME }}-ui" >> $GITHUB_OUTPUT
+
+        echo "UI_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-ui" >> $GITHUB_ENV
+        echo "UI_PRODUCTION_DEPLOYMENT=${{ env.PRODUCTION_DEPLOYMENT_NAME }}-ui" >> $GITHUB_OUTPUT        
+
       shell: bash
 
     # Variables in the env map cannot be defined in terms of other variables in the map
@@ -167,6 +172,7 @@ jobs:
 
         # ==== JARS ====: PWD already in /home/runner/work/azure-spring-cloud-petclinic-mic-srv >> $GITHUB_ENV
         echo "API_GATEWAY_JAR=spring-petclinic-${{ env.API_GATEWAY }}/target/$API_GATEWAY_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "API_GATEWAY_JAR=spring-petclinic-ui-asa-e/target/$UI_JAR_ARTIFACT" >> $GITHUB_ENV
 
         echo ""
         echo "GH_WORKSPACE Check ..."
@@ -175,6 +181,9 @@ jobs:
 
         echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ env.API_GATEWAY_JAR_ARTIFACT }}" >> $GITHUB_ENV
         echo "API_GATEWAY_PACKAGE_PATH=${{ github.workspace }}/${{ env.API_GATEWAY }}/${{ env.API_GATEWAY_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
+
+        echo "UI_PACKAGE_PATH=${{ github.workspace }}/${{ env.UI }}/${{ env.UI_JAR_ARTIFACT }}" >> $GITHUB_ENV
+        echo "UI_PACKAGE_PATH=${{ github.workspace }}/${{ env.UI }}/${{ env.UI_JAR_ARTIFACT }}" >> $GITHUB_OUTPUT
 
       shell: bash
 
@@ -190,6 +199,14 @@ jobs:
 
         echo "API_GATEWAY_STAGING_DEPLOYMENT=$API_GATEWAY_STAGING_DEPLOYMENT"
         echo "API_GATEWAY_PRODUCTION_DEPLOYMENT=$API_GATEWAY_PRODUCTION_DEPLOYMENT"
+
+        echo "UI_JAR_ARTIFACT=$UI_JAR_ARTIFACT"
+        echo "UI_JAR=$UI_JAR"
+
+        echo "UI_STAGING_DEPLOYMENT=$UI_STAGING_DEPLOYMENT"
+        echo "UI_PRODUCTION_DEPLOYMENT=$UI_PRODUCTION_DEPLOYMENT"
+
+
       shell: bash
 
     - name: Download Artifacts from Azure BLOB Storage
@@ -208,13 +225,19 @@ jobs:
         mkdir ${{ github.workspace }}/${{ env.API_GATEWAY }}
         ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
 
+        mkdir ${{ github.workspace }}/${{ env.UI }}
+        ls -al ${{ github.workspace }}/${{ env.UI }}
+
         echo "API_GATEWAY_PACKAGE_PATH=${{ env.API_GATEWAY_PACKAGE_PATH }}"
+        echo "UI_PACKAGE_PATH=${{ env.UI_PACKAGE_PATH }}"
 
         echo "About to download Artifcats from Azure BLOB Storage"
         # --blob-url  ? https://stasapetcliasa.blob.core.windows.net/petcliasa-blob/asa-spring-petclinic-admin-server-2.6.6.jar
         az storage blob download --name ${{ env.API_GATEWAY }} --file $API_GATEWAY_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
+        az storage blob download --name ${{ env.UI }} --file $UI_PACKAGE_PATH --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }}
 
         ls -al ${{ github.workspace }}/${{ env.API_GATEWAY }}
+        ls -al ${{ github.workspace }}/${{ env.UI }}
 
       shell: bash
 
@@ -238,7 +261,7 @@ jobs:
         echo ""
 
         echo "API_GATEWAY_PACKAGE_PATH=${{ env.API_GATEWAY_PACKAGE_PATH }}"
-
+        echo "UI_PACKAGE_PATH=${{ env.UI_PACKAGE_PATH }}"
       
         echo "****************************************************************************************"
         echo "*                                                                                      *"
@@ -249,6 +272,7 @@ jobs:
         echo "****************************************************************************************"
 
         echo "API_GATEWAY_PACKAGE_PATH=${{ env.API_GATEWAY_PACKAGE_PATH }}"
+        echo "UI_PACKAGE_PATH=${{ env.UI_PACKAGE_PATH }}"
 
         echo ""
         ls -al ${{ env.API_GATEWAY }}
@@ -256,8 +280,13 @@ jobs:
         ls -al ${{ env.API_GATEWAY_PACKAGE_PATH }}           
         echo ""
 
+        echo ""
+        ls -al ${{ env.UI }}
+        echo ""
+        ls -al ${{ env.UI_PACKAGE_PATH }}           
+        echo ""
 
-    - name: Deploy UI
+    - name: Deploy API-Gateway
       run: | 
 
         az config set extension.use_dynamic_install=yes_without_prompt
@@ -410,6 +439,161 @@ jobs:
 
         echo "About to assign endpoint to ${{ env.API_GATEWAY }} ... "
         az spring app update --name ${{ env.API_GATEWAY }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --assign-endpoint true
+
+    - name: Deploy UI integrated with ASA-E Managed Spring Cloud gateway
+      run: | 
+
+        az config set extension.use_dynamic_install=yes_without_prompt
+        az extension add --name spring
+        az extension update --name spring
+
+        echo ""
+        echo "UI_STAGING_DEPLOYMENT=${{ env.UI_STAGING_DEPLOYMENT }}"
+        echo ""
+
+        echo ""
+        echo "UI_PRODUCTION_DEPLOYMENT=${{ env.UI_PRODUCTION_DEPLOYMENT }}"
+        echo ""
+
+        echo "****************************************************************************************"
+        echo "*                                                                                      *"
+        echo "*                                                                                      *"
+        echo "* About to deploy UI ...                                                               *"
+        echo "*                                                                                      *"
+        echo "*                                                                                      *"
+        echo "****************************************************************************************"
+
+        UI_STARTUP_PROBE_CFG="spring-petclinic-${{ env.UI }}/${{ env.DEPLOYMENT_STARTUP_PROBE_CFG }}"
+        UI_LIVENESS_PROBE_CFG="spring-petclinic-${{ env.UI }}/${{ env.DEPLOYMENT_LIVENESS_PROBE_CFG }}"
+        UI_READINESS_PROBE_CFG="spring-petclinic-${{ env.UI }}/${{ env.DEPLOYMENT_READINESS_PROBE_CFG }}"
+
+        echo "UI_STARTUP_PROBE_CFG=$UI_STARTUP_PROBE_CFG"
+        echo "UI_LIVENESS_PROBE_CFG=$UI_LIVENESS_PROBE_CFG"
+        echo "UI_READINESS_PROBE_CFG=$UI_READINESS_PROBE_CFG"
+
+        if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
+        then
+          echo "Set deployment name to STAGING"
+          DEPLOYMENT_NAME=${{ env.UI_STAGING_DEPLOYMENT }}
+        else
+          if [ !$DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "set-production" ]
+          then
+              echo "Set deployment name to PRODUCTION"
+              DEPLOYMENT_NAME=${{ env.UI_PRODUCTION_DEPLOYMENT }}
+          else
+              echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
+              exit 1
+          fi
+        fi
+        echo "DEPLOYMENT_NAME="$DEPLOYMENT_NAME
+
+        echo "Cheking if any deployment already exist for App ${{ env.UI }} ..."
+        apigw_deployment=$(az spring app deployment list --app ${{ env.UI }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }})
+
+        if [[ $(echo $apigw_deployment | jq -r 'length') -eq 0 ]]
+        then
+            echo "There is no existing deployment for ${{ env.UI }}"
+            echo "About to create a new Deployment $DEPLOYMENT_NAME"
+            
+            az spring app deployment create \
+            --name $DEPLOYMENT_NAME \
+            --app ${{ env.UI }} \
+            --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
+            --instance-count ${{ env.DEPLOYMENT_INSTANCE_COUNT }} \
+            --cpu ${{ env.DEPLOYMENT_CPU }} \
+            --memory ${{ env.DEPLOYMENT_MEMORY }} \
+            --version ${{ env.DEPLOYMENT_VERSION }} \
+            --skip-clone-settings            
+        else
+            echo "There are existing deployment(s) for ${{ env.UI }}"
+            FOUND_DEPLOYMENT=false
+            for deployment in $(az spring app deployment list --app ${{ env.UI }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.[].name')
+            do
+              echo "About to check Deployment " $deployment
+              if [[ $deployment == $DEPLOYMENT_NAME ]]
+              then
+                echo $DEPLOYMENT_NAME deployment already exists
+                FOUND_DEPLOYMENT=true
+              fi
+            done
+            if [[ $FOUND_DEPLOYMENT == true ]]
+            then
+                az spring app deployment show --name $deployment --app ${{ env.UI }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+            else
+              # https://unix.stackexchange.com/questions/22726/how-to-conditionally-do-something-if-a-command-succeeded-or-failed  
+              trap 'catch $? $LINENO' ERR
+              catch() {
+                echo "Error $1 occurred on $2"
+              }
+              echo "Deployment $DEPLOYMENT_NAME NOT found among the existing deployments"
+              if [[ ${{ env.DEPLOYMENT_CREATE_NEW }} ]]
+              then
+                echo "About to create a new Deployment $DEPLOYMENT_NAME"
+                
+                az spring app deployment create \
+                --name $DEPLOYMENT_NAME \
+                --app ${{ env.UI }} \
+                --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
+                --instance-count ${{ env.DEPLOYMENT_INSTANCE_COUNT }} \
+                --cpu ${{ env.DEPLOYMENT_CPU }} \
+                --memory ${{ env.DEPLOYMENT_MEMORY }} \
+                --version ${{ env.DEPLOYMENT_VERSION }} \
+                --skip-clone-settings
+              else
+                echo "ERROR Input param DEPLOYMENT_CREATE_NEW is set to false, no new Deployment will be created"
+                exit 1
+              fi              
+            fi
+        fi
+
+        echo "About to deploy App ..."
+        az spring app deploy \
+        --name ${{ env.UI }} \
+        --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
+        --artifact-path ${{ env.UI_PACKAGE_PATH }} \
+        --deployment $DEPLOYMENT_NAME \
+        --disable-probe true \
+        --jvm-options="${{ env.DEPLOYMENT_JVM_OPTIONS }}" \
+        --version ${{ env.DEPLOYMENT_VERSION }} \
+        --build-env ${{ env.BUILD_ENV }}  \
+        --build-cpu ${{ env.BUILD_CPU }} \
+        --build-memory ${{ env.BUILD_MEMORY }} \
+        --builder ${{ env.BUILDER }} \
+        --config-file-patterns ${{ env.CFG_FILE_PATTERNS }}
+
+        # /!\ --config-file-patterns cannot be set when there is no active deployment.
+        #az spring app update \
+        #--name ${{ env.UI }} \
+        #--service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} \
+        #--config-file-patterns ${{ env.CFG_FILE_PATTERNS }}      
+
+        if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
+        then
+          echo "${{ env.UI }} has been deployed to a Staging environment"
+        else
+          if [ !$DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "set-production" ]
+          then
+              echo "About to Set $DEPLOYMENT_NAME as Production deployment ..."
+              # https://github.com/Azure/Azure-Spring-Apps/issues/17
+              # [].properties.active = true mean it is a Production Deployment
+              prod_deployment_active=$(az spring app deployment show --name $DEPLOYMENT_NAME --app ${{ env.UI }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} | jq -r '.properties.active')
+              echo "Checking if $DEPLOYMENT_NAME is already set to Active/Production:" $prod_deployment_active
+              if [[ $prod_deployment_active == true ]]
+              then
+                echo "$DEPLOYMENT_NAME is already set to Production"
+              else
+                echo "About to set $DEPLOYMENT_NAME to Production"
+                az spring app set-deployment -d $DEPLOYMENT_NAME -n ${{ env.UI }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }}
+              fi
+          else
+              echo "ERROR Input param DEPLOYMENT_STAGING and DEPLOYMENT_ACTION are NOT consistent, choose [DEPLOYMENT_STAGING=true with DEPLOYMENT_ACTION=deploy for Staging] OR [DEPLOYMENT_STAGING=false with DEPLOYMENT_ACTION=set-production for Go Live]"
+              exit 1
+          fi
+        fi
+
+        echo "About to assign endpoint to ${{ env.UI }} ... "
+        az spring app update --name ${{ env.UI }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --assign-endpoint true
+
 
     # security hardening for self-hosted agents: https://github.com/marketplace/actions/azure-login
     # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners
