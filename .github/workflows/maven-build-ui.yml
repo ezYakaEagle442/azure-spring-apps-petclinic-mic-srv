@@ -104,6 +104,7 @@ jobs:
 
         ls -al
         ls -al spring-petclinic-api-gateway/target/*.jar
+        ls -al spring-petclinic-ui-asa-e/target/*.jar
 
         echo "API_GATEWAY_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.API_GATEWAY }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
         echo "UI_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.UI }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
@@ -126,7 +127,7 @@ jobs:
         sleep 45
 
         echo "API_GATEWAY_JAR=spring-petclinic-${{ env.API_GATEWAY }}/target/$API_GATEWAY_JAR_ARTIFACT" >> $GITHUB_ENV
-        echo "UI_JAR=${{ env.PRJ_PREFIX }}/target/$UI_JAR_ARTIFACT" >> $GITHUB_ENV
+        echo "UI_JAR=spring-petclinic-ui-asa-e/target/$UI_JAR_ARTIFACT" >> $GITHUB_ENV
 
         az version
 
@@ -149,6 +150,7 @@ jobs:
 
         ls -al ${{ env.API_GATEWAY_JAR }}
         ls -al ${{ env.UI_JAR }}
+        
         # https://learn.microsoft.com/en-us/rest/api/storageservices/setting-timeouts-for-blob-service-operations
         az storage blob upload --name ${{ env.API_GATEWAY }} --file ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
         az storage blob upload --name ${{ env.UI }} --file ${{ github.workspace }}/${{ env.UI_JAR }} --container-name ${{ env.AZ_BLOB_CONTAINER_NAME }} --account-name ${{ env.AZ_STORAGE_NAME }} --auth-mode login --overwrite --max-connections ${{ env.AZ_BLOB_MAX_CONNECTIONS }} --timeout ${{ env.AZ_BLOB_TIMEOUT }}
