@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.springframework.samples.petclinic.ui</groupId>
-    <artifactId>asa-spring-petclinic-ui</artifactId>
+    <artifactId>asa-spring-petclinic-ui-asa-e</artifactId>
     <packaging>jar</packaging>
     <description>Spring PetClinic UI with ASA-E Managed Spring Cloud Gateway</description>
 
