@@ -21,7 +21,25 @@
 param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
 
 param location string = resourceGroup().location
-// param rgName string = 'rg-${appName}'
+
+
+@description('The config-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
+param configServerAppIdentityName string = 'id-asa-${appName}-petclinic-config-server-dev-${location}-101'
+
+@description('The api-gateway Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
+param apiGatewayAppIdentityName string = 'id-asa-${appName}-petclinic-api-gateway-dev-${location}-101'
+
+@description('The UI for ASA-E Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
+param uiAppIdentityName string = 'id-asa-${appName}-petclinic-ui-dev-${location}-101'
+
+@description('The customers-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
+param customersServiceAppIdentityName string = 'id-asa-${appName}-petclinic-customers-service-dev-${location}-101'
+
+@description('The vets-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
+param vetsServiceAppIdentityName string = 'id-asa-${appName}-petclinic-vets-service-dev-${location}-101'
+
+@description('The visits-service Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
+param visitsServiceAppIdentityName string = 'id-asa-${appName}-petclinic-visits-service-dev-${location}-101'
 
 @maxLength(24)
 @description('The name of the KV, must be UNIQUE.  A vault name must be between 3-24 alphanumeric characters.')
@@ -104,6 +122,12 @@ module identities './modules/asa/identity.bicep' = {
   params: {
     appName: appName
     location: location
+    apiGatewayAppIdentityName: apiGatewayAppIdentityName
+    uiAppIdentityName: uiAppIdentityName
+    configServerAppIdentityName: configServerAppIdentityName
+    customersServiceAppIdentityName: customersServiceAppIdentityName
+    vetsServiceAppIdentityName: vetsServiceAppIdentityName
+    visitsServiceAppIdentityName: visitsServiceAppIdentityName
   }
 }
 
