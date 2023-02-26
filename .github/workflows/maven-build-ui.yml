@@ -89,7 +89,7 @@ jobs:
       uses: azure/login@v1 # https://github.com/marketplace/actions/azure-login
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
+
     - name: Build with Maven
       id: mvn_build
       run: |
@@ -110,10 +110,15 @@ jobs:
         envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.ts > spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.ts               
         envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.ts > spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.ts
 
+        echo "Checking Angular configuration ...""
+        ls -al spring-petclinic-ui-asa-e/src/main/resources/static/environments
+
         cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.ts
         cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.ts
         cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.ts  
         cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.ts
+
+        echo "Verified SPRING_CLOUD_GATEWAY_URL in Angular configuration"
 
         echo "****************************************************************************************"
         echo "*                                                                                      *"
@@ -135,12 +140,6 @@ jobs:
 
         echo "API_GATEWAY_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.API_GATEWAY }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
         echo "UI_JAR_ARTIFACT=${{ env.PRJ_PREFIX }}-${{ env.UI }}-${{ env.DEPLOYMENT_VERSION }}.jar" >> $GITHUB_ENV
-
-
-    - name: Azure Login
-      uses: azure/login@v1 # https://github.com/marketplace/actions/azure-login
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Authorize local IP access to the Azure BLOB Storage 
       if: ${{ always() }}
