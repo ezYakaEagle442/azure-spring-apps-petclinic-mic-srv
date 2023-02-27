@@ -99,7 +99,7 @@ jobs:
               -p apiPortalSsoClientSecret=${{ env.API_PORTAL_SSO_CLIENT_SECRET }} \
               -p apiPortalSsoIssuerUri=${{ env.SSO_APPLICATION_ISSUER_URI }} \
               -p apiPortalSsoEnabled=${{ env.API_PORTAL_SSO_ENABLED }} \
-              -p gatewayServerUrl=$GATEWAY_URL
+              -p gatewayServerUrl="https://$GATEWAY_URL"
 
               echo "SSO configured on API Portal + Gateway"
 
