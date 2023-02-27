@@ -202,17 +202,15 @@ resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConf
     protocol: 'HTTP'
     routes: [
       {
-        title: 'vets-service'
-        description: 'vets-service'
-        uri: 'http://vets-service'
-        order: 102
-        ssoEnabled: apiPortalSsoEnabled
+        title: 'Get All Vets'
+        description: 'Get All Vets calling vets-service'
+        order: 120
         filters: [
           'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
           'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-set-request-rate-limits-enterprise
         ]
         predicates: [
-          'Path=/api/vet/**'
+          // 'Path=/api/vet/**'
           'Path=/api/vet/vets'
         ]        
       }
@@ -233,17 +231,15 @@ resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeCo
     protocol: 'HTTP'
     routes: [
       {
-        title: 'visits-service' 
-        description: 'visits-service'
-        uri: 'http://visits-service'
-        order: 103
-        ssoEnabled: apiPortalSsoEnabled
+        title: 'Get Visits for a given {ownerId} & /{petId}' 
+        description: 'Get Visits calling visits-service'
+        order: 110
         filters: [
           'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
           'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://docs.vmware.com/en/VMware-Spring-Cloud-Gateway-for-Kubernetes/1.2/scg-k8s/GUID-route-filters.html#ratelimit-limiting-user-requests-filter
         ]
         predicates: [
-          'Path=/api/visit/**'
+          // 'Path=/api/visit/**'
           'Path=/api/visit/owners/{ownerId}/pets/{petId}/visits'
         ]  
       }
@@ -264,30 +260,82 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
     protocol: 'HTTP'
     routes: [
       {
-        description: 'customers-service'
-        title: 'customers-service'
-        uri: 'http://customers-service'
+        description: 'Get owners customers-service'
+        title: 'Get owners'
+        //uri: URI field should be used only ro route to external service out of ASA
         order: 101
-        ssoEnabled: apiPortalSsoEnabled
+        // ssoEnabled: false
+        filters: [
+          'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://docs.vmware.com/en/VMware-Spring-Cloud-Gateway-for-Kubernetes/1.2/scg-k8s/GUID-route-filters.html#ratelimit-limiting-user-requests-filter
+        ]
+        predicates: [ // /!\ 1 Path ONLY inside predicates
+          // 'Path=/api/customer/**' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-path-route-predicate-factory
+          'Path=/api/customer/owners'
+        ]
+      }
+      {
+        description: 'Get Pet Types'
+        title: 'Get Pet Types calling customers-service'
+        order: 102
+        // ssoEnabled: false
         filters: [
           'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
           'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://docs.vmware.com/en/VMware-Spring-Cloud-Gateway-for-Kubernetes/1.2/scg-k8s/GUID-route-filters.html#ratelimit-limiting-user-requests-filter
         ]
         predicates: [
-          'Path=/api/customer/**'
+          // 'Path=/api/customer/**' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-path-route-predicate-factory
           'Path=/api/customer/petTypes'
-          'Path=/api/customer/owners'
+        ]
+      }
+      {
+        description: 'Get Owner given a {ownerId}'
+        title: 'Get Owner calling customers-service'
+        order: 103
+        // ssoEnabled: false
+        filters: [
+          'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://docs.vmware.com/en/VMware-Spring-Cloud-Gateway-for-Kubernetes/1.2/scg-k8s/GUID-route-filters.html#ratelimit-limiting-user-requests-filter
+        ]
+        predicates: [
+          // 'Path=/api/customer/**' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-path-route-predicate-factory
           'Path=/api/customer/owners/{ownerId}'
+        ]
+      }      
+      {
+        description: 'Get Pets given a {ownerId}'
+        title: 'Get Pets calling customers-service'
+        order: 104
+        // ssoEnabled: false
+        filters: [
+          'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://docs.vmware.com/en/VMware-Spring-Cloud-Gateway-for-Kubernetes/1.2/scg-k8s/GUID-route-filters.html#ratelimit-limiting-user-requests-filter
+        ]
+        predicates: [
+          // 'Path=/api/customer/**' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-path-route-predicate-factory
+          'Path=/api/customer/owners/{ownerId}/pets'
+        ]
+      }      
+      {
+        description: 'Get a Pet given a {ownerId} and a {petId}'
+        title: 'Get Pet calling customers-service'
+        order: 105
+        // ssoEnabled: false
+        filters: [
+          'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
+          'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://docs.vmware.com/en/VMware-Spring-Cloud-Gateway-for-Kubernetes/1.2/scg-k8s/GUID-route-filters.html#ratelimit-limiting-user-requests-filter
+        ]
+        predicates: [
+          // 'Path=/api/customer/**' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-path-route-predicate-factory
           'Path=/api/customer/owners/{ownerId}/pets'
           'Path=/api/customer/owners/{ownerId}/pets/{petId}'
         ]
-      }
+      } 
     ]
   }
 }
 output CustomersGatewayRouteConfigId string = CustomersGatewayRouteConfig.id
 output CustomersGatewayRouteConfigAppResourceId string = CustomersGatewayRouteConfig.properties.appResourceId
 output CustomersGatewayRouteConfigRoutes array = CustomersGatewayRouteConfig.properties.routes
-output CustomersGatewayRouteConfigIsSsoEnabled bool = CustomersGatewayRouteConfig.properties.routes[0].ssoEnabled
-output CustomersGatewayRouteConfigPredicates array = CustomersGatewayRouteConfig.properties.routes[0].predicates
+output CustomersGatewayRouteConfigRoute0Predicates array = CustomersGatewayRouteConfig.properties.routes[0].predicates
 
