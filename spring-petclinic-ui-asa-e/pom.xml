@@ -223,7 +223,10 @@
 
             npm init
             npm install @angular/cli 
-           
+
+            cd src/main/resources/static/
+            npm i -g serve
+            serve .
         <profile>
             <id>build-ui</id>
             <build>
