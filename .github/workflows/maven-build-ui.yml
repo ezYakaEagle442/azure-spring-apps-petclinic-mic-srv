@@ -105,13 +105,13 @@ jobs:
         echo "gatewayUrl="$GATEWAY_URL
 
         export SPRING_CLOUD_GATEWAY_URL="https://$GATEWAY_URL"
-        envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/scripts/app.js >app.js
+        envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/scripts/config.js >config.js
         envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.js > environment.js
         envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.js > environment.dev.js
         envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.js > environment.staging.js               
         envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.js > environment.prod.js
 
-        cp app.js spring-petclinic-ui-asa-e/src/main/resources/static/scripts/app.js
+        cp config.js spring-petclinic-ui-asa-e/src/main/resources/static/scripts/config.js
         cp environment.js spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.js
         cp environment.dev.js spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.js
         cp environment.staging.js spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.js

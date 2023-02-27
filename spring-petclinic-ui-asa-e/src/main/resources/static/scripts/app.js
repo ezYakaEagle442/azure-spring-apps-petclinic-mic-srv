@@ -1,12 +1,16 @@
 'use strict';
+
+import {SPRING_CLOUD_GATEWAY_URL} from './config.js';
+
 /* npm install -g @angular/cli */
 /* App Module */
 var petClinicApp = angular.module('petClinicApp', [
     'ui.router', 'layoutNav', 'layoutFooter', 'layoutWelcome',
     'ownerList', 'ownerDetails', 'ownerForm', 'petForm', 'visits', 'vetList']);
 
+
 petClinicApp.constant('environment', {
-    SPRING_CLOUD_GATEWAY_URL: "$SPRING_CLOUD_GATEWAY_URL"
+    SPRING_CLOUD_GATEWAY_URL
     });
 
 petClinicApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', '$httpProvider', function(
