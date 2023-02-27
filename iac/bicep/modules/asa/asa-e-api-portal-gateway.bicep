@@ -306,20 +306,6 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
         ]
       }      
       {
-        description: 'Get Pets given a {ownerId}'
-        title: 'Get Pets calling customers-service'
-        order: 104
-        // ssoEnabled: false
-        filters: [
-          'StripPrefix=2' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-stripprefix-gatewayfilter-factory
-          'RateLimit=2,5s' // limit all users to two requests every 5 seconds https://docs.vmware.com/en/VMware-Spring-Cloud-Gateway-for-Kubernetes/1.2/scg-k8s/GUID-route-filters.html#ratelimit-limiting-user-requests-filter
-        ]
-        predicates: [
-          // 'Path=/api/customer/**' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-path-route-predicate-factory
-          'Path=/api/customer/owners/{ownerId}/pets'
-        ]
-      }      
-      {
         description: 'Get a Pet given a {ownerId} and a {petId}'
         title: 'Get Pet calling customers-service'
         order: 105
