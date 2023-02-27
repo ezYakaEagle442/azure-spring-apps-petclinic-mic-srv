@@ -327,7 +327,6 @@ resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/rout
         ]
         predicates: [
           // 'Path=/api/customer/**' // https://cloud.spring.io/spring-cloud-gateway/reference/html/#the-path-route-predicate-factory
-          'Path=/api/customer/owners/{ownerId}/pets'
           'Path=/api/customer/owners/{ownerId}/pets/{petId}'
         ]
       } 
