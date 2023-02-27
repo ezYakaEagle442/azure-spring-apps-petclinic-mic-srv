@@ -105,30 +105,37 @@ jobs:
         echo "gatewayUrl="$GATEWAY_URL
 
         export SPRING_CLOUD_GATEWAY_URL="https://$GATEWAY_URL"
-        envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.ts > environment.ts
-        envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.ts > environment.dev.ts
-        envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.ts > environment.staging.ts               
-        envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.ts > environment.prod.ts
+        envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/scripts/app.js >app.js
+        envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.js > environment.js
+        envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.js > environment.dev.js
+        envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.js > environment.staging.js               
+        envsubst < spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.js > environment.prod.js
 
-        cp environment.ts spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.ts
-        cp environment.dev.ts spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.ts
-        cp environment.staging.ts spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.ts
-        cp environment.prod.ts spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.ts
+        cp app.js spring-petclinic-ui-asa-e/src/main/resources/static/scripts/app.js
+        cp environment.js spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.js
+        cp environment.dev.js spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.js
+        cp environment.staging.js spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.js
+        cp environment.prod.js spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.js
 
         echo "Checking Angular configuration ..."
+
+        cat spring-petclinic-ui-asa-e/src/main/resources/static/scripts/app.js
+        echo ""
+
         ls -al spring-petclinic-ui-asa-e/src/main/resources/static/environments
+        echo ""
 
-        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.ts
+        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.js
         echo ""
 
         echo ""
-        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.ts
+        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.dev.js
         echo ""
 
-        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.ts
+        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.staging.js
         echo ""
 
-        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.ts
+        cat spring-petclinic-ui-asa-e/src/main/resources/static/environments/environment.prod.js
         echo ""
 
         echo ""
