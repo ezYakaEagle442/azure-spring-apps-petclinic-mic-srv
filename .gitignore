@@ -2,6 +2,8 @@ prv/*
 deploy/*
 cnf/*
 
+node_modules
+
 # Maven
 target/
 !.mvn/wrapper/maven-wrapper.jar
