@@ -168,6 +168,9 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureS
       ]
       allowedMethods: [
         'GET'
+        'POST'
+        'PUT'
+        'DELETE'
       ]
       allowedHeaders: [
         '*'
