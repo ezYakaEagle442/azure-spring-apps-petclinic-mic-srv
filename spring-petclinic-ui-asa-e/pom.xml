@@ -196,7 +196,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>            
+            </plugin>                      
         </plugins>
     </build>
 
@@ -213,5 +213,61 @@
                 </plugins>
             </build>
         </profile>
+
+        <!-- https://www.comakeit.com/blog/building-a-web-application-with-spring-boot-and-angular/#:~:text=1%20Step%201:%20Using%20spring%20initializer%20create%20a,rest%20api%20through%20curl%20command.%20...%20%C3%89l%C3%A9ments%20suppl%C3%A9mentaires -->
+        <!-- 
+            sudo apt install nodejs
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+            nvm list-remote
+            nvm install v18.14.2
+
+            npm init
+            npm install @angular/cli 
+           
+        <profile>
+            <id>build-ui</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>install frontend-app</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>node</executable>
+                                    <arguments>
+                                        <argument>${project.basedir}/src/main/resources/static</argument>
+                                        <argument>npm</argument>
+                                        <argument>install</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build ui</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>node</executable>
+                                    <arguments>
+                                        <argument>${project.basedir}/src/main/resources/static</argument>
+                                        <argument>ng</argument>
+                                        <argument>build</argument>
+                                        <argument>dash dashconfiguration=production</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        -->
     </profiles>
 </project>
