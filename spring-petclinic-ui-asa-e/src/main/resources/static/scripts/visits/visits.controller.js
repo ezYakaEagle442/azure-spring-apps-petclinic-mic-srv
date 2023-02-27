@@ -1,9 +1,9 @@
 'use strict';
 
-import { environment } from '../../environments/environment';
+// import { environment } from '../../environments/environment';
 
 angular.module('visits')
-    .controller('VisitsController', ['$http', '$state', '$stateParams', '$filter', function ($http, $state, $stateParams, $filter) {
+    .controller('VisitsController', ['$http', '$state', '$stateParams', '$filter', 'environment', function ($http, $state, $stateParams, $filter, environment) {
         var self = this;
         var petId = $stateParams.petId || 0;
         var url = environment.SPRING_CLOUD_GATEWAY_URL+"/api/visit/owners/" + ($stateParams.ownerId || 0) + "/pets/" + petId + "/visits";

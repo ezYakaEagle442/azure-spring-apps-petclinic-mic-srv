@@ -1,9 +1,9 @@
 'use strict';
 
-import { environment } from '../../environments/environment';
+// import { environment } from '../../environments/environment';
 
 angular.module('vetList')
-    .controller('VetListController', ['$http', function ($http) {
+    .controller('VetListController', ['$http', 'environment', function ($http, environment) {
         var self = this;
 
         $http.get(environment.SPRING_CLOUD_GATEWAY_URL+'/api/vet/vets').then(function (resp) {

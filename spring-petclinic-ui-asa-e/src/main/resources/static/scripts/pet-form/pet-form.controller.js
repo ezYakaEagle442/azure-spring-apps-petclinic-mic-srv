@@ -1,9 +1,9 @@
 'use strict';
 
-import { environment } from '../../environments/environment';
+// import { environment } from '../../environments/environment';
 
 angular.module('petForm')
-    .controller('PetFormController', ['$http', '$state', '$stateParams', function ($http, $state, $stateParams) {
+    .controller('PetFormController', ['$http', '$state', '$stateParams', 'environment', function ($http, $state, $stateParams, environment) {
         var self = this;
         var ownerId = $stateParams.ownerId || 0;
 

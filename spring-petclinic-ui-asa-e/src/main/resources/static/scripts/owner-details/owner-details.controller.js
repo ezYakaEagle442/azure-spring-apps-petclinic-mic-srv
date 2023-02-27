@@ -1,9 +1,9 @@
 'use strict';
 
-import { environment } from '../../environments/environment';
+// import { environment } from '../../environments/environment';
 
 angular.module('ownerDetails')
-    .controller('OwnerDetailsController', ['$http', '$stateParams', function ($http, $stateParams) {
+    .controller('OwnerDetailsController', ['$http', '$stateParams', 'environment', function ($http, $stateParams, environment) {
         var self = this;
 
         $http.get(environment.SPRING_CLOUD_GATEWAY_URL+'/api/customer/owners/' + $stateParams.ownerId).then(function (resp) {
