@@ -1,0 +1,14 @@
+{
+  "name": "petclinic-ui",
+  "version": "1.0.0",
+  "description": "Petclinic UI integrated with ASA-E Managed Spring Cloud Gateway",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@angular/cli": "^15.2.0"
+  }
+}
