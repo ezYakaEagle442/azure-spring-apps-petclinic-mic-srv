@@ -806,9 +806,9 @@ resource devToolPortals 'Microsoft.AppPlatform/Spring/DevToolPortals@2022-11-01-
       clientSecret: apiPortalSsoClientSecret
       metadataUrl: 'string'
       scopes: [
-        '???'
-        '???'
-        '???'
+        'openid'
+        'profile'
+        'email'
       ]
     }
     */
