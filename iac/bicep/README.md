@@ -216,6 +216,12 @@ API_PORTAL_SSO_CLIENT_SECRET | SSO_APPLICATION_CLIENT_PWD
 SSO_APPLICATION_ISSUER_URI |  PUT HERE THE VALUE OF $SSO_APPLICATION_ISSUER_URI 
 SSO_APPLICATION_JWK_SET_URI |  |  PUT HERE THE VALUE OF $SSO_APPLICATION_JWK_SET_URI
 
+Finally regarding RBAC, you ahve to create a custom Role and add permission 'Other: List environment variables secret for Microsoft Azure Spring Apps Spring Cloud Gateway' to be able to view the Spring Cloud Gateway from he Azure Portal
+
+Check :
+- [https://github.com/Azure/Azure-Spring-Apps/issues/37](https://github.com/Azure/Azure-Spring-Apps/issues/37)
+- [https://learn.microsoft.com/en-us/azure/spring-apps/how-to-permissions?tabs=Azure-portal](https://learn.microsoft.com/en-us/azure/spring-apps/how-to-permissions?tabs=Azure-portal)
+
 ## Standard Tier
 
 To use [Pipelines with GitHub Actions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-github-actions?tabs=CLI) see [../../../README.md](../../README.md)
