@@ -18,9 +18,8 @@ param serverName string = appName
 
 @description('Azure Spring Apps Outbound Public IPs as an Array')
 param azureSpringAppsOutboundPubIP array
-
 // https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/how-to-deploy-on-azure-free-account
-@description('Azure database for MySQL SKU')
+@description('Azure Database for MySQL SKU')
 @allowed([
   'Standard_D4s_v3'
   'Standard_D2s_v3'
@@ -28,7 +27,7 @@ param azureSpringAppsOutboundPubIP array
 ])
 param databaseSkuName string = 'Standard_B1ms' //  'GP_Gen5_2' for single server
 
-@description('Azure database for PostgreSQL pricing tier')
+@description('Azure Database for MySQL pricing tier')
 @allowed([
   'Burstable'
   'GeneralPurpose'
@@ -36,7 +35,7 @@ param databaseSkuName string = 'Standard_B1ms' //  'GP_Gen5_2' for single server
 ])
 param databaseSkuTier string = 'Burstable'
 
-@description('PostgreSQL version see https://learn.microsoft.com/en-us/azure/mysql/concepts-version-policy')
+@description('MySQL version see https://learn.microsoft.com/en-us/azure/mysql/concepts-version-policy')
 @allowed([
   '8.0'
   '5.7'
