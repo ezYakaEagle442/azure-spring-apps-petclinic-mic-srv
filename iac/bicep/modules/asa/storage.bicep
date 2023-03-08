@@ -182,7 +182,7 @@ resource azureblobservice 'Microsoft.Storage/storageAccounts/blobServices@2022-0
       ]
       enable: false
       name: 'AccessTimeTracking'
-      trackingGranularityInDays: 2
+      trackingGranularityInDays: 1
     }
     restorePolicy: {
       days: 2
