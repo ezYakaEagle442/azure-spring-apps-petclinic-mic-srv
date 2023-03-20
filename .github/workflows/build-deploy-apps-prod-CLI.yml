@@ -269,6 +269,7 @@ jobs:
 
     - name: Display environment variables
       run: |
+
         echo "Checking GITHUB_ENV"
 
         echo "LOCAL_IP=$LOCAL_IP"
@@ -320,7 +321,6 @@ jobs:
         # Runner will be blocked by network rules of storage account. Must Allow its IP
         echo "/!\ In Bicep : RBAC ==> GH Runner SPN must have "Storage Blob Data Contributor" Role on the storage Account"
         echo "/!\ The SPN Id is NOT the App Registration Object ID, but the Enterprise Registration Object ID"
-
 
         pwd
         ls -al
@@ -440,6 +440,10 @@ jobs:
         echo "VETS_SERVICE_LIVENESS_PROBE_CFG=$VETS_SERVICE_LIVENESS_PROBE_CFG"
         echo "VETS_SERVICE_READINESS_PROBE_CFG=$VETS_SERVICE_READINESS_PROBE_CFG"
 
+        # https://github.com/Azure/Azure-Spring-Apps/issues/17
+        PROD_DEPLOYMENT_NAME=$(az spring app deployment list --app ${{ env.VETS_SERVICE }} --service ${{ env.AZURE_SPRING_APPS_SERVICE }} -g ${{ env.RG_APP }} --query "[?properties.active].name")
+        echo "PROD_DEPLOYMENT_NAME="$PROD_DEPLOYMENT_NAME
+        
         if [ $DEPLOYMENT_STAGING ] && [ $DEPLOYMENT_ACTION == "deploy" ]
         then
           echo "Set deployment name to STAGING"
