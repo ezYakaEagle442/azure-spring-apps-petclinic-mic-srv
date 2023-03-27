@@ -88,12 +88,31 @@ param blobContainerName string = '${appName}-blob'
 @description('the GitHub Runner Service Principal Id')
 param ghRunnerSpnPrincipalId string
 
+@allowed([
+  'CapacityReservation'
+  'LACluster'
+]
+)
+@description('The Log AnalyticsWorkspace SKU - see https://learn.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs')
+param laSKU string = 'LACluster'
+
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.operationalinsights/workspaces?tabs=bicep
 resource logAnalyticsWorkspace  'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: logAnalyticsWorkspaceName
   location: location
+  properties: any({
+    retentionInDays: 30
+    features: {
+      searchVersion: 1
+    }
+    sku: {
+      name: laSKU
+    }
+  })
 }
 output logAnalyticsWorkspaceResourceId string = logAnalyticsWorkspace.id
+output logAnalyticsWorkspaceName string = logAnalyticsWorkspace.name
+output logAnalyticsWorkspaceCustomerId string = logAnalyticsWorkspace.properties.customerId
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.insights/components?tabs=bicep
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
