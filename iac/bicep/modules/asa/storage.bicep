@@ -185,7 +185,7 @@ resource azureblobservice 'Microsoft.Storage/storageAccounts/blobServices@2022-0
       trackingGranularityInDays: 1
     }
     restorePolicy: {
-      days: 2
+      days: 1
       enabled: false
     }
   }
