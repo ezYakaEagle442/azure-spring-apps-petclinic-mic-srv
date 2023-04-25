@@ -166,13 +166,13 @@ resource azureblobservice 'Microsoft.Storage/storageAccounts/blobServices@2022-0
   properties: {
     containerDeleteRetentionPolicy: {
       allowPermanentDelete: true
-      days: 1
+      days: 2
       enabled: true
     }
     // defaultServiceVersion: ''
     deleteRetentionPolicy: {
       allowPermanentDelete: true
-      days: 1
+      days: 2
       enabled: true
     }
     isVersioningEnabled: false
