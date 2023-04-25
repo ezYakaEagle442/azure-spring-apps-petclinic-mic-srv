@@ -18,7 +18,7 @@
 @maxLength(23)
 // to get a unique name each time ==> param appName string = 'demo${uniqueString(resourceGroup().id, deployment().name)}'
 // uniqueString Creates a deterministic hash string based on the values provided as parameters. The returned value is 13 characters long
-param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 param location string = resourceGroup().location
 

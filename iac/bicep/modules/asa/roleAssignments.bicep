@@ -15,7 +15,7 @@ param asaCustomersServicePrincipalId string
 param asaVetsServicePrincipalId string
 param asaVisitsServicePrincipalId string
 
-resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+resource kv 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
   name: kvName
   scope: resourceGroup(kvRGName)
 }

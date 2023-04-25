@@ -17,7 +17,7 @@
 // You can only use this function within an expression for the default value of a parameter.
 @maxLength(23)
 // to get a unique name each time ==> param appName string = 'demo${uniqueString(resourceGroup().id, deployment().name)}'
-param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 param location string = resourceGroup().location
 // param rgName string = 'rg-${appName}'
@@ -129,26 +129,6 @@ param mySQLServerName string = 'petcliasa'
 @description('The MySQL administrator Login')
 param mySQLadministratorLogin  string = 'mys_adm'
 
-@description('Should a MySQL Firewall be set to allow client workstation for local Dev/Test only')
-param setFwRuleClient bool = false
-
-@description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
-param startIpAddress string = '10.42.1.0'
-
-@description('Allow Azure Spring Apps from Apps subnet to access MySQL DB')
-param endIpAddress string = '10.42.1.15'
-
-/*
-module rg 'rg.bicep' = {
-  name: 'rg-bicep-${appName}'
-  scope: subscription()
-  params: {
-    rgName: rgName
-    location: location
-  }
-}
-*/
-
 
 module azurespringapps './modules/asa/asa-e.bicep' = if (azureSpringAppsTier=='Enterprise') {
   name: 'asa-e-pub'
@@ -183,7 +163,7 @@ resource kvRG 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   scope: subscription()
 }
 
-resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+resource kv 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
   name: kvName
   scope: kvRG
 }  

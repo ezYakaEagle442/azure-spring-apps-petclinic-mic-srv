@@ -7,7 +7,7 @@ az deployment group create --name iac-101-asa-dns -f ./asa/dns.bicep -g rg-iac-a
 
 @description('A UNIQUE name')
 @maxLength(23)
-param appName string = 'petcliasa${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location

@@ -6,7 +6,7 @@ az deployment group create --name asa-petclinic-storage -f iac/bicep/modules/asa
 */
 @description('A UNIQUE name')
 @maxLength(23)
-param appName string = 'petcliasa${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
@@ -49,7 +49,7 @@ param storageIdentityName string = 'id-asa-${appName}-petclinic-strorage-dev-${l
 
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.managedidentity/userassignedidentities?pivots=deployment-language-bicep
-resource storageIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
+resource storageIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: storageIdentityName
   location: location
   tags: tags
@@ -57,7 +57,7 @@ resource storageIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-
 output storageIdentityId string = storageIdentity.id
 output storageIdentityPrincipalId string = storageIdentity.properties.principalId
 
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-12-01' existing = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2023-03-01-preview' existing = {
   name: azureSpringAppsInstanceName
 }
 

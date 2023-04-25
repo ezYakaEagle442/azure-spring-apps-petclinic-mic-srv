@@ -5,7 +5,7 @@ param location string = resourceGroup().location
 
 @description('A UNIQUE name')
 @maxLength(23)
-param appName string = 'petcliasa${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 @description('The Identity Tags. See https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources?tabs=bicep#apply-an-object')
 param tags object = {
@@ -54,7 +54,7 @@ output configServerIdentityId string = configServerIdentity.id
 output configServerIdentityName string = configServerIdentity.name
 output configServerPrincipalId string = configServerIdentity.properties.principalId
 
-resource apiGatewayIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
+resource apiGatewayIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: apiGatewayAppIdentityName
   location: location
   tags: tags
@@ -64,7 +64,7 @@ output apiGatewayIdentityId string = apiGatewayIdentity.id
 output apiGatewayIdentityName string = apiGatewayIdentity.name
 output apiGatewayPrincipalId string = apiGatewayIdentity.properties.principalId
 
-resource uiAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
+resource uiAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: uiAppIdentityName
   location: location
   tags: tags
@@ -74,7 +74,7 @@ output uiAppIdentityId string = uiAppIdentity.id
 output uiAppIdentityName string = uiAppIdentity.name
 output uiAppIdentityPrincipalId string = uiAppIdentity.properties.principalId
 
-resource customersServicedentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
+resource customersServicedentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: customersServiceAppIdentityName
   location: location
   tags: tags
@@ -84,7 +84,7 @@ output customersServiceIdentityId string = customersServicedentity.id
 output customersServiceIdentityName string = customersServicedentity.name
 output customersServicePrincipalId string = customersServicedentity.properties.principalId
 
-resource vetsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
+resource vetsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: vetsServiceAppIdentityName
   location: location
   tags: tags
@@ -94,7 +94,7 @@ output vetsServiceIdentityId string = vetsServiceIdentity.id
 output vetsServiceIdentityName string = vetsServiceIdentity.name
 output vetsServicePrincipalId string = vetsServiceIdentity.properties.principalId
 
-resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
+resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: visitsServiceAppIdentityName
   location: location
   tags: tags

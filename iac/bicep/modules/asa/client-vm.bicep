@@ -2,7 +2,7 @@
 
 @description('A UNIQUE name')
 @maxLength(23)
-param appName string = 'petcliasa${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
@@ -34,7 +34,7 @@ param nicName string = 'nic-asa-${appName}-client-vm'
 @description('emailRecipient ainformed before the VM shutdown')
 param autoShutdownNotificationEmail string
 
-resource vnet 'Microsoft.Network/virtualNetworks@2021-08-01' existing =  {
+resource vnet 'Microsoft.Network/virtualNetworks@2022-09-01' existing =  {
   name: vnetName
 }
 output vnetId string = vnet.id
@@ -42,7 +42,7 @@ output vnetGUID string = vnet.properties.resourceGuid
 output subnetId string = vnet.properties.subnets[0].id
 
 // https://docs.microsoft.com/en-us/azure/templates/microsoft.network/publicipaddresses?tabs=bicep#publicipaddresssku
-resource pip 'Microsoft.Network/publicIPAddresses@2021-08-01' = {
+resource pip 'Microsoft.Network/publicIPAddresses@2022-09-01' = {
   name: 'pip-vm-asa-petclinic-client'
   location: location
   sku: {
@@ -58,7 +58,7 @@ output pipId string = pip.id
 output pipGUID string = pip.properties.resourceGuid
 output pipAddress string = pip.properties.ipAddress
 
-resource NSG 'Microsoft.Network/networkSecurityGroups@2021-08-01' = {
+resource NSG 'Microsoft.Network/networkSecurityGroups@2022-09-01' = {
   name: nsgName
   location: location
   properties: {
@@ -82,7 +82,7 @@ resource NSG 'Microsoft.Network/networkSecurityGroups@2021-08-01' = {
 }
 
 // https://docs.microsoft.com/en-us/azure/templates/microsoft.network/networkinterfaces?tabs=bicep
-resource NIC1 'Microsoft.Network/networkInterfaces@2021-08-01' = {
+resource NIC1 'Microsoft.Network/networkInterfaces@2022-09-01' = {
   location: location
   name: nicName
   properties: {
@@ -126,7 +126,7 @@ var unattendSetLocalRegionFirstRunXML = '<FirstLogonCommands><SynchronousCommand
 var customScript = 'Set-WinSystemLocale fr-FR\\r\\nSet-WinUserLanguageList -LanguageList fr-FR -Force\\r\\nSet-Culture -CultureInfo fr-FR\\r\\nSet-WinHomeLocation -GeoId 84\\r\\nRestart-Computer -Force'
 
 // https://docs.microsoft.com/en-us/azure/templates/microsoft.compute/virtualmachines?tabs=bicep
-resource windowsVM 'Microsoft.Compute/virtualMachines@2022-08-01' = {
+resource windowsVM 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   name: windowsVMName
   location: location
   properties: {

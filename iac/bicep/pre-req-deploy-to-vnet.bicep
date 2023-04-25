@@ -17,7 +17,7 @@
 // You can only use this function within an expression for the default value of a parameter.
 @maxLength(23)
 // to get a unique name each time ==> param appName string = 'demo${uniqueString(resourceGroup().id, deployment().name)}'
-param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 param location string = resourceGroup().location
 // param rgName string = 'rg-${appName}'
@@ -98,7 +98,7 @@ resource kvRG 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   scope: subscription()
 }
 
-resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
+resource kv 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
   name: kvName
   scope: kvRG
 }
@@ -154,7 +154,7 @@ module vnetModule './modules/asa/vnet.bicep' = if (deployToVNet) {
   }   
 }
 
-resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' existing = if (deployToVNet) {
+resource vnet 'Microsoft.Network/virtualNetworks@2022-09-01' existing = if (deployToVNet) {
   name: vnetName
 }
 

@@ -1,7 +1,7 @@
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring?tabs=bicep
 @description('A UNIQUE name')
 @maxLength(23)
-param appName string = 'petcliasa${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 param deploymentVersion string = '2.6.13'
 
@@ -90,13 +90,13 @@ resource kvRG 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   scope: subscription()
 }
 
-resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+resource kv 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
   name: kvName
   scope: kvRG
 }
 // pre-req: https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-azure-cli#prerequisites
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-11-01-preview' existing = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2023-03-01-preview' existing = {
   name: azureSpringAppsInstanceName
 }
 
@@ -117,42 +117,42 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appInsightsName
 }
 
-resource configServerIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource configServerIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: configServerAppIdentityName
 }
 
-resource apiGatewayIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource apiGatewayIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: apiGatewayAppIdentityName
 }
 
-resource customersServicedentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource customersServicedentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: customersServiceAppIdentityName
 }
 
-resource vetsServiceAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource vetsServiceAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: vetsServiceAppIdentityName
 }
 
-resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: visitsServiceAppIdentityName
 }
 
-resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2022-12-01' existing = {
+resource azureSpringAppsconfigserver 'Microsoft.AppPlatform/Spring/configServers@2023-03-01-preview' existing = {
   name: configServerName
 }
 
-resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
+resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' existing = {
   name: 'customers-service'
   parent: azureSpringApps
 }
 
-resource adminserverapp 'Microsoft.AppPlatform/Spring/apps@2022-11-01-preview' existing = {
+resource adminserverapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' existing = {
   name: 'adm-test'
   parent: azureSpringApps
 }
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/apps/deployments?pivots=deployment-language-bicep
-resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-12-01' = {
+resource adminserverappdeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2023-03-01-preview' = {
   name: 'default'
   parent: adminserverapp
   sku: {
@@ -278,18 +278,18 @@ resource getUploadUrl 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
 */
 
 
-resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
+resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' existing = {
   name: 'vets-service'
   parent: azureSpringApps
 
 }
 
-resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
+resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' existing = {
   name: 'visits-service'
   parent: azureSpringApps
 }
 
-resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
+resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' existing = {
   name: 'api-gateway'
   parent: azureSpringApps
 }

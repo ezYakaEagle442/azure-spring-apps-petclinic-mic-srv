@@ -10,7 +10,7 @@
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring?tabs=bicep
 @description('A UNIQUE name')
 @maxLength(23)
-param appName string = 'petcliasa${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
@@ -78,7 +78,7 @@ resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-12-01' existing = {
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-use-enterprise-api-portal
 // az spring api-portal  update  --help
-resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: apiPortalName
   parent: azureSpringApps
   sku: {
@@ -123,7 +123,7 @@ resource gatewayCustomdomain 'Microsoft.AppPlatform/Spring/gateways/domains@2022
 */
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways?pivots=deployment-language-bicep
-resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource gateway 'Microsoft.AppPlatform/Spring/gateways@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: gatewayName
   parent: azureSpringApps
   sku: {
@@ -181,23 +181,23 @@ resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureS
 output gatewayId string = gateway.id
 output gatewayUrl string = gateway.properties.url
 
-resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
+resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' existing = {
   name: 'vets-service'
   parent: azureSpringApps
 }
 
-resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
+resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' existing = {
   name: 'customers-service'
   parent: azureSpringApps
 }
 
-resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' existing = {
+resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' existing = {
   name: 'visits-service'
   parent: azureSpringApps
 }
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways/routeconfigs?pivots=deployment-language-bicep
-resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource VetsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'vets-service-gateway-route-config'
   parent: gateway
   properties: {
@@ -226,7 +226,7 @@ output VetsGatewayRouteConfigRoutes array = VetsGatewayRouteConfig.properties.ro
 output VetsGatewayRouteConfigIsSsoEnabled bool = VetsGatewayRouteConfig.properties.routes[0].ssoEnabled
 output VetsGatewayRouteConfigPredicates array = VetsGatewayRouteConfig.properties.routes[0].predicates
 
-resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource VisitsGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'visits-service-gateway-route-config'
   parent: gateway
   properties: {
@@ -255,7 +255,7 @@ output VisitsGatewayRouteConfigRoutes array = VisitsGatewayRouteConfig.propertie
 output VisitsGatewayRouteConfigIsSsoEnabled bool = VisitsGatewayRouteConfig.properties.routes[0].ssoEnabled
 output VisitsGatewayRouteConfigPredicates array = VisitsGatewayRouteConfig.properties.routes[0].predicates
 
-resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource CustomersGatewayRouteConfig 'Microsoft.AppPlatform/Spring/gateways/routeConfigs@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'customers-service-gateway-route-config'
   parent: gateway
   properties: {

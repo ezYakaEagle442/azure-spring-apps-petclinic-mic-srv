@@ -29,15 +29,15 @@ param asaCustomersServicePrincipalId string
 param asaVetsServicePrincipalId string
 param asaVisitsServicePrincipalId string
 
-resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' existing = {
+resource vnet 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
   name: vnetName
 }
 
-resource appSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-05-01' existing = {
+resource appSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing = {
   name: '${vnetName}/${subnetName}'
 }
 
-resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
+resource kv 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
   name: kvName
   scope: resourceGroup(kvRGName)
 }

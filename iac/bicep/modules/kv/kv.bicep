@@ -8,7 +8,7 @@ Microsoft.KeyVault/locations/deletedVaults/purge/action
 
 @description('A UNIQUE name')
 @maxLength(23)
-param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 @maxLength(24)
 @description('The name of the KV, must be UNIQUE.  A vault name must be between 3-24 alphanumeric characters.')
@@ -48,7 +48,7 @@ param ipRules array = []
 ]
 */
 
-resource kv 'Microsoft.KeyVault/vaults@2022-07-01' = {
+resource kv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: kvName
   location: location
   properties: {

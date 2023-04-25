@@ -10,7 +10,7 @@
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring?tabs=bicep
 @description('A UNIQUE name')
 @maxLength(23)
-param appName string = 'petcliasa${uniqueString(deployment().name)}'
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
@@ -176,13 +176,13 @@ resource kvRG 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   scope: subscription()
 }
 
-resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+resource kv 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
   name: kvName
   scope: kvRG
 }
 // pre-req: https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-azure-cli#prerequisites
-resource azureSpringApps 'Microsoft.AppPlatform/Spring@2022-12-01' = {
+resource azureSpringApps 'Microsoft.AppPlatform/Spring@2023-03-01-preview' = {
   name: azureSpringAppsInstanceName
   location: location
   sku: {
@@ -262,7 +262,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-infrastructure-vnet-bicep?tabs=azure-spring-apps-enterprise
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-application-insights?pivots=sc-enterprise-tier
-resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   // name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' default (for Build Service ) /default (Builder) /default (Build Pack binding name)
   name: '${azureSpringApps.name}/default/default/default' 
   properties: {
@@ -279,7 +279,7 @@ resource azureSpringAppsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildSe
   ]
 }
 
-resource azureSpringAppsJavaBuilderAppInsightsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource azureSpringAppsJavaBuilderAppInsightsMonitoringSettings 'Microsoft.AppPlatform/Spring/buildServices/builders/buildpackBindings@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   // name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' default (for Build Service ) /default (Builder) /default (Build Pack binding name)
   name: '${azureSpringApps.name}/${buildServiceName}/${builderName}/${monitoringSettingsName}' 
   properties: {
@@ -299,28 +299,28 @@ resource azureSpringAppsJavaBuilderAppInsightsMonitoringSettings 'Microsoft.AppP
 
 
 
-resource apiGatewayIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource apiGatewayIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: apiGatewayAppIdentityName
 }
 
-resource uiIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource uiIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: uiAppIdentityName
 }
 
-resource customersServicedentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource customersServicedentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: customersServiceAppIdentityName
 }
 
-resource vetsServiceAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource vetsServiceAppIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: vetsServiceAppIdentityName
 }
 
-resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
+resource visitsServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: visitsServiceAppIdentityName
 }
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-09-01-preview/spring/configurationservices?pivots=deployment-language-bicep
-resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: applicationConfigurationServiceName
   parent: azureSpringApps
   properties: {
@@ -349,7 +349,7 @@ resource appconfigservice 'Microsoft.AppPlatform/Spring/configurationServices@20
   }
 }
 
-resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
+resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' = {
   name: 'customers-service'
   location: location
   parent: azureSpringApps
@@ -389,7 +389,7 @@ resource customersserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
 }
 output customersServiceIdentity string = customersserviceapp.identity.userAssignedIdentities['${customersServicedentity.id}'].principalId
 
-resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
+resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' = {
   name: 'vets-service'
   location: location
   parent: azureSpringApps
@@ -429,7 +429,7 @@ resource vetsserviceapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
 }
 output vetsServiceIdentity string = vetsserviceapp.identity.userAssignedIdentities['${vetsServiceAppIdentity.id}'].principalId
 
-resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
+resource visitsservicerapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' = {
   name: 'visits-service'
   location: location
   parent: azureSpringApps
@@ -471,7 +471,7 @@ output visitsServiceIdentity string = visitsservicerapp.identity.userAssignedIde
 
 
 // https://github.com/MicrosoftDocs/azure-docs/issues/102825
-resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
+resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' = {
   name: 'api-gateway'
   location: location
   parent: azureSpringApps
@@ -514,7 +514,7 @@ resource apigatewayapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
 }
 output apiGatewayIdentity string = apigatewayapp.identity.userAssignedIdentities['${apiGatewayIdentity.id}'].principalId
 
-resource uiapp 'Microsoft.AppPlatform/Spring/apps@2022-12-01' = {
+resource uiapp 'Microsoft.AppPlatform/Spring/apps@2023-03-01-preview' = {
   name: 'ui-asa-e' // App name must be between 4 and 32 characters long
   location: location
   parent: azureSpringApps
@@ -618,7 +618,7 @@ az spring service-registry bind \
 
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-deploy-apps-enterprise#activate-service-registration-and-discovery
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/serviceregistries?pivots=deployment-language-bicep
-resource serviceRegistry 'Microsoft.AppPlatform/Spring/serviceRegistries@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource serviceRegistry 'Microsoft.AppPlatform/Spring/serviceRegistries@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: serviceRegistryName
   parent: azureSpringApps
 
@@ -632,7 +632,7 @@ output serviceRegistryId string = serviceRegistry.id
 // https://learn.microsoft.com/en-us/azure/spring-apps/quickstart-configure-single-sign-on-enterprise
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-use-enterprise-api-portal
 // az spring api-portal  update  --help
-resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource apiPortal 'Microsoft.AppPlatform/Spring/apiPortals@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: apiPortalName
   parent: azureSpringApps
   sku: {
@@ -657,7 +657,7 @@ output apiPortalUrl string = apiPortal.properties.url
 output gatewayIds array = apiPortal.properties.gatewayIds
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2022-11-01-preview/spring/gateways?pivots=deployment-language-bicep
-resource gateway 'Microsoft.AppPlatform/Spring/gateways@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource gateway 'Microsoft.AppPlatform/Spring/gateways@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: gatewayName
   parent: azureSpringApps
   sku: {
@@ -706,14 +706,14 @@ output gatewayUrl string = gateway.properties.url
 
 // https://github.com/Azure/azure-rest-api-specs/issues/18286
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
-resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-12-01' existing = if (azureSpringAppsTier=='Enterprise') {
+resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2023-03-01-preview' existing = if (azureSpringAppsTier=='Enterprise') {
   //scope: resourceGroup('my RG')
   name: '${azureSpringAppsInstanceName}/${buildServiceName}' 
   // parent: azureSpringApps
 }
 
 // /!\ should add ' existing' = if (azureSpringAppsTier=='Enterprise') {
-resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   // '{your-service-name}/default/default'  //{your-service-name}/{build-service-name}/{agenpool-name}
   name: '${azureSpringAppsInstanceName}/${buildServiceName}/${buildAgentPoolName}' // default/default as buildServiceName / agentpoolName
   properties: {
@@ -730,7 +730,7 @@ resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2
 // /!\ If you're using the tanzu-buildpacks/java-azure buildpack, we recommend that you set the BP_JVM_VERSION environment variable in the build-env argument.
 // az spring build-service builder create --help
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal#default-builder-and-tanzu-buildpacks
-resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: builderName
   parent: buildService
   properties: {
@@ -787,7 +787,7 @@ resource buildResult 'Microsoft.AppPlatform/Spring/buildServices/builds/results@
 
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring/devtoolportals?pivots=deployment-language-bicep
-resource devToolPortals 'Microsoft.AppPlatform/Spring/DevToolPortals@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource devToolPortals 'Microsoft.AppPlatform/Spring/DevToolPortals@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'default'
   parent: azureSpringApps
   properties: {
@@ -816,7 +816,7 @@ resource devToolPortals 'Microsoft.AppPlatform/Spring/DevToolPortals@2022-11-01-
 }
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring/applicationaccelerators?pivots=deployment-language-bicep
-resource appAccelerators 'Microsoft.AppPlatform/Spring/applicationAccelerators@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource appAccelerators 'Microsoft.AppPlatform/Spring/applicationAccelerators@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
  name: 'default'
  parent: azureSpringApps
  sku: {
@@ -834,7 +834,7 @@ output appAcceleratorsComponents array = appAccelerators.properties.components
 // C# Weather Forecast ? or asa-weatherforecast-csharp ?
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring/applicationaccelerators/predefinedaccelerators?pivots=deployment-language-bicep
-resource predefinedAcceleratorACME 'Microsoft.AppPlatform/Spring/applicationAccelerators/predefinedAccelerators@2022-11-01-preview' existing  = if (azureSpringAppsTier=='Enterprise') {
+resource predefinedAcceleratorACME 'Microsoft.AppPlatform/Spring/applicationAccelerators/predefinedAccelerators@2023-03-01-preview' existing  = if (azureSpringAppsTier=='Enterprise') {
   name: 'asa-acme-fitness-store'
   parent: appAccelerators
 }
@@ -844,7 +844,7 @@ output predefinedAcceleratorsDisplayName string = predefinedAcceleratorACME.prop
 
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/spring/applicationliveviews?pivots=deployment-language-bicep
-resource appLiveViews 'Microsoft.AppPlatform/Spring/applicationLiveViews@2022-11-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource appLiveViews 'Microsoft.AppPlatform/Spring/applicationLiveViews@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: 'default'
   parent: azureSpringApps
  }

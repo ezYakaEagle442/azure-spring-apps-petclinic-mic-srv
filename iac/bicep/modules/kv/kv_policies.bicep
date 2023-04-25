@@ -1,6 +1,6 @@
 @description('A UNIQUE name')
-@maxLength(20)
-param appName string = 'petcliasa${uniqueString(resourceGroup().id)}'
+@maxLength(23)
+param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
 
 @maxLength(24)
 @description('The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters.')
@@ -20,7 +20,7 @@ resource kv 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 // create accessPolicies https://docs.microsoft.com/en-us/azure/templates/microsoft.keyvault/vaults/accesspolicies?tabs=bicep
 // /!\ Preview feature: When enableRbacAuthorization is true in KV, the key vault will use RBAC for authorization of data actions, and the access policies specified in vault properties will be ignored
 // https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/loops#loop-with-condition
-resource kvAccessPolicies 'Microsoft.KeyVault/vaults/accessPolicies@2022-07-01' = { 
+resource kvAccessPolicies 'Microsoft.KeyVault/vaults/accessPolicies@2023-02-01' = { 
   name: 'add' // any('add-${app.appName}')
   parent: kv // https://github.com/Azure/bicep/issues/5660 https://gitmetadata.com/repo/Azure/bicep/issues/4756
   properties: {
