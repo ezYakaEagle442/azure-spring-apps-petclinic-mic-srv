@@ -159,7 +159,7 @@ output azurestorageId string = azurestorage.id
 output azurestorageHttpEndpoint string = azurestorage.properties.primaryEndpoints.blob
 output azurestorageFileEndpoint string = azurestorage.properties.primaryEndpoints.file
 
-
+// az storage account blob-service-properties show -n staasapetcliasa -g rg-iac-asa-petclinic-mic-srv
 resource azureblobservice 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
   name: azureBlobServiceName
   parent: azurestorage
@@ -185,7 +185,7 @@ resource azureblobservice 'Microsoft.Storage/storageAccounts/blobServices@2022-0
       trackingGranularityInDays: 1
     }
     restorePolicy: {
-      days: 2
+      days: 30
       enabled: false
     }
   }
