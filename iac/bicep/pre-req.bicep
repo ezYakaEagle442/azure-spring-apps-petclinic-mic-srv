@@ -91,10 +91,15 @@ param ghRunnerSpnPrincipalId string
 @allowed([
   'CapacityReservation'
   'LACluster'
+  'PerGB2018'
+  'Standalone'
+  'PerNode'
+  'Premium'
+  'Standard'
 ]
 )
 @description('The Log AnalyticsWorkspace SKU - see https://learn.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs')
-param laSKU string = 'LACluster'
+param laSKU string = 'PerGB2018'
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.operationalinsights/workspaces?tabs=bicep
 resource logAnalyticsWorkspace  'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
