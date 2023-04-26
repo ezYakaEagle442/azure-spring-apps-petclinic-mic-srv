@@ -22,6 +22,10 @@ param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription
 param location string = resourceGroup().location
 // param rgName string = 'rg-${appName}'
 
+// https://docs.microsoft.com/en-us/rest/api/containerregistry/registries/check-name-availability
+@description('The name of the ACR, must be UNIQUE. The name must contain only alphanumeric characters, be globally unique, and between 5 and 50 characters in length.')
+param acrName string = appName
+
 @maxLength(24)
 @description('The name of the KV, must be UNIQUE.  A vault name must be between 3-24 alphanumeric characters.')
 param kvName string // = 'kv-${appName}'
@@ -138,6 +142,7 @@ module azurespringapps './modules/asa/asa-e.bicep' = if (azureSpringAppsTier=='E
     location: location
     kvName: kvName
     kvRGName: kvRGName
+    acrName: acrName
     azureSpringAppsInstanceName: azureSpringAppsInstanceName
     azureSpringAppsSkuCapacity: azureSpringAppsSkuCapacity
     azureSpringAppsSkuName: azureSpringAppsSkuName
