@@ -706,14 +706,13 @@ output gatewayId string = gateway.id
 output gatewayUrl string = gateway.properties.url
 // output gatewayApiserverUrl string = gateway.properties.apiMetadataProperties.serverUrl
 
-
 resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
   name: acrName
 }
 
 // https://github.com/Azure/azure-rest-api-specs/blob/main/specification/appplatform/resource-manager/Microsoft.AppPlatform/preview/2023-03-01-preview/examples/ContainerRegistries_CreateOrUpdate.json
 resource containerregistry 'Microsoft.AppPlatform/Spring/containerRegistries@2023-03-01-preview' = {
-  name: acrName
+  name: 'default' // only 'default' is supported.
   parent: azureSpringApps
   properties: {
     credentials : {
