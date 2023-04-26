@@ -297,8 +297,6 @@ resource azureSpringAppsJavaBuilderAppInsightsMonitoringSettings 'Microsoft.AppP
   ]
 }
 
-
-
 resource apiGatewayIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: apiGatewayAppIdentityName
 }
@@ -706,14 +704,14 @@ output gatewayUrl string = gateway.properties.url
 
 // https://github.com/Azure/azure-rest-api-specs/issues/18286
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
-resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2023-03-01-preview' existing = if (azureSpringAppsTier=='Enterprise') {
+resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-12-01' existing = if (azureSpringAppsTier=='Enterprise') {
   //scope: resourceGroup('my RG')
   name: '${azureSpringAppsInstanceName}/${buildServiceName}' 
   // parent: azureSpringApps
 }
 
 // /!\ should add ' existing' = if (azureSpringAppsTier=='Enterprise') {
-resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   // '{your-service-name}/default/default'  //{your-service-name}/{build-service-name}/{agenpool-name}
   name: '${azureSpringAppsInstanceName}/${buildServiceName}/${buildAgentPoolName}' // default/default as buildServiceName / agentpoolName
   properties: {
@@ -730,7 +728,7 @@ resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2
 // /!\ If you're using the tanzu-buildpacks/java-azure buildpack, we recommend that you set the BP_JVM_VERSION environment variable in the build-env argument.
 // az spring build-service builder create --help
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal#default-builder-and-tanzu-buildpacks
-resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
+resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
   name: builderName
   parent: buildService
   properties: {
