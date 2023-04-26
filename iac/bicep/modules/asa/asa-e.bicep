@@ -15,6 +15,10 @@ param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription
 @description('The location of the Azure resources.')
 param location string = resourceGroup().location
 
+// https://docs.microsoft.com/en-us/rest/api/containerregistry/registries/check-name-availability
+@description('The name of the ACR, must be UNIQUE. The name must contain only alphanumeric characters, be globally unique, and between 5 and 50 characters in length.')
+param acrName string = appName
+
 @description('The Azure Active Directory tenant ID that should be used to manage Azure Spring Apps Apps Identity.')
 param tenantId string = subscription().tenantId
 
@@ -702,16 +706,36 @@ output gatewayId string = gateway.id
 output gatewayUrl string = gateway.properties.url
 // output gatewayApiserverUrl string = gateway.properties.apiMetadataProperties.serverUrl
 
+
+resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
+  name: acrName
+}
+
+// https://github.com/Azure/azure-rest-api-specs/blob/main/specification/appplatform/resource-manager/Microsoft.AppPlatform/preview/2023-03-01-preview/examples/ContainerRegistries_CreateOrUpdate.json
+resource containerregistry 'Microsoft.AppPlatform/Spring/containerRegistries@2023-03-01-preview' = {
+  name: acrName
+  parent: azureSpringApps
+  properties: {
+    credentials : {
+      type: 'BasicAuth'
+      server: acr.properties.loginServer
+      username: acr.listCredentials().username
+      password: acr.listCredentials().passwords[0].value
+    }
+  }
+
+}
+
 // https://github.com/Azure/azure-rest-api-specs/issues/18286
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
-resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2022-12-01' existing = if (azureSpringAppsTier=='Enterprise') {
+resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2023-03-01-preview' existing = if (azureSpringAppsTier=='Enterprise') {
   //scope: resourceGroup('my RG')
   name: '${azureSpringAppsInstanceName}/${buildServiceName}' 
   // parent: azureSpringApps
 }
 
 // /!\ should add ' existing' = if (azureSpringAppsTier=='Enterprise') {
-resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   // '{your-service-name}/default/default'  //{your-service-name}/{build-service-name}/{agenpool-name}
   name: '${azureSpringAppsInstanceName}/${buildServiceName}/${buildAgentPoolName}' // default/default as buildServiceName / agentpoolName
   properties: {
@@ -728,7 +752,7 @@ resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2
 // /!\ If you're using the tanzu-buildpacks/java-azure buildpack, we recommend that you set the BP_JVM_VERSION environment variable in the build-env argument.
 // az spring build-service builder create --help
 // https://learn.microsoft.com/en-us/azure/spring-apps/how-to-enterprise-build-service?tabs=azure-portal#default-builder-and-tanzu-buildpacks
-resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2022-12-01' = if (azureSpringAppsTier=='Enterprise') {
+resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   name: builderName
   parent: buildService
   properties: {

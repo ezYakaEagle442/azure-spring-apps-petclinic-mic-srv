@@ -19,9 +19,11 @@
 // to get a unique name each time ==> param appName string = 'demo${uniqueString(resourceGroup().id, deployment().name)}'
 // uniqueString Creates a deterministic hash string based on the values provided as parameters. The returned value is 13 characters long
 param appName string = 'petcliasa${uniqueString(resourceGroup().id, subscription().id)}'
-
 param location string = resourceGroup().location
 
+// https://docs.microsoft.com/en-us/rest/api/containerregistry/registries/check-name-availability
+@description('The name of the ACR, must be UNIQUE. The name must contain only alphanumeric characters, be globally unique, and between 5 and 50 characters in length.')
+param acrName string = appName
 
 @description('The config-server Identity name, see Character limit: 3-128 Valid characters: Alphanumerics, hyphens, and underscores')
 param configServerAppIdentityName string = 'id-asa-${appName}-petclinic-config-server-dev-${location}-101'
@@ -154,6 +156,22 @@ module identities './modules/asa/identity.bicep' = {
     visitsServiceAppIdentityName: visitsServiceAppIdentityName
   }
 }
+
+
+module ACR './modules/asa/acr.bicep' = {
+  name: 'acr'
+  params: {
+    appName: appName
+    acrName: acrName
+    location: location
+  }
+}
+
+output acrId string = ACR.outputs.acrId
+output acrName string = ACR.outputs.acrName
+output acrIdentity string = ACR.outputs.acrIdentity
+output acrType string = ACR.outputs.acrType
+output acrRegistryUrl string = ACR.outputs.acrRegistryUrl
 
 module storage './modules/asa/storage.bicep' = {
   name: 'storage'

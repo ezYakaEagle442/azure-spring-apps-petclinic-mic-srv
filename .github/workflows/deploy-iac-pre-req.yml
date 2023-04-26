@@ -9,6 +9,7 @@ env:
   RG_KV: rg-iac-kv21 # RG where to deploy KV
   RG_APP: rg-iac-asa-petclinic-mic-srv # RG where to deploy the other Azure services: ASA, MySQL, etc.
   
+  ACR_NAME: acrpetcliasa
   DEPLOY_TO_VNET: false
 
   KV_NAME: kv-petcliasa21 # The name of the KV, must be UNIQUE. A vault name must be between 3-24 alphanumeric characters
@@ -175,7 +176,8 @@ jobs:
             -p azureStorageName=${{ env.AZ_STORAGE_NAME }} \
             -p blobContainerName=${{ env.AZ_BLOB_CONTAINER_NAME }} \
             -p ghRunnerSpnPrincipalId=${{ env.SPN_ID }} \
-            -p deployToVNet=${{ env.DEPLOY_TO_VNET }}
+            -p deployToVNet=${{ env.DEPLOY_TO_VNET }} \
+            -p acrName=${{ env.ACR_NAME }}
 
           vetsServicePrincipalId=$(az deployment group show --name asa-identities -g ${{ env.RG_APP }} --query properties.outputs.vetsServicePrincipalId.value -o tsv)
           visitsServicePrincipalId=$(az deployment group show --name asa-identities -g ${{ env.RG_APP }} --query properties.outputs.visitsServicePrincipalId.value -o tsv)
