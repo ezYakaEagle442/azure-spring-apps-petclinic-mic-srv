@@ -727,11 +727,25 @@ resource containerregistry 'Microsoft.AppPlatform/Spring/containerRegistries@202
 
 // https://github.com/Azure/azure-rest-api-specs/issues/18286
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
-resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2023-03-01-preview' existing = if (azureSpringAppsTier=='Enterprise') {
+// From 2023-03-01-preview API version, the default build service won't be created during provisioning a service instance by default
+resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   //scope: resourceGroup('my RG')
   name: '${azureSpringAppsInstanceName}/${buildServiceName}' 
   // parent: azureSpringApps
+  properties: {
+    containerRegistry: acr.id
+    /* read-only. Expressions cannot be assigned to read-only properties. 
+    resourceRequests: {
+      cpu: '1' // CPU resource quantity. Should be 500m or number of CPU cores.
+      memory: '1Gi' // Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi.
+    }
+    */
+  }
 }
+
+output buildServicekPackVersion string = buildService.properties.kPackVersion
+output buildServiceresourceRequestsCpu string = buildService.properties.resourceRequests.cpu
+output buildServiceresourceRequestsMemory string = buildService.properties.resourceRequests.memory
 
 // /!\ should add ' existing' = if (azureSpringAppsTier=='Enterprise') {
 resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
@@ -739,7 +753,7 @@ resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2
   name: '${azureSpringAppsInstanceName}/${buildServiceName}/${buildAgentPoolName}' // default/default as buildServiceName / agentpoolName
   properties: {
     poolSize: {
-      name: 'S1'
+      name: 'S2'
     }
   }
   dependsOn: [
