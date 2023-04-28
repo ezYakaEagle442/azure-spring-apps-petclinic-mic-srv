@@ -135,7 +135,7 @@ param buildServiceName string = 'default'
 @description('The Azure Spring Apps Java Builder name.')
 param builderName string = 'java-builder'
 
-@description('The Azure Spring Apps Java Builder version.')
+@description('The Azure Spring Apps Java Builder version. See https://network.tanzu.vmware.com/products/tanzu-base-bionic-stack#/releases/1218795/artifact_references')
 @allowed([
   'base'
   'full'
@@ -711,6 +711,7 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existin
 }
 
 // https://github.com/Azure/azure-rest-api-specs/blob/main/specification/appplatform/resource-manager/Microsoft.AppPlatform/preview/2023-03-01-preview/examples/ContainerRegistries_CreateOrUpdate.json
+/*
 resource containerregistry 'Microsoft.AppPlatform/Spring/containerRegistries@2023-03-01-preview' = {
   name: 'default' // only 'default' is supported.
   parent: azureSpringApps
@@ -722,24 +723,24 @@ resource containerregistry 'Microsoft.AppPlatform/Spring/containerRegistries@202
       password: acr.listCredentials().passwords[0].value
     }
   }
-
 }
+*/
 
 // https://github.com/Azure/azure-rest-api-specs/issues/18286
 // Feature BuildService is not supported in Sku S0: https://github.com/MicrosoftDocs/azure-docs/issues/89924
 // From 2023-03-01-preview API version, the default build service won't be created during provisioning a service instance by default
+// 'existing' should be removed once the default build service is created.
 resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
   //scope: resourceGroup('my RG')
   name: '${azureSpringAppsInstanceName}/${buildServiceName}' 
   // parent: azureSpringApps
   properties: {
-    containerRegistry: acr.id
-    /* read-only. Expressions cannot be assigned to read-only properties. 
+    // containerRegistry: acr.id can only use '--container-image' to deploy.
+    /* read-only. Expressions cannot be assigned to read-only properties. */
     resourceRequests: {
-      cpu: '1' // CPU resource quantity. Should be 500m or number of CPU cores.
-      memory: '1Gi' // Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi.
+      //cpu: '1' // CPU resource quantity. Should be 500m or number of CPU cores.
+      //memory: '2Gi' // Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi.
     }
-    */
   }
 }
 
@@ -782,7 +783,7 @@ resource builder 'Microsoft.AppPlatform/Spring/buildServices/builders@2023-03-01
     // https://docs.vmware.com/en/VMware-Tanzu-Buildpacks/services/tanzu-buildpacks/GUID-full-stack-release-notes.html
     // 
     stack: {
-      id: 'io.buildpacks.stacks.bionic' // io.buildpacks.stacks.bionic-base or tanzu-base-bionic-stack ?   https://docs.pivotal.io/tanzu-buildpacks/stacks.html , OSS from https://github.com/paketo-buildpacks/java
+      id: 'io.buildpacks.stacks.jammy' // io.buildpacks.stacks.bionic-base or tanzu-base-bionic-stack ?   https://docs.pivotal.io/tanzu-buildpacks/stacks.html , OSS from https://github.com/paketo-buildpacks/java
       version: builderVersion // base or full  | NOT 1.2.35 https://network.tanzu.vmware.com/products/tanzu-base-bionic-stack#/releases/1218795/artifact_references
     }
   }
