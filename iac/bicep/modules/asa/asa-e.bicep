@@ -736,12 +736,17 @@ resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2023-03-01-pre
   // parent: azureSpringApps
   properties: {
     // containerRegistry: acr.id can only use '--container-image' to deploy.
-    /* read-only. Expressions cannot be assigned to read-only properties. */
+    /* read-only. Expressions cannot be assigned to read-only properties. 
+    https://learn.microsoft.com/en-us/azure/templates/microsoft.appplatform/2023-03-01-preview/spring/buildservices?pivots=deployment-language-bicep#buildservicepropertiesresourcerequests
+    */
     resourceRequests: {
       //cpu: '1' // CPU resource quantity. Should be 500m or number of CPU cores.
       //memory: '2Gi' // Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi.
     }
   }
+  dependsOn: [
+    azureSpringApps
+  ]    
 }
 
 output buildServicekPackVersion string = buildService.properties.kPackVersion
