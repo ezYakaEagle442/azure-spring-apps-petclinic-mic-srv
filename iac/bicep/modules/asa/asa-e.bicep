@@ -750,8 +750,8 @@ resource buildService 'Microsoft.AppPlatform/Spring/buildServices@2023-03-01-pre
 }
 
 output buildServicekPackVersion string = buildService.properties.kPackVersion
-output buildServiceresourceRequestsCpu string = buildService.properties.resourceRequests.cpu
-output buildServiceresourceRequestsMemory string = buildService.properties.resourceRequests.memory
+//output buildServiceresourceRequestsCpu string = buildService.properties.resourceRequests.cpu
+//output buildServiceresourceRequestsMemory string = buildService.properties.resourceRequests.memory
 
 // /!\ should add ' existing' = if (azureSpringAppsTier=='Enterprise') {
 resource buildagentpool 'Microsoft.AppPlatform/Spring/buildServices/agentPools@2023-03-01-preview' = if (azureSpringAppsTier=='Enterprise') {
