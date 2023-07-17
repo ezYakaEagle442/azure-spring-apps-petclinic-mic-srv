@@ -152,7 +152,8 @@ jobs:
 
             gatewayUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayUrl.value -o tsv)
             # gatewayApiserverUrl=$(az deployment group show --name asa-e-pub -g ${{ env.RG_APP }} --query properties.outputs.gatewayApiserverUrl.value -o tsv)
-
+            gatewayUrl="https://${gatewayUrl}"
+            
             echo "gatewayUrl=" $gatewayUrl
             # echo "gatewayApiserverUrl=" $gatewayApiserverUrl
 
